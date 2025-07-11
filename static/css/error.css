@@ -1,0 +1,59 @@
+/* General styling for the error page */
+body {
+    background-color: #000000; /* Pure pitch black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Error message container */
+.error-container {
+    text-align: center;
+    padding: 30px;
+    background-color: #222222; /* Slightly darker gray for better contrast */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1); /* Softer shadow effect */
+    max-width: 500px;
+    width: 90%;
+}
+
+/* Large error code */
+.error-container h1 {
+    font-size: 6rem;
+    color: #ffffff; /* White for the error code */
+    margin-bottom: 10px;
+}
+
+/* Error message */
+.error-container h2 {
+    font-size: 2rem;
+    color: #e0e0e0; /* Light grayish-white */
+    margin-bottom: 10px;
+}
+
+/* Extra details */
+.error-container p {
+    font-size: 1.1rem;
+    color: #b0b0b0; /* Medium gray */
+    margin-bottom: 20px;
+}
+
+/* Home button styling */
+.btn-home {
+    font-size: 1rem;
+    padding: 10px 20px;
+    background-color: #555555; /* Medium gray button */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.btn-home:hover {
+    background-color: #777777; /* Lighter gray on hover */
+}

@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - ART&BAY{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="ab-checkout-container">
+    <div class="ab-header">
+        <div class="ab-logo">
+            <div class="ab-logo-circle"></div>
+            ART&BAY
+        </div>
+        <div class="ab-steps">
+            <div class="ab-step ab-active">
+                1
+                <span class="ab-step-label">Cart</span>
+            </div>
+            <div class="ab-step ab-active">
+                2
+                <span class="ab-step-label">Shipping</span>
+            </div>
+            <div class="ab-step">
+                3
+                <span class="ab-step-label">Payment</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ab-checkout-content">
+        <div class="ab-checkout-form">
+            <h2>Shipping Information</h2>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="ab-alert ab-alert-warning">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form id="abShippingForm" method="POST" action="{{ url_for('checkout.process_shipping') }}" onsubmit="return false;">
+                <div class="ab-form-group">
+                    <label for="ab-fullname">Full Name</label>
+                    <input type="text" id="ab-fullname" name="fullname" placeholder="John Doe" required>
+                </div>
+
+                <div class="ab-form-group">
+                    <label for="ab-email">Email Address</label>
+                    <input type="email" id="ab-email" name="email" placeholder="john@example.com" required>
+                </div>
+
+                <div class="ab-form-group">
+                    <label for="ab-address">Address</label>
+                    <input type="text" id="ab-address" name="address" placeholder="123 Main St" required>
+                </div>
+
+                <div class="ab-form-group">
+                    <div class="ab-form-row">
+                        <div style="flex: 1;">
+                            <label for="ab-city">City</label>
+                            <input type="text" id="ab-city" name="city" placeholder="New York" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="ab-zip">Zip Code</label>
+                            <input type="text" id="ab-zip" name="zip" placeholder="10001" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ab-form-group">
+                    <label for="ab-country">Country</label>
+                    <select id="ab-country" name="country" required>
+                        <option value="us">United States</option>
+                        <option value="ca">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="au">Australia</option>
+                    </select>
+                </div>
+
+                <div class="ab-buttons">
+                    <a href="{{ url_for('cart.view_cart') }}" class="ab-btn ab-btn-outline">Back to Cart</a>
+                    <button type="submit" class="ab-btn ab-btn-primary">Continue to Payment</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="ab-order-summary">
+            <div class="ab-summary-title">Order Summary</div>
+
+            <div class="ab-cart-items">
+                {% for item in cart_items %}
+                <div class="ab-cart-item">
+                    <div class="ab-item-image">
+                        <img src="{{ url_for('static', filename='Uploads/' ~ item.image_path) }}" alt="{{ item.title }}" loading="lazy">
+                    </div>
+                    <div class="ab-item-details">
+                        <div class="ab-item-name">{{ item.title }}</div>
+                        <div class="ab-item-price">₹{{ "%.2f"|format(item.price) }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="ab-summary-divider"></div>
+
+            <div>
+                <div class="ab-summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{{ "%.2f"|format(subtotal) }}</span>
+                </div>
+                <div class="ab-summary-row">
+                    <span>Shipping</span>
+                    <span>₹{{ "%.2f"|format(shipping) }}</span>
+                </div>
+                <div class="ab-summary-row">
+                    <span>Tax</span>
+                    <span>₹{{ "%.2f"|format(tax) }}</span>
+                </div>
+
+                <div class="ab-summary-divider"></div>
+
+                <div class="ab-summary-row ab-total">
+                    <span>Total</span>
+                    <span>₹{{ "%.2f"|format(total) }}</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="ab-payment-note">Payment Methods</div>
+                <div class="ab-payment-methods">
+                    <div class="ab-payment-method ab-active">
+                        <div class="ab-card-icon"></div>
+                    </div>
+                    <div class="ab-payment-method">
+                        <div class="ab-paypal-icon"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order confirmation modal -->
+    <div id="abOrderModal" class="ab-modal">
+        <div class="ab-modal-content">
+            <div class="ab-success-icon"></div>
+            <h2>Thank you for your order!</h2>
+            <p>Your order has been confirmed and is being processed.</p>
+            <button id="abBackToHome" class="ab-btn ab-btn-primary">Back to Home</button>
+        </div>
+    </div>
+</div>
+<div id="abOrderModal" class="ab-modal">
+    <div class="ab-modal-content">
+        <div class="ab-success-icon"></div>
+        <h2>Shipping Information Saved!</h2>
+        <p>Proceeding to payment...</p>
+        <button id="abContinueToPayment" class="ab-btn ab-btn-primary">Continue</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/checkout.js') }}" defer></script>
+{% endblock %}

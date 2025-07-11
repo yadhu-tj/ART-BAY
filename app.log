@@ -1,0 +1,27 @@
+2025-03-30 23:36:20,145 - CRITICAL - Application initialization failed: cannot import name 'init_artist_db' from 'models.artist_queries' (c:\Users\Yadhu nandhan\my_flask_project\models\artist_queries.py)
+Traceback (most recent call last):
+  File "c:\Users\Yadhu nandhan\my_flask_project\app.py", line 47, in create_app
+    from models.artist_queries import init_artist_db
+ImportError: cannot import name 'init_artist_db' from 'models.artist_queries' (c:\Users\Yadhu nandhan\my_flask_project\models\artist_queries.py)
+2025-03-30 23:39:13,073 - INFO - Database connection pool initialized successfully
+2025-03-30 23:39:13,074 - INFO - Database initialized
+2025-03-30 23:39:13,083 - CRITICAL - Application initialization failed: cannot import name 'get_all_artist_artworks' from 'models.artist_queries' (c:\Users\Yadhu nandhan\my_flask_project\models\artist_queries.py)
+Traceback (most recent call last):
+  File "c:\Users\Yadhu nandhan\my_flask_project\app.py", line 57, in create_app
+    from blueprints.dashboard_routes import dashboard_bp
+  File "c:\Users\Yadhu nandhan\my_flask_project\blueprints\dashboard_routes.py", line 4, in <module>
+    from models.artist_queries import (
+    ...<5 lines>...
+    )
+ImportError: cannot import name 'get_all_artist_artworks' from 'models.artist_queries' (c:\Users\Yadhu nandhan\my_flask_project\models\artist_queries.py)
+2025-03-30 23:49:05,223 - INFO - Database connection pool initialized successfully
+2025-03-30 23:49:05,223 - INFO - Database initialized
+2025-03-30 23:49:05,231 - CRITICAL - Application initialization failed: cannot import name 'get_all_artist_artworks' from 'models.artist_queries' (c:\Users\Yadhu nandhan\my_flask_project\models\artist_queries.py)
+Traceback (most recent call last):
+  File "c:\Users\Yadhu nandhan\my_flask_project\app.py", line 57, in create_app
+    from blueprints.dashboard_routes import dashboard_bp
+  File "c:\Users\Yadhu nandhan\my_flask_project\blueprints\dashboard_routes.py", line 4, in <module>
+    from models.artist_queries import (
+    ...<5 lines>...
+    )
+ImportError: cannot import name 'get_all_artist_artworks' from 'models.artist_queries' (c:\Users\Yadhu nandhan\my_flask_project\models\artist_queries.py)

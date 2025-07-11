@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #000;
+    color: #ddd;
+    overflow-x: hidden;
+}
+
+/* ================================
+   🔔 Message Alerter Styling
+================================= */
+#message-alerter {
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    position: fixed;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 10px;
+}
+
+.alert-message {
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    font-size: 16px;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: auto;
+}
+
+/* Success Message */
+.alert-message.success {
+    background-color: #2e7d32;
+    color: #fff;
+}
+
+/* Error Message */
+.alert-message.error {
+    background-color: #d32f2f;
+    color: #fff;
+}
+
+/* ================================
+   🪟 Modal Styling
+================================= */
+.modal {
+    z-index: 2000 !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+}
+
+.modal-dialog {
+    max-width: 500px;
+    margin: auto;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0px 0px 12px rgba(255, 165, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.modal-header {
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.modal-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.modal-header .btn-close {
+    background-color: #fff;
+    opacity: 1;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+.modal-body {
+    padding: 15px 20px;
+    width: 100%;
+}
+
+/* ================================
+   📝 Form Styling
+================================= */
+.form-floating label {
+    color: #999;
+    transition: all 0.3s ease-in-out;
+    font-size: 14px;
+    left: 15px;
+}
+
+.form-floating input:focus + label,
+.form-floating input:not(:placeholder-shown) + label {
+    top: 8px;
+    font-size: 12px;
+    color: #ff6a00;
+}
+
+.form-floating input {
+    background-color: #111;
+    border: 1px solid #444;
+    color: #fff;
+    height: 45px;
+    border-radius: 8px;
+    pointer-events: auto;
+    position: relative;
+}
+
+.form-floating input:focus {
+    border-color: #ff6a00;
+    box-shadow: 0 0 8px rgba(255, 106, 0, 0.5);
+}
+
+/* Hide native browser autofill background */
+input:-webkit-autofill {
+    box-shadow: 0 0 0 30px #111 inset !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
+/* ================================
+   🎯 Button Styling
+================================= */
+.btn-primary {
+    background: linear-gradient(135deg, #ff6a00, #ffcc00);
+    border: none;
+    width: 100%;
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out;
+    color: #000;
+}
+
+.btn-primary:hover {
+    opacity: 0.85;
+}
+
+/* ================================
+   📱 Text & Link Styling
+================================= */
+p {
+    font-size: 14px;
+}
+
+a {
+    color: #ff6a00;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ================================
+   💡 Responsive
+================================= */
+@media (max-width: 576px) {
+    .modal-content {
+        padding: 15px;
+    }
+
+    .form-floating input {
+        height: 42px;
+    }
+
+    .btn-primary {
+        padding: 10px;
+        font-size: 15px;
+    }
+}

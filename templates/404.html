@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/404.css') }}">
+  
+{% endblock %}
+{% block title %}404 - Page Not Found{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <h1>404</h1>
+    <h2>Page Not Found</h2>
+    <p>Sorry, the page you're looking for doesn't exist or has been moved.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary btn-home">Return Home</a>
+</div>
+{% endblock %}

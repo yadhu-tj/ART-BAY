@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Particle Background -->
+<ul class="particles">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
+    <section class="additional-content">
+        <div class="signup-container autoShow">
+            <h1 class="signup-title">Join as an Artist</h1>
+            <p class="signup-subtitle">Showcase your talent to the world.</p>
+            
+            <form id="artist-signup-form" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="full-name">Full Name</label>
+                    <input type="text" id="full-name" name="full_name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="portfolio">Portfolio Link</label>
+                    <input type="url" id="portfolio" name="portfolio" placeholder="e.g., https://yourportfolio.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="bio">Short Bio</label>
+                    <textarea id="bio" name="bio" placeholder="Tell us about yourself (max 200 characters)" maxlength="200" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profile-pic">Profile Picture</label>
+                    <input type="file" id="profile-pic" name="profile_pic" accept="image/*">
+                </div>
+                
+                <button type="submit" class="explore-btn signup-btn">Sign Up</button>
+            </form>
+            
+            <div id="form-message" class="alert" style="display: none;"></div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+    
+{% endblock %}

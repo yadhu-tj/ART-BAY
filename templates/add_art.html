@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Artwork - ART&BAY{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_art.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="add-art-container">
+    <h1>Add New Artwork</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <p class="flash-message">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form id="addArtForm" 
+          action="{{ url_for('artist_dashboard.add_art') }}" 
+          method="POST" 
+          enctype="multipart/form-data" 
+          data-redirect="{{ url_for('artist_dashboard.dashboard') }}">
+        <div class="form-group">
+            <label for="title">Title *</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price (₹) *</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category" class="custom-select">
+                <option value="">Select a category</option>
+                <option value="Painting">Painting</option>
+                <option value="Sculpture">Sculpture</option>
+                <option value="Photography">Photography</option>
+                <option value="Digital">Digital</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Image *</label>
+            <input type="file" id="image" name="image" accept=".png,.jpg,.jpeg" required>
+            <div id="imagePreview"></div>
+        </div>
+
+        <button type="submit" id="submitBtn">Add Artwork</button>
+    </form>
+
+    <a href="{{ url_for('artist_dashboard.dashboard') }}" class="back-btn">← Go to Dashboard</a>
+</div>
+
+<script src="{{ url_for('static', filename='js/add_art.js') }}"></script>
+{% endblock %}

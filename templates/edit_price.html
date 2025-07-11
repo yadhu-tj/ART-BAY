@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Price - ART&BAY{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_price.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="edit_price__container">
+    <div class="edit_price__header">
+        <h1 class="edit_price__title">Edit Price for "{{ art.title }}"</h1>
+        <div class="edit_price__artwork-preview">
+            <img src="{{ url_for('static', filename='Uploads/' ~ art.image_path) }}" alt="{{ art.title }}" class="edit_price__artwork-image">
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="edit_price__flash-container">
+                {% for message in messages %}
+                    <div class="edit_price__flash-message">
+                        <i class="fas fa-info-circle"></i>
+                        <span>{{ message }}</span>
+                        <button class="edit_price__flash-close">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="edit_price__form-container">
+        <form id="edit-price-form" action="{{ url_for('artist_dashboard.edit_price', art_id=art.art_id) }}" method="POST" class="edit_price__form">
+            <div class="edit_price__form-group">
+                <label for="price" class="edit_price__label">New Price (₹):</label>
+                <div class="edit_price__input-wrapper">
+                    <span class="edit_price__currency-symbol">₹</span>
+                    <input type="number" id="price" name="price" 
+                        value="{{ art.price }}" step="0.01" min="0" required
+                        class="edit_price__input">
+                </div>
+                <p class="edit_price__help-text">Enter the new price for your artwork</p>
+            </div>
+            <div class="edit_price__actions">
+                <button type="submit" class="edit_price__submit-btn">
+                    <i class="fas fa-check-circle"></i> Update Price
+                </button>
+                <a href="{{ url_for('artist_dashboard.dashboard') }}" class="edit_price__back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle flash message dismissal
+        const closeButtons = document.querySelectorAll('.edit_price__flash-close');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const flashMessage = this.closest('.edit_price__flash-message');
+                flashMessage.style.opacity = '0';
+                setTimeout(() => {
+                    flashMessage.style.display = 'none';
+                }, 300);
+            });
+        });
+
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(() => {
+            const flashMessages = document.querySelectorAll('.edit_price__flash-message');
+            flashMessages.forEach(message => {
+                message.style.opacity = '0';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}
