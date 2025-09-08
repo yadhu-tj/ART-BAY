@@ -1,0 +1,192 @@
+/* Signup OTP Styles */
+.signup-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.signup-step {
+    transition: all 0.3s ease;
+}
+
+.signup-step.active {
+    display: block;
+}
+
+.step-transition {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* OTP Input Styles */
+.otp-input-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.otp-inputs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.otp-input {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+.otp-input:focus {
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 0.2rem rgba(255, 106, 0, 0.25);
+    outline: none;
+}
+
+.otp-input.filled {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.otp-input.error {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Text Selection Styling */
+.otp-input::selection {
+    background-color: #ff6a00;
+    color: #fff;
+}
+
+.otp-input::-moz-selection {
+    background-color: #ff6a00;
+    color: #fff;
+}
+
+/* Autofill Styling */
+.otp-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #fff inset !important;
+    -webkit-text-fill-color: #333 !important;
+}
+
+.otp-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px #fff inset !important;
+    -webkit-text-fill-color: #333 !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Button Loading States */
+.btn-loading {
+    display: none;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Timer Styles */
+#otpTimer {
+    font-size: 14px;
+    color: #666;
+}
+
+#resendOtpBtn {
+    font-size: 14px;
+    color: #ff6a00;
+    text-decoration: none;
+}
+
+#resendOtpBtn:hover {
+    color: #e55a00;
+    text-decoration: underline;
+}
+
+/* Success Step */
+#successStep .fas.fa-check-circle {
+    color: #28a745;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .otp-input {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .otp-inputs {
+        gap: 8px;
+    }
+}
+
+/* Form Validation */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Loading Animation */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* User Email Display */
+#userEmail {
+    color: #ff6a00;
+    font-weight: 600;
+}
+
+/* Back Button */
+#backToSignupBtn {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+#backToSignupBtn:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+/* Go to Login Button */
+#goToLoginBtn {
+    background-color: #ff6a00;
+    border-color: #ff6a00;
+}
+
+#goToLoginBtn:hover {
+    background-color: #e55a00;
+    border-color: #e55a00;
+} 

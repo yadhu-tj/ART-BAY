@@ -5,160 +5,266 @@
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
+    <style>
+        /* Override base template styles for checkout page */
+        body {
+            background-color: #000000 !important;
+            color: #eee !important;
+        }
+        
+        .content {
+            background-color: #000000 !important;
+        }
+        
+        /* Ensure checkout page has proper spacing */
+        .checkout-container {
+            padding-top: 80px;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-<div class="ab-checkout-container">
-    <div class="ab-header">
-        <div class="ab-logo">
-            <div class="ab-logo-circle"></div>
-            ART&BAY
+<div class="checkout-container">
+    <!-- Header with Progress Steps -->
+    <div class="checkout-header">
+        <div class="logo-section">
+            <div class="logo-circle"></div>
+            <h1>ART&BAY</h1>
         </div>
-        <div class="ab-steps">
-            <div class="ab-step ab-active">
-                1
-                <span class="ab-step-label">Cart</span>
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <span class="step-label">Shipping</span>
             </div>
-            <div class="ab-step ab-active">
-                2
-                <span class="ab-step-label">Shipping</span>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <span class="step-label">Payment</span>
             </div>
-            <div class="ab-step">
-                3
-                <span class="ab-step-label">Payment</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="ab-checkout-content">
-        <div class="ab-checkout-form">
-            <h2>Shipping Information</h2>
-
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="ab-alert ab-alert-warning">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <form id="abShippingForm" method="POST" action="{{ url_for('checkout.process_shipping') }}" onsubmit="return false;">
-                <div class="ab-form-group">
-                    <label for="ab-fullname">Full Name</label>
-                    <input type="text" id="ab-fullname" name="fullname" placeholder="John Doe" required>
-                </div>
-
-                <div class="ab-form-group">
-                    <label for="ab-email">Email Address</label>
-                    <input type="email" id="ab-email" name="email" placeholder="john@example.com" required>
-                </div>
-
-                <div class="ab-form-group">
-                    <label for="ab-address">Address</label>
-                    <input type="text" id="ab-address" name="address" placeholder="123 Main St" required>
-                </div>
-
-                <div class="ab-form-group">
-                    <div class="ab-form-row">
-                        <div style="flex: 1;">
-                            <label for="ab-city">City</label>
-                            <input type="text" id="ab-city" name="city" placeholder="New York" required>
-                        </div>
-                        <div style="flex: 1;">
-                            <label for="ab-zip">Zip Code</label>
-                            <input type="text" id="ab-zip" name="zip" placeholder="10001" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ab-form-group">
-                    <label for="ab-country">Country</label>
-                    <select id="ab-country" name="country" required>
-                        <option value="us">United States</option>
-                        <option value="ca">Canada</option>
-                        <option value="uk">United Kingdom</option>
-                        <option value="au">Australia</option>
-                    </select>
-                </div>
-
-                <div class="ab-buttons">
-                    <a href="{{ url_for('cart.view_cart') }}" class="ab-btn ab-btn-outline">Back to Cart</a>
-                    <button type="submit" class="ab-btn ab-btn-primary">Continue to Payment</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="ab-order-summary">
-            <div class="ab-summary-title">Order Summary</div>
-
-            <div class="ab-cart-items">
-                {% for item in cart_items %}
-                <div class="ab-cart-item">
-                    <div class="ab-item-image">
-                        <img src="{{ url_for('static', filename='Uploads/' ~ item.image_path) }}" alt="{{ item.title }}" loading="lazy">
-                    </div>
-                    <div class="ab-item-details">
-                        <div class="ab-item-name">{{ item.title }}</div>
-                        <div class="ab-item-price">₹{{ "%.2f"|format(item.price) }}</div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="ab-summary-divider"></div>
-
-            <div>
-                <div class="ab-summary-row">
-                    <span>Subtotal</span>
-                    <span>₹{{ "%.2f"|format(subtotal) }}</span>
-                </div>
-                <div class="ab-summary-row">
-                    <span>Shipping</span>
-                    <span>₹{{ "%.2f"|format(shipping) }}</span>
-                </div>
-                <div class="ab-summary-row">
-                    <span>Tax</span>
-                    <span>₹{{ "%.2f"|format(tax) }}</span>
-                </div>
-
-                <div class="ab-summary-divider"></div>
-
-                <div class="ab-summary-row ab-total">
-                    <span>Total</span>
-                    <span>₹{{ "%.2f"|format(total) }}</span>
-                </div>
-            </div>
-
-            <div>
-                <div class="ab-payment-note">Payment Methods</div>
-                <div class="ab-payment-methods">
-                    <div class="ab-payment-method ab-active">
-                        <div class="ab-card-icon"></div>
-                    </div>
-                    <div class="ab-payment-method">
-                        <div class="ab-paypal-icon"></div>
-                    </div>
-                </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <span class="step-label">Confirmation</span>
             </div>
         </div>
     </div>
 
-    <!-- Order confirmation modal -->
-    <div id="abOrderModal" class="ab-modal">
-        <div class="ab-modal-content">
-            <div class="ab-success-icon"></div>
-            <h2>Thank you for your order!</h2>
-            <p>Your order has been confirmed and is being processed.</p>
-            <button id="abBackToHome" class="ab-btn ab-btn-primary">Back to Home</button>
+    <div class="checkout-content">
+        <!-- Step 1: Shipping Information -->
+        <div class="checkout-step active" id="shipping-step">
+            <div class="step-content">
+                <h2>Shipping Information</h2>
+                <p class="step-description">Please provide your shipping details</p>
+
+                <form id="shipping-form" class="checkout-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" value="{{ session.user.email if session.user else '' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State/Province</label>
+                            <input type="text" id="state" name="state" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="zipCode">ZIP/Postal Code</label>
+                            <input type="text" id="zipCode" name="zipCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" name="country" required>
+                                <option value="">Select Country</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                                <option value="IN">India</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{{ url_for('cart.view_cart') }}" class="btn btn-outline">Back to Cart</a>
+                        <button type="button" class="btn btn-primary" id="continue-to-payment">Continue to Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Payment Information -->
+        <div class="checkout-step" id="payment-step">
+            <div class="step-content">
+                <h2>Payment Information</h2>
+                <p class="step-description">Secure payment powered by Stripe</p>
+
+                <form id="payment-form" class="checkout-form">
+                    <div class="payment-methods">
+                        <div class="payment-method active" data-method="card">
+                            <div class="method-icon">💳</div>
+                            <span>Credit/Debit Card</span>
+                        </div>
+                        <div class="payment-method" data-method="paypal">
+                            <div class="method-icon">🅿️</div>
+                            <span>PayPal</span>
+                        </div>
+                    </div>
+
+                    <div class="card-details" id="card-details">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number</label>
+                            <div class="card-input">
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <div class="card-icons">
+                                    <span class="card-icon">💳</span>
+                                    <span class="card-icon">🔒</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate">Expiry Date</label>
+                                <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cardName">Name on Card</label>
+                            <input type="text" id="cardName" name="cardName" required>
+                        </div>
+                    </div>
+
+                    <div class="paypal-details" id="paypal-details" style="display: none;">
+                        <div class="paypal-info">
+                            <p>You will be redirected to PayPal to complete your payment securely.</p>
+                            <div class="paypal-button">
+                                <span>🅿️</span>
+                                <span>Pay with PayPal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="back-to-shipping">Back to Shipping</button>
+                        <button type="button" class="btn btn-primary" id="process-payment">Pay ₹{{ "%.2f"|format(total) }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 3: Order Confirmation -->
+        <div class="checkout-step" id="confirmation-step">
+            <div class="step-content">
+                <div class="success-animation">
+                    <div class="success-icon">✓</div>
+                    <h2>Payment Successful!</h2>
+                    <p class="order-id">Order #<span id="orderNumber">12345</span></p>
+                    <p class="confirmation-message">Thank you for your purchase! You will receive an email confirmation shortly.</p>
+                </div>
+
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div class="summary-items">
+                        {% for item in cart_items %}
+                        <div class="summary-item">
+                            <img src="{{ url_for('static', filename='uploads/' ~ item.image_path) }}" alt="{{ item.title }}">
+                            <div class="item-details">
+                                <h4>{{ item.title }}</h4>
+                                <p>₹{{ "%.2f"|format(item.price) }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('home') }}" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary Sidebar -->
+    <div class="order-summary-sidebar">
+        <h3>Order Summary</h3>
+        
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item">
+                <img src="{{ url_for('static', filename='uploads/' ~ item.image_path) }}" alt="{{ item.title }}">
+                <div class="item-info">
+                    <h4>{{ item.title }}</h4>
+                    <p class="item-price">₹{{ "%.2f"|format(item.price) }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="summary-totals">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹{{ "%.2f"|format(subtotal) }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>₹{{ "%.2f"|format(shipping) }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax</span>
+                <span>₹{{ "%.2f"|format(tax) }}</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>₹{{ "%.2f"|format(total) }}</span>
+            </div>
+        </div>
+
+        <div class="security-badge">
+            <div class="security-icon">🔒</div>
+            <div class="security-text">
+                <h4>Secure Checkout</h4>
+                <p>Your payment information is encrypted and secure</p>
+            </div>
         </div>
     </div>
 </div>
-<div id="abOrderModal" class="ab-modal">
-    <div class="ab-modal-content">
-        <div class="ab-success-icon"></div>
-        <h2>Shipping Information Saved!</h2>
-        <p>Proceeding to payment...</p>
-        <button id="abContinueToPayment" class="ab-btn ab-btn-primary">Continue</button>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Processing your payment...</p>
     </div>
 </div>
 

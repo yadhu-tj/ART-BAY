@@ -1,26 +1,78 @@
 /* ======= HEADER ======= */
+:root {
+  --header-bg: #000000;
+  --header-text: #ffffff;
+  --header-accent: #ff6a00;
+  --header-hover: #ddd;
+  --dropdown-bg: #000000;
+  --dropdown-border: #333;
+  --dropdown-hover: #222;
+  --modal-bg: #1a1a1a;
+  --modal-shadow: rgba(255, 165, 0, 0.2);
+}
+
+/* Message Alerter */
+.message-alerter {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2100;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.alert-message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.alert-message.success {
+  background-color: rgba(76, 175, 80, 0.9);
+  color: white;
+}
+
+.alert-message.error {
+  background-color: rgba(244, 67, 54, 0.9);
+  color: white;
+}
+
 header {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding: 0 5%; /* Changed from fixed pixels to percentage */
-  min-height: 80px; /* Changed from fixed height to min-height */
-  background-color: #000000;
+  gap: clamp(8px, 2vw, 15px);
+  padding: 0 clamp(10px, 5%, 50px);
+  min-height: 80px;
+  background-color: var(--header-bg);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   border-radius: 0 0 15px 15px;
   z-index: 1000;
   transition: all 0.3s ease;
-  position: relative; /* Added for proper z-index context */
+  position: relative;
 }
 
 /* ======= LOGO ======= */
+.logo {
+  display: flex;
+  align-items: center;
+}
+
 .logo img {
-  height: 50px;
-  max-height: 50px; /* Added max-height */
-  width: auto; /* Ensure proper aspect ratio */
+  height: clamp(30px, 5vw, 50px);
+  width: auto;
   transition: transform 0.3s ease;
 }
 
@@ -32,8 +84,8 @@ header {
 .user-section {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap; /* Added to ensure it wraps on smaller screens */
+  gap: clamp(10px, 3vw, 20px);
+  flex-wrap: wrap;
 }
 
 /* ======= SEARCH BAR ======= */
@@ -42,21 +94,22 @@ header {
   align-items: center;
   flex: 1;
   max-width: 300px;
-  width: 100%; /* Added to ensure it takes full width when needed */
+  width: 100%;
+  position: relative;
 }
 
 .search-bar input {
   width: 100%;
-  padding: 10px 15px;
+  padding: clamp(8px, 2vw, 10px) clamp(10px, 3vw, 15px);
   border: 2px solid #555;
   border-radius: 25px;
   background-color: #222;
-  color: #ffffff;
-  font-size: 1rem; /* Changed to relative unit */
+  color: var(--header-text);
+  font-size: clamp(0.875rem, 2vw, 1rem);
   outline: none;
   font-family: 'Playfair Display', serif;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  
+  padding-right: 40px; /* Space for the search button */
 }
 
 .search-bar input::placeholder {
@@ -64,29 +117,50 @@ header {
 }
 
 .search-bar input:focus {
-  border-color: #ff6a00;
+  border-color: var(--header-accent);
   box-shadow: 0 0 10px rgb(211, 118, 25);
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  color: var(--header-accent);
 }
 
 /* ======= USER MENU (Cart & Login) ======= */
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: clamp(8px, 2vw, 15px);
   flex-wrap: wrap;
 }
 
 .user-menu a {
-  color: #ffffff;
-  font-size: 1.375rem; /* Changed to relative unit */
+  color: var(--header-text);
+  font-size: clamp(1rem, 2.5vw, 1.375rem);
   text-decoration: none;
-  transition: transform 0.3s ease;
-  display: flex; /* Added for better alignment */
+  transition: transform 0.3s ease, color 0.3s ease;
+  display: flex;
   align-items: center;
 }
 
 .user-menu a:hover {
-  color: #ddd;
+  color: var(--header-hover);
   transform: scale(1.2);
 }
 
@@ -99,14 +173,17 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.375rem; /* Changed to relative unit */
+  font-size: clamp(1rem, 2.5vw, 1.375rem);
   color: white;
   cursor: pointer;
   transition: color 0.3s ease, transform 0.3s ease;
+  background: transparent;
+  border: none;
+  padding: 5px;
 }
 
 .user-dropdown .dropbtn:hover {
-  color: #ddd;
+  color: var(--header-hover);
   transform: scale(1.1);
 }
 
@@ -114,13 +191,13 @@ header {
   position: absolute;
   top: 110%;
   right: 0;
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--dropdown-bg);
+  color: var(--header-text);
   padding: 10px 0;
   border-radius: 10px;
   min-width: 180px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-  border: 1px solid #333;
+  border: 1px solid var(--dropdown-border);
   z-index: 1100;
   opacity: 0;
   transform: translateY(-10px);
@@ -136,10 +213,18 @@ header {
 
 /* Add touch support for mobile */
 @media (hover: none) {
-  .user-dropdown.active .dropdown-menu {
+  .user-dropdown.active .dropdown-menu,
+  .dropdown-menu.show {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+  }
+  
+  /* Prevent hover effects on touch devices */
+  .user-menu a:hover,
+  .user-dropdown .dropbtn:hover,
+  .dropdown-item:hover {
+    transform: none;
   }
 }
 
@@ -150,26 +235,56 @@ header {
   padding: 12px 20px;
   text-decoration: none;
   color: #ddd;
-  font-size: 1rem; /* Changed to relative unit */
+  font-size: clamp(0.875rem, 2vw, 1rem);
   transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-item:hover {
-  background-color: #222;
-  color: #ffffff;
+  background-color: var(--dropdown-hover);
+  color: var(--header-text);
 }
 
 .dropdown-item i {
   transition: color 0.3s ease;
+  min-width: 20px; /* Ensure icons align properly */
+  text-align: center;
 }
 
 /* ======= REGISTER AS ARTIST DROPDOWN ITEM ======= */
 .dropdown-item i.fa-paint-brush {
-  color: #ff6a00;
+  color: var(--header-accent);
 }
 
 .dropdown-item:hover i.fa-paint-brush {
-  color: #ffffff;
+  color: var(--header-text);
+}
+
+/* ======= DYNAMIC ARTIST NAVIGATION ======= */
+.artist-navigation {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 5px 0;
+  padding: 5px 0;
+  width: 100%;
+}
+
+.artist-home-link i.fa-home {
+  color: #4CAF50;
+}
+
+.artist-dashboard-link i.fa-palette {
+  color: var(--header-accent);
+}
+
+.artist-home-link:hover i.fa-home {
+  color: var(--header-text);
+}
+
+.artist-dashboard-link:hover i.fa-palette {
+  color: var(--header-text);
 }
 
 /* ======= MODAL (SIGNUP & LOGIN) ======= */
@@ -179,29 +294,70 @@ header {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%; /* Changed from 80% for more consistency */
+  width: 90%;
   max-width: 500px;
-  padding: 20px;
+  padding: 0;
   border-radius: 15px;
+  margin: 0;
 }
 
 body.modal-open {
   overflow: hidden;
+  padding-right: 0 !important; /* Prevent layout shift */
+}
+
+.modal-dialog {
+  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .modal-content {
-  background: #1a1a1a;
+  background: var(--modal-bg);
   color: #fff;
   border-radius: 15px;
   padding: 20px;
-  box-shadow: 0px 0px 12px rgba(255, 165, 0, 0.2);
+  box-shadow: 0px 0px 12px var(--modal-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  width: 100%; /* Added for better responsiveness */
-  max-height: 90vh; /* Added to prevent overflow on small screens */
-  overflow-y: auto; /* Allow scrolling for tall modals */
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: none;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+}
+
+.modal-body {
+  width: 100%;
+  padding: 15px 0;
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 15px;
+}
+
+.btn-close {
+  color: white;
+  opacity: 0.8;
+  filter: invert(1) brightness(200%);
 }
 
 /* ======= USER ICON IN NAV ======= */
@@ -212,16 +368,15 @@ body.modal-open {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #ff6a00;
+  background-color: var(--header-accent);
   color: white;
   font-weight: bold;
-  font-size: 1rem; /* Changed to relative unit */
+  font-size: clamp(0.875rem, 2vw, 1rem);
   cursor: pointer;
 }
 
 /* ======= RESPONSIVE DESIGN ======= */
 @media (max-width: 992px) {
-  /* Added new breakpoint for larger tablets */
   header {
     padding: 0 4%;
   }
@@ -243,11 +398,8 @@ body.modal-open {
 
   .logo {
     display: flex;
-    justify-content: center;
-  }
-
-  .logo img {
-    height: 40px;
+    justify-content: flex-start; /* Align logo to the left */
+    width: 100%;
   }
 
   .user-section {
@@ -264,49 +416,51 @@ body.modal-open {
     margin-top: 10px;
   }
 
-  .search-bar input {
-    width: 100%;
-    font-size: 0.9375rem;
-    padding: 10px 14px;
-  }
-
   .user-menu {
     order: 1;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    padding: 0 10px;
+    display: flex;
+    flex-direction: row; /* Ensure horizontal layout */
+    justify-content: center; /* Center the items */
     width: 100%;
-    gap: 12px;
+    gap: 0; /* Remove gap */
+  }
+
+  /* Create a wrapper for cart and dropdown */
+  .user-menu::after {
+    content: "";
+    display: block;
+    flex: 1;
+  }
+  
+  .user-menu::before {
+    content: "";
+    display: block;
+    flex: 1;
+  }
+  
+  /* Direct styling for cart icon */
+  .cart-icon {
+    margin-right: 15px; /* Space between cart and dropdown */
+    order: 1; /* First item */
+  }
+  
+  .user-dropdown {
+    order: 2; /* Second item */
   }
 
   .user-menu a,
   .user-dropdown .dropbtn {
     font-size: 1.25rem;
-    flex: 1;
     text-align: center;
     justify-content: center;
   }
 
   .dropdown-menu {
-    width: 100%;
-    left: 0;
+    width: auto;
+    min-width: 180px;
+    left: auto;
     right: 0;
-    border-radius: 0 0 10px 10px;
-  }
-
-  .dropdown-item {
-    padding: 10px 15px;
-    font-size: 0.875rem;
-  }
-
-  .modal {
-    width: 90%;
-    max-width: 400px;
-    padding: 15px;
-  }
-  
-  .modal-content {
-    padding: 15px;
+    border-radius: 10px;
   }
 }
 
@@ -316,13 +470,14 @@ body.modal-open {
     gap: 12px;
   }
 
-  .logo img {
-    height: 35px;
-  }
-
   .search-bar input {
     font-size: 0.875rem;
-    padding: 8px 12px;
+    padding: 8px 12px 8px 12px;
+  }
+
+  .search-button {
+    right: 8px;
+    font-size: 0.875rem;
   }
 
   .user-section {
@@ -344,6 +499,19 @@ body.modal-open {
     padding: 8px 12px;
     font-size: 0.875rem;
   }
+  
+  .modal-content {
+    padding: 12px;
+  }
+  
+  .modal-header,
+  .modal-footer {
+    padding: 10px 0;
+  }
+  
+  .modal-body {
+    padding: 10px 0;
+  }
 }
 
 /* Added smallest screen size breakpoint */
@@ -357,7 +525,23 @@ body.modal-open {
     font-size: 0.9375rem;
   }
   
-  .logo img {
-    height: 30px;
+  .dropdown-item {
+    padding: 8px 10px;
+    font-size: 0.8125rem;
+  }
+  
+  .modal {
+    width: 98%;
+  }
+  
+  .modal-content {
+    padding: 10px;
+  }
+}
+
+/* Fix for iOS Safari 100vh issue */
+@supports (-webkit-touch-callout: none) {
+  .modal-dialog {
+    min-height: -webkit-fill-available;
   }
 }

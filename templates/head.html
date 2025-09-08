@@ -1,4 +1,4 @@
-<div id="message-alerter"></div>
+<div id="message-alerter" class="message-alerter"></div>
 
 <header id="header-container">
     <!-- Logo on the left -->
@@ -11,16 +11,19 @@
         <!-- Search bar -->
         <div class="search-bar">
             <input type="text" placeholder="Search for art or artist">
+            <button type="button" class="search-button" aria-label="Search">
+                <i class="fas fa-search"></i>
+            </button>
         </div>
 
         <!-- Cart and user icons -->
         <div class="user-menu">
-            <a href="/cart" class="cart-icon">
+            <a href="/cart" class="cart-icon" aria-label="Shopping Cart">
                 <i class="fas fa-shopping-cart"></i>
             </a>
 
             <div class="user-dropdown dropdown">
-                <div class="dropbtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="dropbtn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User Menu">
                     {% if user %}
                         <!-- Display the first letter of the username -->
                         <div class="user-icon">
@@ -38,9 +41,17 @@
                             <i class="fas fa-user"></i> {{ user.name }}
                         </a>
                         {% if user.role == 'artist' %}
-                            <a href="{{ url_for('artist_dashboard.dashboard') }}" class="dropdown-item">
-                                <i class="fas fa-palette"></i> Go to your Artist Dashboard
-                            </a>
+                            <!-- Dynamic navigation for artists -->
+                            <div class="artist-navigation">
+                                <!-- Show "Return Home" when on artist dashboard -->
+                                <a href="{{ url_for('home') }}" class="dropdown-item artist-home-link" style="display: none;">
+                                    <i class="fas fa-home"></i> Return Home
+                                </a>
+                                <!-- Show "Artist Dashboard" when on home page -->
+                                <a href="{{ url_for('artist_dashboard.dashboard') }}" class="dropdown-item artist-dashboard-link">
+                                    <i class="fas fa-palette"></i> Artist Dashboard
+                                </a>
+                            </div>
                         {% endif %}
                         {% if user.role != 'artist' %}
                             <button class="dropdown-item register-artist">
@@ -62,10 +73,11 @@
 
 <!-- SIGNUP MODAL -->
 <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="signupModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="signupFormContainer"></div> <!-- Signup form will be loaded dynamically -->
@@ -76,10 +88,11 @@
 
 <!-- LOGIN MODAL -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loginModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="loginFormContainer"></div> <!-- Login form will be loaded dynamically -->
@@ -88,26 +101,38 @@
     </div>
 </div>
 
-<!-- REGISTER ARTIST RULES MODAL -->
 <div class="modal fade" id="registerArtistModal" tabindex="-1" aria-labelledby="registerArtistModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="registerArtistModalLabel">Artist Registration Rules</h5>
+                <h5 class="modal-title" id="registerArtistModalLabel">Become an Artist</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            
             <div class="modal-body">
-                <p>Please read the following rules and regulations before registering as an artist:</p>
+                <p>Please read the following rules before submitting your application:</p>
                 <ul>
-                    <li>You must be logged in to register as an artist.</li>
+                    <li>You must be logged in to apply.</li>
                     <li>All artwork must be original and owned by you.</li>
                     <li>Follow our community guidelines for content submission.</li>
-                    <li>Registration is final; contact support to downgrade your role.</li>
                 </ul>
+                <hr>
+
+                <form id="registerArtistForm" action="{{ url_for('artist.register') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="artistBio" class="form-label">Your Bio</label>
+                        <textarea class="form-control" id="artistBio" name="bio" rows="4" required minlength="10" placeholder="Tell us about yourself as an artist..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="artistProfilePic" class="form-label">Profile Picture (Optional)</label>
+                        <input class="form-control" type="file" id="artistProfilePic" name="profile_pic" accept="image/png, image/jpeg">
+                    </div>
+                </form>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmRegisterArtist">Agree and Register</button>
+                <button type="submit" class="btn btn-primary" form="registerArtistForm">Submit Application</button>
             </div>
         </div>
     </div>

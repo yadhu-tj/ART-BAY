@@ -151,6 +151,17 @@ input:-webkit-autofill {
     -webkit-text-fill-color: #fff !important;
 }
 
+/* Text Selection Styling for Signup Inputs */
+.form-floating input::selection {
+    background-color: #ff6a00;
+    color: #fff;
+}
+
+.form-floating input::-moz-selection {
+    background-color: #ff6a00;
+    color: #fff;
+}
+
 /* ================================
    🎯 Button Styling
 ================================= */

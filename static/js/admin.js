@@ -1,11 +1,11 @@
 /**
- * Admin Dashboard JavaScript
+ * Admin Dashboard JavaScript - Enhanced Version
  * Handles all interactive functionality for the admin dashboard
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize sidebar toggle for mobile
-    initSidebar();
+    // Initialize mobile sidebar functionality
+    initMobileSidebar();
     
     // Initialize dashboard components based on active page
     const activePage = document.querySelector('.admin-nav-link.active');
@@ -33,10 +33,202 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize global components
     initAlerts();
+    initRefreshButtons();
+    initSearchFunctionality();
+    initTooltips();
+    initModalHandling(); // Initialize modal handling
 });
 
 /**
- * Initialize sidebar toggle functionality
+ * Initialize modal handling
+ */
+function initModalHandling() {
+    // Handle modal open/close to prevent body scrolling
+    document.addEventListener('show.bs.modal', function(event) {
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+        document.body.style.paddingRight = '0';
+    });
+    
+    document.addEventListener('hidden.bs.modal', function(event) {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
+    
+    // Remove focus outline from modal elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('shown.bs.modal', function() {
+                // Remove focus outline from modal content
+                const modalContent = this.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.style.outline = 'none';
+                    modalContent.setAttribute('tabindex', '-1');
+                }
+                
+                // Remove focus outline from modal dialog
+                const modalDialog = this.querySelector('.modal-dialog');
+                if (modalDialog) {
+                    modalDialog.style.outline = 'none';
+                }
+            });
+        });
+    });
+    
+    // Prevent modal backdrop from causing scrolling
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-backdrop')) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+}
+
+/**
+ * Initialize mobile sidebar functionality
+ */
+function initMobileSidebar() {
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('admin-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    if (sidebarToggle && sidebar && overlay) {
+        // Toggle sidebar
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.classList.toggle('sidebar-open');
+        });
+        
+        // Close sidebar when clicking overlay
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+        });
+        
+        // Close sidebar when clicking on a nav link (mobile)
+        document.querySelectorAll('.admin-nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+    }
+}
+
+/**
+ * Initialize refresh buttons
+ */
+function initRefreshButtons() {
+    const refreshButtons = {
+        'refresh-users': loadUsersData,
+        'refresh-artworks': loadArtworksData,
+        'refresh-orders': loadOrdersData
+    };
+    
+    Object.keys(refreshButtons).forEach(buttonId => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('click', function() {
+                this.classList.add('loading');
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-spinner fa-spin me-1';
+                }
+                
+                refreshButtons[buttonId]().finally(() => {
+                    this.classList.remove('loading');
+                    if (icon) {
+                        icon.className = 'fas fa-sync-alt me-1';
+                    }
+                });
+            });
+        }
+    });
+}
+
+/**
+ * Initialize search functionality
+ */
+function initSearchFunctionality() {
+    const searchInputs = {
+        'admin_user_search_input': '#admin_users_table tbody tr',
+        'admin_artwork_search_input': '#admin_artworks_table tbody tr',
+        'admin_order_search_input': '#admin_orders_table tbody tr'
+    };
+    
+    Object.keys(searchInputs).forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll(searchInputs[inputId]);
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                        row.classList.add('fade-in');
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Show no results message if needed
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+                const noResultsRow = row.querySelector('.no-results');
+                if (visibleRows.length === 0 && searchTerm) {
+                    if (!noResultsRow) {
+                        const noResults = document.createElement('tr');
+                        noResults.className = 'no-results';
+                        noResults.innerHTML = `
+                            <td colspan="100%" class="text-center">
+                                <div class="py-4">
+                                    <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                                    <p class="text-muted">No results found for "${searchTerm}"</p>
+                                </div>
+                            </td>
+                        `;
+                        row.parentNode.appendChild(noResults);
+                    }
+                } else if (noResultsRow) {
+                    noResultsRow.remove();
+                }
+            });
+        }
+    });
+}
+
+/**
+ * Initialize tooltips
+ */
+function initTooltips() {
+    // Initialize Bootstrap tooltips if available
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+}
+
+/**
+ * Initialize sidebar toggle for mobile
  */
 function initSidebar() {
     const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -54,6 +246,12 @@ function initSidebar() {
  * Load dashboard data and initialize dashboard components
  */
 function loadDashboardData() {
+    // Show loading state
+    const cards = document.querySelectorAll('.admin-card');
+    cards.forEach(card => {
+        card.classList.add('loading');
+    });
+    
     // Fetch and render dashboard metrics
     fetch('/admin/api/metrics')
         .then(response => response.json())
@@ -69,6 +267,12 @@ function loadDashboardData() {
             console.error('Error loading metrics:', error);
             showAlert('Failed to load dashboard metrics', 'danger');
             renderDashboardMetrics({ total_users: 0, total_artworks: 0, pending_artists: 0 });
+        })
+        .finally(() => {
+            // Remove loading state
+            cards.forEach(card => {
+                card.classList.remove('loading');
+            });
         });
 }
 
@@ -76,9 +280,9 @@ function loadDashboardData() {
  * Render dashboard metrics to the UI
  */
 function renderDashboardMetrics(metrics) {
-    console.log('Rendering metrics:', metrics); // Debug log
+    console.log('Rendering metrics:', metrics);
     const cards = document.querySelectorAll('.admin-card');
-    console.log('Cards found, count:', cards.length); // Debug log
+    console.log('Cards found, count:', cards.length);
 
     // Retry mechanism if cards aren't found immediately
     if (cards.length === 0) {
@@ -89,7 +293,7 @@ function renderDashboardMetrics(metrics) {
             } else {
                 console.error('No .admin-card elements found after retry');
             }
-        }, 100); // Retry after 100ms
+        }, 100);
         return;
     }
 
@@ -108,12 +312,11 @@ function renderCards(cards, metrics) {
     cards.forEach(card => {
         if (!card.classList.contains('show')) {
             card.classList.add('show');
-            // Fallback to force visibility if CSS transition fails
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
         }
     });
-    console.log('Cards updated, count:', cards.length); // Debug log
+    console.log('Cards updated, count:', cards.length);
 }
 
 /**
@@ -140,6 +343,13 @@ function initUserManagement() {
             const email = this.getAttribute('data-email');
             
             if (confirm(`Are you sure you want to delete user with email: ${email}?`)) {
+                // Show loading state
+                this.classList.add('loading');
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-spinner fa-spin';
+                }
+                
                 // Send delete request
                 fetch('/admin/users/delete', {
                     method: 'POST',
@@ -165,11 +375,18 @@ function initUserManagement() {
                 .catch(error => {
                     console.error('Error:', error);
                     showAlert('An error occurred while deleting the user', 'danger');
+                })
+                .finally(() => {
+                    // Remove loading state
+                    this.classList.remove('loading');
+                    if (icon) {
+                        icon.className = 'fas fa-trash';
+                    }
                 });
             }
         });
     });
-    // Inside your initUserManagement function, add this code for the edit button functionality
+    
     // User edit button click
     document.querySelectorAll('.admin-user-edit-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -209,6 +426,12 @@ function initUserManagement() {
             
             console.log('Sending update request with data:', { email, name, role });
             
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+            submitBtn.disabled = true;
+            
             // Send update request
             fetch('/admin/users/update', {
                 method: 'POST',
@@ -245,6 +468,11 @@ function initUserManagement() {
             .catch(error => {
                 console.error('Error:', error);
                 showAlert('An error occurred while updating the user', 'danger');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             });
         });
     } else {
@@ -276,8 +504,17 @@ function loadUsersData() {
     const usersTable = document.querySelector('#admin_users_table tbody');
     if (!usersTable) return;
     
-    // Clear table
-    usersTable.innerHTML = '<tr><td colspan="4" class="text-center">Loading users...</td></tr>';
+    // Show loading state
+    usersTable.innerHTML = `
+        <tr>
+            <td colspan="4" class="text-center">
+                <div class="py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-muted mb-3"></i>
+                    <p class="text-muted">Loading users...</p>
+                </div>
+            </td>
+        </tr>
+    `;
     
     // Fetch users data
     fetch('/admin/api/users')
@@ -286,23 +523,43 @@ function loadUsersData() {
             usersTable.innerHTML = '';
             
             if (users.length === 0) {
-                usersTable.innerHTML = '<tr><td colspan="4" class="text-center">No users found</td></tr>';
+                usersTable.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <div class="py-4">
+                                <i class="fas fa-users fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No users found</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
             users.forEach(user => {
                 const row = document.createElement('tr');
+                const roleClass = user.role === 'admin' ? 'primary' : user.role === 'artist' ? 'success' : 'secondary';
                 row.innerHTML = `
                     <td>${user.email}</td>
                     <td>${user.name}</td>
-                    <td>${user.role}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary admin-user-edit-btn"
-                                data-email="${user.email}"
-                                data-name="${user.name}"
-                                data-role="${user.role}">Edit</button>
-                        <button class="btn btn-sm btn-danger admin-user-delete-btn"
-                                data-email="${user.email}">Delete</button>
+                        <span class="badge badge-${roleClass}">${user.role}</span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-primary admin-user-edit-btn"
+                                    data-email="${user.email}"
+                                    data-name="${user.name}"
+                                    data-role="${user.role}"
+                                    title="Edit User">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger admin-user-delete-btn"
+                                    data-email="${user.email}"
+                                    title="Delete User">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 usersTable.appendChild(row);
@@ -313,7 +570,16 @@ function loadUsersData() {
         })
         .catch(error => {
             console.error('Error loading users:', error);
-            usersTable.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error loading users</td></tr>';
+            usersTable.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center">
+                        <div class="py-4">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                            <p class="text-danger">Error loading users</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
         });
 }
 
@@ -373,6 +639,11 @@ function initArtworkManagement() {
             const title = document.getElementById('admin_artwork_edit_title').value;
             const price = document.getElementById('admin_artwork_edit_price').value;
             
+            // Show loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+            this.disabled = true;
+            
             // Send update request
             fetch('/admin/artworks/update', {
                 method: 'POST',
@@ -404,6 +675,11 @@ function initArtworkManagement() {
             .catch(error => {
                 console.error('Error:', error);
                 showAlert('An error occurred', 'danger');
+            })
+            .finally(() => {
+                // Restore button state
+                this.innerHTML = originalText;
+                this.disabled = false;
             });
         });
     }
@@ -413,6 +689,11 @@ function initArtworkManagement() {
     if (deleteArtworkBtn) {
         deleteArtworkBtn.addEventListener('click', function() {
             const id = document.getElementById('admin_artwork_delete_id').value;
+            
+            // Show loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+            this.disabled = true;
             
             // Send delete request
             fetch('/admin/artworks/delete', {
@@ -443,6 +724,11 @@ function initArtworkManagement() {
             .catch(error => {
                 console.error('Error:', error);
                 showAlert('An error occurred', 'danger');
+            })
+            .finally(() => {
+                // Restore button state
+                this.innerHTML = originalText;
+                this.disabled = false;
             });
         });
     }
@@ -455,8 +741,17 @@ function loadArtworksData() {
     const artworksTable = document.querySelector('#admin_artworks_table tbody');
     if (!artworksTable) return;
     
-    // Clear table
-    artworksTable.innerHTML = '<tr><td colspan="4" class="text-center">Loading artworks...</td></tr>';
+    // Show loading state
+    artworksTable.innerHTML = `
+        <tr>
+            <td colspan="4" class="text-center">
+                <div class="py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-muted mb-3"></i>
+                    <p class="text-muted">Loading artworks...</p>
+                </div>
+            </td>
+        </tr>
+    `;
     
     // Fetch artworks data
     fetch('/admin/api/artworks')
@@ -465,7 +760,16 @@ function loadArtworksData() {
             artworksTable.innerHTML = '';
             
             if (artworks.length === 0) {
-                artworksTable.innerHTML = '<tr><td colspan="4" class="text-center">No artworks found</td></tr>';
+                artworksTable.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <div class="py-4">
+                                <i class="fas fa-palette fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No artworks found</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
@@ -474,18 +778,24 @@ function loadArtworksData() {
                 row.innerHTML = `
                     <td>${artwork.title}</td>
                     <td>${artwork.artist || 'Unknown'}</td>
-                    <td>₹${parseFloat(artwork.price).toFixed(2)}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary admin-artwork-edit-btn"
-                                data-id="${artwork.art_id}" 
-                                data-title="${artwork.title}" 
-                                data-price="${artwork.price}">
-                            Edit
-                        </button>
-                        <button class="btn btn-sm btn-danger admin-artwork-delete-btn" 
-                                data-id="${artwork.art_id}">
-                            Delete
-                        </button>
+                        <span class="badge badge-success">₹${parseFloat(artwork.price).toFixed(2)}</span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-primary admin-artwork-edit-btn"
+                                    data-id="${artwork.art_id}" 
+                                    data-title="${artwork.title}" 
+                                    data-price="${artwork.price}"
+                                    title="Edit Artwork">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger admin-artwork-delete-btn" 
+                                    data-id="${artwork.art_id}"
+                                    title="Delete Artwork">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 artworksTable.appendChild(row);
@@ -496,7 +806,16 @@ function loadArtworksData() {
         })
         .catch(error => {
             console.error('Error loading artworks:', error);
-            artworksTable.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error loading artworks</td></tr>';
+            artworksTable.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center">
+                        <div class="py-4">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                            <p class="text-danger">Error loading artworks</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
         });
 }
 
@@ -522,6 +841,11 @@ function initOrderManagement() {
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('admin-order-view-btn')) {
             const id = e.target.getAttribute('data-id');
+            
+            // Show loading state
+            const originalText = e.target.innerHTML;
+            e.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            e.target.disabled = true;
             
             // Fetch order details
             fetch(`/admin/orders/details/${id}`)
@@ -560,6 +884,11 @@ function initOrderManagement() {
                 .catch(error => {
                     console.error('Error:', error);
                     showAlert('An error occurred', 'danger');
+                })
+                .finally(() => {
+                    // Restore button state
+                    e.target.innerHTML = originalText;
+                    e.target.disabled = false;
                 });
         }
     });
@@ -572,8 +901,17 @@ function loadOrdersData() {
     const ordersTable = document.querySelector('#admin_orders_table tbody');
     if (!ordersTable) return;
     
-    // Clear table
-    ordersTable.innerHTML = '<tr><td colspan="5" class="text-center">Loading orders...</td></tr>';
+    // Show loading state
+    ordersTable.innerHTML = `
+        <tr>
+            <td colspan="5" class="text-center">
+                <div class="py-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-muted mb-3"></i>
+                    <p class="text-muted">Loading orders...</p>
+                </div>
+            </td>
+        </tr>
+    `;
     
     // Fetch orders data
     fetch('/admin/api/orders')
@@ -582,21 +920,37 @@ function loadOrdersData() {
             ordersTable.innerHTML = '';
             
             if (orders.length === 0) {
-                ordersTable.innerHTML = '<tr><td colspan="5" class="text-center">No orders found</td></tr>';
+                ordersTable.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <div class="py-4">
+                                <i class="fas fa-shopping-cart fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No orders found</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
             orders.forEach(order => {
+                const statusClass = order.order_status === 'completed' ? 'success' : 
+                                  order.order_status === 'pending' ? 'warning' : 'info';
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${order.order_id}</td>
+                    <td>#${order.order_id}</td>
                     <td>${order.email}</td>
-                    <td>₹${parseFloat(order.total_price).toFixed(2)}</td>
-                    <td>${order.order_status}</td>
+                    <td>
+                        <span class="badge badge-success">₹${parseFloat(order.total_price).toFixed(2)}</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-${statusClass}">${order.order_status}</span>
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-primary admin-order-view-btn" 
-                                data-id="${order.order_id}">
-                            View
+                                data-id="${order.order_id}"
+                                title="View Details">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </td>
                 `;
@@ -608,7 +962,16 @@ function loadOrdersData() {
         })
         .catch(error => {
             console.error('Error loading orders:', error);
-            ordersTable.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading orders</td></tr>';
+            ordersTable.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <div class="py-4">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                            <p class="text-danger">Error loading orders</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
         });
 }
 
@@ -622,6 +985,12 @@ function initSettingsForm() {
             e.preventDefault();
             
             const formData = new FormData(this);
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+            submitBtn.disabled = true;
             
             fetch('/admin/settings', {
                 method: 'POST',
@@ -638,6 +1007,11 @@ function initSettingsForm() {
             .catch(error => {
                 console.error('Error:', error);
                 showAlert('An error occurred', 'danger');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             });
         });
     }
@@ -651,6 +1025,7 @@ function showAlert(message, type) {
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.role = 'alert';
     alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;

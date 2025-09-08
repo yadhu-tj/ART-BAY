@@ -15,7 +15,7 @@
             <h1 class="signup-title">Join as an Artist</h1>
             <p class="signup-subtitle">Showcase your talent to the world.</p>
             
-            <form id="artist-signup-form" method="POST" enctype="multipart/form-data">
+            <form id="artist-signup-form" action="{{ url_for('artist.register') }}" method="POST">
                 <div class="form-group">
                     <label for="full-name">Full Name</label>
                     <input type="text" id="full-name" name="full_name" placeholder="Enter your full name" required>

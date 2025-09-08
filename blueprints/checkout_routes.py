@@ -1,10 +1,9 @@
 import logging
-from decimal import Decimal
 import json
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
-from mysql.connector import Error
-from models.checkout_queries import MySQLShippingInfo
-from models.cart_queries import get_cart_items
+from decimal import Decimal
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, current_app
+from models.cart_queries import get_cart_items, clear_cart
+from models.checkout_queries import add_shipping_info, create_order_and_get_id, add_order_items
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -87,74 +86,172 @@ def process_shipping():
             logger.info("No user in session, redirecting to login")
             return jsonify({"error": "Login required to process shipping"}), 401
 
-        fullname = request.form.get('fullname')
-        email = session['user']['email']  # Use session email for consistency
-        address = request.form.get('address')
-        city = request.form.get('city')
-        zipcode = request.form.get('zip')
-        country = request.form.get('country')
+        # Get form data
+        shipping_data = {
+            'firstName': request.form.get('firstName'),
+            'lastName': request.form.get('lastName'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone'),
+            'address': request.form.get('address'),
+            'city': request.form.get('city'),
+            'state': request.form.get('state'),
+            'zipCode': request.form.get('zipCode'),
+            'country': request.form.get('country')
+        }
 
-        logger.info(f"Received shipping form: fullname={fullname}, email={email}, address={address}, city={city}, zipcode={zipcode}, country={country}")
+        logger.info(f"Received shipping form: {shipping_data}")
 
-        if not all([fullname, address, city, zipcode, country]):
-            logger.info("Missing required fields")
+        # Validate required fields
+        required_fields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode', 'country']
+        missing_fields = [field for field in required_fields if not shipping_data.get(field)]
+        
+        if missing_fields:
+            logger.info(f"Missing required fields: {missing_fields}")
             return jsonify({"error": "Please fill in all required fields"}), 400
 
-        db_config = current_app.config['DB_CONFIG']
-        shipping_db = MySQLShippingInfo(
-            host=db_config['host'],
-            database=db_config['database'],
-            user=db_config['user'],
-            password=db_config['password']
-        )
+        # Store shipping data in session for payment step
+        session['shipping_data'] = shipping_data
 
-        if not shipping_db.connect():
-            logger.error("Database connection failed")
-            return jsonify({"error": "Database connection failed"}), 500
-
-        # Verify email exists in users table
-        conn = current_app.db_pool.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT email FROM users WHERE email = %s", (email,))
-        user_exists = cursor.fetchone()
-        cursor.close()
-        conn.close()
-
-        if not user_exists:
-            logger.error(f"Email {email} not found in users table")
-            return jsonify({"error": "User email not registered"}), 400
-
-        shipping_id = shipping_db.add_shipping_info(
-            email=email,
-            name=fullname,
-            phone="N/A",
-            address=address,
-            city=city,
-            zipcode=zipcode,
-            country=country
-        )
-
-        shipping_db.close()
-
-        if shipping_id:
-            logger.info(f"Shipping info saved, ID: {shipping_id}")
-            session['shipping_id'] = shipping_id
-            # Clear cart
-            conn = current_app.db_pool.get_connection()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM cart WHERE email = %s", (email,))
-            conn.commit()
-            cursor.close()
-            conn.close()
-            session.pop('shipping_id', None)
-            return jsonify({"message": "Shipping information saved successfully"}), 200
-        else:
-            logger.error("Failed to save shipping info")
-            return jsonify({"error": "Failed to save shipping information"}), 500
+        return jsonify({
+            "status": "success",
+            "message": "Shipping information saved successfully"
+        }), 200
 
     except Exception as e:
-        logger.error(f"🔥 Error processing shipping info for {email}: {e}")
+        logger.error(f"🔥 Error processing shipping info: {e}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+# Process payment (fake payment system)
+@checkout_bp.route('/process_payment', methods=['POST'])
+def process_payment():
+    try:
+        if 'user' not in session:
+            return jsonify({"error": "Login required to process payment"}), 401
+
+        if 'shipping_data' not in session:
+            return jsonify({"error": "Shipping information required"}), 400
+
+        # Get payment data
+        payment_data = {
+            'method': request.form.get('paymentMethod'),
+            'cardNumber': request.form.get('cardNumber', '').replace(' ', ''),
+            'expiryDate': request.form.get('expiryDate'),
+            'cvv': request.form.get('cvv'),
+            'cardName': request.form.get('cardName')
+        }
+
+        logger.info(f"Processing payment for {session['user']['email']}")
+        logger.info(f"Payment data received: {payment_data}")
+        logger.info(f"Session shipping data: {session.get('shipping_data')}")
+        logger.info(f"Session cart: {session.get('cart')}")
+
+        # Validate payment data
+        if not payment_data['method']:
+            logger.error("Payment method not provided")
+            return jsonify({"error": "Payment method is required"}), 400
+
+        if payment_data['method'] == 'card':
+            if not payment_data['cardNumber'] or not payment_data['expiryDate'] or not payment_data['cvv'] or not payment_data['cardName']:
+                logger.error("Missing required card payment fields")
+                return jsonify({"error": "Please fill in all required card payment fields"}), 400
+
+        # Simulate payment processing
+        # In a real application, this would integrate with a payment gateway
+        import time
+        time.sleep(2)  # Simulate processing time
+
+        # Simulate 90% success rate
+        import random
+        if random.random() > 0.1:  # 90% success rate
+            # Create order in database
+            try:
+                # Get cart items
+                cart_items = session.get('cart') or get_cart_items(session['user']['email'])
+                
+                if not cart_items:
+                    return jsonify({"error": "No items in cart"}), 400
+
+                # Calculate total
+                subtotal = sum(Decimal(str(item['price'])) * item['quantity'] for item in cart_items)
+                shipping = Decimal('50.00')
+                tax = (subtotal * Decimal('0.1')).quantize(Decimal('0.01'))
+                total = subtotal + shipping + tax
+
+                # Create order
+                order_id = create_order_and_get_id(
+                    session['user']['email'],
+                    float(total)
+                )
+
+                if order_id:
+                    # Add order items
+                    add_order_items(order_id, cart_items)
+
+                    # Clear cart
+                    clear_result = clear_cart(session['user']['email'])
+                    if 'error' in clear_result:
+                        logger.error(f"Failed to clear cart: {clear_result['error']}")
+                    else:
+                        logger.info(f"Cart cleared successfully for {session['user']['email']}")
+                    
+                    session.pop('cart', None)
+                    session.pop('shipping_data', None)
+
+                    logger.info(f"Order created successfully: {order_id}")
+                    
+                    return jsonify({
+                        "status": "success",
+                        "message": "Payment processed successfully!",
+                        "order_id": order_id
+                    }), 200
+                else:
+                    return jsonify({"error": "Failed to create order"}), 500
+
+            except Exception as e:
+                logger.error(f"Error creating order: {e}")
+                return jsonify({"error": "Failed to process order"}), 500
+
+        else:
+            # Simulate payment failure
+            return jsonify({"error": "Payment failed. Please try again."}), 400
+
+    except Exception as e:
+        logger.error(f"Payment processing error: {e}")
+        return jsonify({"error": "An error occurred during payment processing"}), 500
+
+# Get order confirmation
+@checkout_bp.route('/order_confirmation/<int:order_id>')
+def order_confirmation(order_id):
+    if 'user' not in session:
+        return redirect(url_for('auth.login'))
+
+    try:
+        # In a real application, you would fetch order details from database
+        # For now, we'll just show a success page
+        return render_template('order_confirmation.html', order_id=order_id)
+    except Exception as e:
+        logger.error(f"Error showing order confirmation: {e}")
+        flash("Error loading order confirmation.")
+        return redirect(url_for('home'))
+
+# Debug route to check cart status
+@checkout_bp.route('/debug/cart_status')
+def debug_cart_status():
+    if 'user' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    try:
+        cart_items = get_cart_items(session['user']['email'])
+        return jsonify({
+            "user_email": session['user']['email'],
+            "cart_items": cart_items,
+            "cart_count": len(cart_items) if not isinstance(cart_items, dict) else 0,
+            "session_cart": session.get('cart'),
+            "session_shipping": session.get('shipping_data')
+        })
+    except Exception as e:
+        logger.error(f"Error checking cart status: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # Register the Blueprint
 def init_app(app):

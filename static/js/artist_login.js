@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // New functionality integrated from the other code
         try {
-            const response = await fetch(`${BASE_URL}/artist/artist-signup`, {
+            const response = await fetch(form.action, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'

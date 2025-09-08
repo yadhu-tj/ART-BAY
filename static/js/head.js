@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded!");
 
+    // Mobile Detection
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+
     // Utility Functions
     function removeAllBackdrops() {
         document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
@@ -81,29 +84,102 @@ document.addEventListener("DOMContentLoaded", function () {
             closeAllModals();
 
             try {
+                // Show loading indicator
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.className = 'text-center p-3';
+                loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                container.innerHTML = '';
+                container.appendChild(loadingIndicator);
+
                 const response = await fetch(endpoint);
                 if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
 
                 const html = await response.text();
+                console.log('Loaded HTML content:', html.substring(0, 200) + '...'); // Log first 200 chars
                 container.innerHTML = html;
 
                 const modal = document.getElementById(modalId);
                 const modalContent = modal.querySelector('.modal-content');
                 if (modalContent && container.firstChild) {
-                    modalContent.innerHTML = '<div class="text-center p-3"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-                    setTimeout(() => {
-                        modalContent.innerHTML = '';
-                        modalContent.appendChild(container.firstChild);
-                    }, 300); // simulate loading time
+                    modalContent.innerHTML = '';
+                    modalContent.appendChild(container.firstChild);
                 }
 
-                new bootstrap.Modal(modal).show();
+                const modalInstance = new bootstrap.Modal(modal);
+                modalInstance.show();
                 console.log(`Modal ${modalId} loaded successfully`);
+                
+                // Initialize OTP functionality if login modal is loaded
+                if (modalId === 'loginModal') {
+                    setTimeout(() => {
+                        console.log('Checking for OTP elements in modal...');
+                        // Search within the modal content specifically
+                        const modalContent = document.querySelector('#loginModal .modal-content');
+                        const emailStep = modalContent ? modalContent.querySelector('#emailStep') : null;
+                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
+                        const passwordStep = modalContent ? modalContent.querySelector('#passwordStep') : null;
+                        console.log('emailStep found:', !!emailStep);
+                        console.log('otpStep found:', !!otpStep);
+                        console.log('passwordStep found:', !!passwordStep);
+                        
+                        if (typeof initializeOTPLogin === 'function') {
+                            initializeOTPLogin();
+                        }
+                    }, 500); // Increased delay to ensure DOM is ready
+                }
+                
+                // Initialize OTP functionality if signup modal is loaded
+                if (modalId === 'signupModal') {
+                    setTimeout(() => {
+                        console.log('Checking for signup OTP elements in modal...');
+                        // Search within the modal content specifically
+                        const modalContent = document.querySelector('#signupModal .modal-content');
+                        console.log('Modal content found:', !!modalContent);
+                        if (modalContent) {
+                            console.log('Modal content HTML:', modalContent.innerHTML.substring(0, 300) + '...');
+                        }
+                        const userInfoStep = modalContent ? modalContent.querySelector('#userInfoStep') : null;
+                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
+                        const successStep = modalContent ? modalContent.querySelector('#successStep') : null;
+                        console.log('userInfoStep found:', !!userInfoStep);
+                        console.log('otpStep found:', !!otpStep);
+                        console.log('successStep found:', !!successStep);
+                        
+                        if (typeof initializeOTPSignup === 'function') {
+                            console.log('Calling initializeOTPSignup...');
+                            initializeOTPSignup();
+                        } else {
+                            console.log('❌ initializeOTPSignup function not found!');
+                        }
+                    }, 500); // Increased delay to ensure DOM is ready
+                }
             } catch (error) {
                 console.error(`Error loading ${endpoint}:`, error);
                 showMessage(`Failed to load ${endpoint}`, "error");
             }
         });
+    }
+
+    // Mobile dropdown toggle
+    if (isMobile) {
+        const dropdownToggle = document.querySelector('.user-dropdown .dropbtn');
+        if (dropdownToggle) {
+            dropdownToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const dropdown = this.closest('.user-dropdown');
+                dropdown.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.user-dropdown')) {
+                    document.querySelectorAll('.user-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                    });
+                }
+            });
+        }
     }
 
     // Event Listeners
@@ -128,8 +204,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const switchModal = async (url, containerId, modalId) => {
             closeAllModals();
             try {
-                const html = await (await fetch(url)).text();
+                // Show loading indicator
                 const container = document.getElementById(containerId);
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.className = 'text-center p-3';
+                loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                container.innerHTML = '';
+                container.appendChild(loadingIndicator);
+
+                const html = await (await fetch(url)).text();
                 container.innerHTML = html;
                 const modal = document.getElementById(modalId);
                 const modalContent = modal.querySelector('.modal-content');
@@ -138,6 +221,51 @@ document.addEventListener("DOMContentLoaded", function () {
                     modalContent.appendChild(container.firstChild);
                 }
                 new bootstrap.Modal(modal).show();
+                
+                // Initialize OTP functionality if login modal is loaded
+                if (modalId === 'loginModal') {
+                    setTimeout(() => {
+                        console.log('Checking for OTP elements in switchModal...');
+                        // Search within the modal content specifically
+                        const modalContent = document.querySelector('#loginModal .modal-content');
+                        const emailStep = modalContent ? modalContent.querySelector('#emailStep') : null;
+                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
+                        const passwordStep = modalContent ? modalContent.querySelector('#passwordStep') : null;
+                        console.log('emailStep found:', !!emailStep);
+                        console.log('otpStep found:', !!otpStep);
+                        console.log('passwordStep found:', !!passwordStep);
+                        
+                        if (typeof initializeOTPLogin === 'function') {
+                            initializeOTPLogin();
+                        }
+                    }, 500); // Increased delay to ensure DOM is ready
+                }
+                
+                // Initialize OTP functionality if signup modal is loaded
+                if (modalId === 'signupModal') {
+                    setTimeout(() => {
+                        console.log('Checking for signup OTP elements in switchModal...');
+                        // Search within the modal content specifically
+                        const modalContent = document.querySelector('#signupModal .modal-content');
+                        console.log('Modal content found:', !!modalContent);
+                        if (modalContent) {
+                            console.log('Modal content HTML:', modalContent.innerHTML.substring(0, 300) + '...');
+                        }
+                        const userInfoStep = modalContent ? modalContent.querySelector('#userInfoStep') : null;
+                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
+                        const successStep = modalContent ? modalContent.querySelector('#successStep') : null;
+                        console.log('userInfoStep found:', !!userInfoStep);
+                        console.log('otpStep found:', !!otpStep);
+                        console.log('successStep found:', !!successStep);
+                        
+                        if (typeof initializeOTPSignup === 'function') {
+                            console.log('Calling initializeOTPSignup from switchModal...');
+                            initializeOTPSignup();
+                        } else {
+                            console.log('❌ initializeOTPSignup function not found in switchModal!');
+                        }
+                    }, 500); // Increased delay to ensure DOM is ready
+                }
             } catch (error) {
                 console.error("Error switching modals:", error);
                 showMessage("Modal load error", "error");
@@ -158,38 +286,83 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Register Artist
-    const confirmRegisterArtistBtn = document.getElementById("confirmRegisterArtist");
-    if (confirmRegisterArtistBtn) {
-        confirmRegisterArtistBtn.addEventListener("click", async () => {
+    document.addEventListener('submit', async (e) => {
+        if (e.target.matches('#registerArtistForm')) {
+            e.preventDefault(); // Prevent default form submission
+            console.log('Artist form submission triggered');
+
+            const artistForm = e.target;
+            const submitBtn = document.querySelector('button[type="submit"][form="registerArtistForm"]');
+            
+            if (!artistForm || !submitBtn) {
+                console.error('Artist form or submit button not found!');
+                showMessage('Form error: Please try again.', 'error');
+                return;
+            }
+
+            // Client-side validation for bio
+            const bio = artistForm.querySelector('#artistBio').value.trim();
+            if (bio.length < 10) {
+                console.log('Validation failed: Bio too short');
+                showMessage('Please enter a bio with at least 10 characters.', 'error');
+                return;
+            }
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            console.log('Submitting form to:', artistForm.action);
+
             try {
-                const response = await fetch("/auth/register-artist", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                console.log('Sending fetch request to:', artistForm.action);
+                const response = await fetch(artistForm.action, {
+                    method: 'POST',
+                    body: new FormData(artistForm),
                     credentials: 'include'
                 });
 
-                const text = await response.text();
-                const data = JSON.parse(text);
+                console.log('Fetch response status:', response.status);
+                const data = await response.json();
+                console.log('Server response:', data);
 
-                if (data.status === "success" && data.redirect) {
-                    showMessage(data.message || "Successfully registered as an artist!");
-                    bootstrap.Modal.getInstance(document.getElementById("registerArtistModal")).hide();
-                    window.location.href = data.redirect;
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('registerArtistModal'));
+                    if (modal) {
+                        console.log('Closing modal');
+                        modal.hide();
+                    }
                 } else {
-                    showMessage(data.message || "Failed to register as an artist", "error");
-                    bootstrap.Modal.getInstance(document.getElementById("registerArtistModal")).hide();
-                    if (data.redirect) window.location.href = data.redirect;
+                    console.log('Server error:', data.error);
+                    showMessage(data.error || 'Application failed. Please try again.', 'error');
                 }
             } catch (error) {
-                console.error("Artist registration error:", error);
-                showMessage("An error occurred while registering: " + error.message, "error");
-                bootstrap.Modal.getInstance(document.getElementById("registerArtistModal")).hide();
-                if (error.message.includes("Unexpected response format")) {
-                    window.location.href = "/auth/login";
-                }
+                console.error('Artist registration error:', error);
+                showMessage('An error occurred during your application. Please try again.', 'error');
+            } finally {
+                // Re-enable submit button
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Submit Application';
+                    console.log('Submit button re-enabled');
+                }, 2000);
             }
-        });
-    }
+        }
+    });
+
+    // Ensure modal is ready before form interactions
+    document.addEventListener('shown.bs.modal', (e) => {
+        if (e.target.id === 'registerArtistModal') {
+            console.log('Artist modal shown');
+            const artistForm = document.getElementById('registerArtistForm');
+            const submitBtn = document.querySelector('button[type="submit"][form="registerArtistForm"]');
+            if (!artistForm || !submitBtn) {
+                console.error('Artist form or submit button not found in modal!');
+            } else {
+                console.log('Artist form and submit button found in modal');
+            }
+        }
+    });
 
     // Form Submission
     document.body.addEventListener("submit", function (event) {
@@ -274,6 +447,55 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Dynamic Artist Navigation
+    function updateArtistNavigation() {
+        const artistHomeLink = document.querySelector('.artist-home-link');
+        const artistDashboardLink = document.querySelector('.artist-dashboard-link');
+        
+        if (!artistHomeLink || !artistDashboardLink) return;
+        
+        // Get current page path
+        const currentPath = window.location.pathname;
+        
+        // Check if we're on the artist dashboard
+        const isOnDashboard = currentPath.includes('/artist-dashboard') || 
+                             currentPath.includes('/dashboard') ||
+                             document.querySelector('.artist_dashboard__container');
+        
+        // Check if we're on the home page
+        const isOnHome = currentPath === '/' || 
+                        currentPath === '/home' ||
+                        document.querySelector('.content-wrapper');
+        
+        if (isOnDashboard) {
+            // Show "Return Home" link, hide "Artist Dashboard" link
+            artistHomeLink.style.display = 'block';
+            artistDashboardLink.style.display = 'none';
+        } else if (isOnHome) {
+            // Show "Artist Dashboard" link, hide "Return Home" link
+            artistHomeLink.style.display = 'none';
+            artistDashboardLink.style.display = 'block';
+        } else {
+            // On other pages, show both options
+            artistHomeLink.style.display = 'block';
+            artistDashboardLink.style.display = 'block';
+        }
+    }
+
+    // Initialize dynamic navigation
+    updateArtistNavigation();
+    
+    // Update navigation when dropdown is opened
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('.dropbtn') || event.target.closest('.dropdown-toggle')) {
+            setTimeout(updateArtistNavigation, 100);
+        }
+    });
+    
+    // Update navigation on page load and navigation
+    window.addEventListener('load', updateArtistNavigation);
+    window.addEventListener('popstate', updateArtistNavigation);
+    
     // Artist Dashboard Navigation
     document.querySelectorAll('a[href="/artist/dashboard"]').forEach(link => {
         link.addEventListener("click", async function (event) {
@@ -303,5 +525,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    console.log("All scripts loaded successfully!");
+    // Handle viewport height issues on mobile
+    function setVhProperty() {
+        // First we get the viewport height and we multiply it by 1% to get a value for a vh unit
+        let vh = window.innerHeight * 0.01;
+        // Then we set the value in the --vh custom property to the root of the document
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    // Set the --vh value initially and on resize
+    setVhProperty();
+    window.addEventListener('resize', setVhProperty);
 });

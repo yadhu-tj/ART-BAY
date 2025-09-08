@@ -10,10 +10,17 @@
 {% block content %}
 <div class="artist_dashboard__container">
     <div class="artist_dashboard__header">
-        <h1 class="artist_dashboard__title">My Art Dashboard</h1>
-        <a href="{{ url_for('artist_dashboard.add_art') }}" class="artist_dashboard__add-btn">
-            <i class="fas fa-plus-circle"></i> Add New Art
-        </a>
+        <div class="artist_dashboard__header-left">
+            <h1 class="artist_dashboard__title">My Art Dashboard</h1>
+        </div>
+        <div class="artist_dashboard__header-right">
+            <a href="{{ url_for('home') }}" class="artist_dashboard__home-btn">
+                <i class="fas fa-home"></i> Return Home
+            </a>
+            <a href="{{ url_for('artist_dashboard.add_art') }}" class="artist_dashboard__add-btn">
+                <i class="fas fa-plus-circle"></i> Add New Art
+            </a>
+        </div>
     </div>
 
     {% with messages = get_flashed_messages() %}
