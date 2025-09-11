@@ -1,6 +1,9 @@
 import logging
 import sys
+import os
 from flask import Flask, render_template, session
+
+# Import the Config class
 from config.config import Config
 from models.database import init_db_pool, close_db_connection
 
@@ -14,7 +17,24 @@ logging.basicConfig(
 def create_app():
     """Initialize and configure the Flask application."""
     app = Flask(__name__)
+
+    # --- THIS IS THE KEY CHANGE ---
+    # Load the default config first
     app.config.from_object(Config)
+    # Then, explicitly override it with environment variables if they exist.
+    # This makes it robust for both local and server environments.
+    app.config.update(
+        SECRET_KEY=os.getenv('SECRET_KEY'),
+        DB_CONFIG={
+            'host': os.getenv('DB_HOST'),
+            'user': os.getenv('DB_USER'),
+            'password': os.getenv('DB_PASSWORD'),
+            'database': os.getenv('DB_NAME')
+        },
+        SENDER_EMAIL=os.getenv('SENDER_EMAIL'),
+        SENDER_PASSWORD=os.getenv('SENDER_PASSWORD')
+    )
+    # --- END OF CHANGE ---
 
     # Initialize and register database functions
     init_db_pool(app)
@@ -37,12 +57,10 @@ def create_app():
     app.register_blueprint(checkout_bp, url_prefix='/checkout')
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
-    # Context Processor to make user available in all templates
     @app.context_processor
     def inject_user():
         return {'user': session.get('user')}
 
-    # Core Routes
     @app.route('/')
     def home():
         return render_template('index.html')
@@ -53,7 +71,6 @@ def create_app():
         artworks = get_all_artworks()
         return render_template('gallery.html', artworks=artworks)
 
-    # Error Handlers
     @app.errorhandler(404)
     def not_found_error(error):
         return render_template('404.html'), 404
