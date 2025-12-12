@@ -1,0 +1,196 @@
+.add-art-container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 25px rgba(255, 106, 0, 0.1);
+    color: #f0f0f0;
+}
+
+h1 {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 28px;
+    margin-bottom: 25px;
+    text-shadow: 0 0 6px rgba(255, 106, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #ccc;
+    font-size: 15px;
+}
+
+.form-group input,
+.form-group textarea,
+.custom-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.custom-select:focus {
+    outline: none;
+    border-color: #ff6a00;
+    box-shadow: 0 0 8px rgba(255, 106, 0, 0.3);
+}
+
+.form-group textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+    background: none;
+    color: #ccc;
+    border: none;
+}
+
+.custom-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #ffddb3; /* Light orange text */
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ff944d' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    transition: border-color 0.2s ease;
+}
+
+/* Style dropdown options */
+.custom-select option {
+    background-color: #1a1a1a;
+    color: #ffddb3;
+}
+
+
+#imagePreview {
+    margin-top: 12px;
+    text-align: center;
+}
+
+#imagePreview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 106, 0, 0.1);
+}
+
+button[type="submit"] {
+    background: linear-gradient(135deg, #ff6a00, #ffaa00);
+    color: #000;
+    border: none;
+    padding: 14px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 17px;
+    font-weight: bold;
+    font-family: 'Cinzel', serif;
+    box-shadow: 0 6px 16px rgba(255, 106, 0, 0.4);
+    transition: all 0.25s ease;
+}
+
+button[type="submit"]:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(255, 106, 0, 0.6);
+}
+
+button[type="submit"]:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.back-btn {
+    display: block;
+    text-align: center;
+    margin-top: 22px;
+    color: #ff944d;
+    font-size: 15px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+    color: #ffaa00;
+}
+
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    background: rgba(40, 167, 69, 0.1);
+    color: #a7e6b0;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 6px 0;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    font-size: 15px;
+}
+
+.error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.3);
+}
+
+.error-message {
+    color: #ff6a6a;
+    font-size: 14px;
+    margin-top: 5px;
+}
+.toast-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #1f1f1f;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+    font-weight: bold;
+}
+
+.toast-message.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-message.success {
+    background-color: #28a745;
+}
+
+.toast-message.error {
+    background-color: #dc3545;
+}

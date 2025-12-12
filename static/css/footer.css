@@ -1,0 +1,134 @@
+
+body {
+  margin: 0;
+  font-family: 'Playfair Display', serif; /* Switch to a premium font for consistency */
+  background-color: #010101; /* Matches your main page background */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1; /* Makes sure the content area takes up the remaining space */
+  padding: 20px;
+  text-align: center;
+}
+
+/* Premium Black-and-White Classic Footer */
+.footer {
+  background-color: #1a1a1a; /* Deep black for elegance */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); /* Subtle upward shadow for depth */
+  position: relative;
+  width: 100%;
+  padding: 40px 20px; /* Increased padding for a more spacious, premium feel */
+  text-align: center;
+  color: #ffffff; /* Crisp white text */
+  margin-top: auto; /* Ensures footer stays at the bottom */
+  border-top: 1px solid #333; /* Subtle gray border for classic separation */
+}
+
+.footer .footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 30px; /* Added gap for better spacing */
+}
+
+.footer .footer-bottom {
+  margin-top: 30px;
+  border-top: 1px solid #444; /* Slightly darker gray line */
+  padding-top: 15px;
+  font-size: 14px; /* Slightly larger for readability */
+  color: #ccc; /* Light gray for a softer look */
+}
+
+.footer .footer-section {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px 0;
+}
+
+.footer .footer-section h4 {
+  font-size: 22px; /* Larger for a bold, elegant header */
+  margin-bottom: 20px;
+  color: #ffffff; /* White for contrast */
+  font-weight: 600;
+  text-transform: uppercase; /* Classic uppercase for sophistication */
+  letter-spacing: 1px; /* Adds a refined touch */
+  border-bottom: 2px solid #666; /* Subtle underline for section titles */
+  padding-bottom: 5px;
+}
+
+.footer .footer-section p,
+.footer .footer-section a {
+  color: #ddd; /* Light gray for text */
+  text-decoration: none;
+  font-size: 16px; /* Slightly larger for elegance */
+  line-height: 1.8; /* More spacious line height */
+}
+
+.footer .footer-section a:hover {
+  color: #ffffff; /* White on hover for a clean transition */
+  text-decoration: underline; /* Classic underline effect */
+}
+
+.footer .social-icons {
+  margin-top: 15px;
+}
+
+.footer .social-icons a {
+  display: inline-block;
+  margin: 0 15px;
+  font-size: 24px; /* Larger icons for a premium feel */
+  color: #bbb; /* Light gray for icons */
+  transition: color 0.3s ease, transform 0.3s ease; /* Smooth transition with scale */
+}
+
+.footer .social-icons a:hover {
+  color: #ffffff; /* White on hover */
+  transform: scale(1.2); /* Slight zoom for interactivity */
+}.fa-facebook-f:hover {
+  color: #1877F2;
+  transform: scale(1.2);
+  transition: color 0.1s ease, transform 0.3s ease;
+ 
+}
+.fa-twitter:hover {
+  color: #1DA1F2;
+  transform: scale(1.2);
+  transition: color 0.1s ease, transform 0.3s ease;
+}
+.fa-instagram:hover {
+  color: #E4405F;
+  transform: scale(1.2);
+  transition: color 0.1s ease, transform 0.3s ease;
+}
+/* Responsive design */
+@media (max-width: 768px) {
+  .footer .footer-content {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px; /* Adjusted gap for mobile */
+  }
+
+  .footer .footer-section {
+      text-align: center;
+      margin: 15px 0;
+  }
+
+  .footer .footer-section h4 {
+      font-size: 20px; /* Slightly smaller on mobile */
+  }
+
+  .footer .footer-section p,
+  .footer .footer-section a {
+      font-size: 14px; /* Smaller text on mobile */
+  }
+
+  .footer .social-icons a {
+      font-size: 20px; /* Slightly smaller icons on mobile */
+      margin: 0 10px;
+  }
+}

@@ -1,0 +1,47 @@
+body {
+    background-color: #000000; /* Pure pitch black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.error-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #333333; /* Dark gray for the container */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-top: 120px; /* Offset for header padding of 100px + extra buffer */
+}
+
+.error-container h1 {
+    font-size: 6rem;
+    color: #ffffff; /* White for the "404" */
+    margin-bottom: 0;
+}
+
+.error-container h2 {
+    font-size: 2rem;
+    color: #e0e0e0; /* Light grayish-white for the subtitle */
+}
+
+.error-container p {
+    font-size: 1.1rem;
+    color: #b0b0b0; /* Medium gray for the text */
+    margin-bottom: 20px;
+}
+
+.btn-home {
+    font-size: 1rem;
+    padding: 10px 20px;
+    background-color: #555555; /* Medium gray button */
+    color: #ffffff; /* White text on button */
+    border: none;
+}
+
+.btn-home:hover {
+    background-color: #777777; /* Lighter gray on hover */
+}
