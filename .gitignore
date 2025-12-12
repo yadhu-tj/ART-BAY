@@ -6,4 +6,8 @@ instance/
 .pytest_cache/
 .DS_Store
 
-.uploads/
+# Correct path to the nested folder
+static/uploads/*
+
+# Exception for the .gitkeep file inside that nested folder
+!static/uploads/.gitkeep
