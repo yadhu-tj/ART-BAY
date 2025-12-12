@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Your Shopping Cart - ART&BAY{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1>Your Collection Cart</h1>
+
+    <div id="cart-loading" class="cart-loading">
+        <div class="loader"></div>
+    </div>
+    
+    <div class="cart-items" id="cart-items">
+        <!-- Items will be loaded dynamically via JavaScript -->
+    </div>
+
+    <div class="cart-summary" id="cart-summary" style="display: none;">
+        <p class="total-price">Total: ₹0.00</p>
+        <form id="checkout-form" action="{{ url_for('checkout.checkout_page') }}" method="GET">
+            <input type="hidden" name="cart_items" id="cart_items_input">
+            <input type="hidden" name="email" id="email_input" value="{{ session['user']['email'] if session.get('user') else '' }}">
+            <button type="submit" class="checkout-btn">
+                <i class="fas fa-lock"></i> Secure Checkout
+            </button>
+        </form>
+    </div>
+    
+    <!-- Toast notification container -->
+    <div id="toast-container"></div>
+</div>
+
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}

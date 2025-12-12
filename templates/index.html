@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap">
+{% endblock %}
+
+{% block content %}
+  <div class="content-wrapper">
+    <!-- Horizontal Tabs -->
+    <div class="horizontal-tabs">
+      {% set categories = [
+        ("Paintings", url_for('gallery')), 
+        ("Photography", "#"), 
+        ("Sculpture", "#"), 
+        ("Drawings", "#"), 
+        ("Prints", "#"), 
+        ("Inspiration", "#"), 
+        ("Art Advisory", "#")
+      ] %}
+      
+      {% for category, link in categories %}
+        <a href="{{ link }}" class="tab-item">{{ category }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- Slider -->
+    <div class="slider">
+      <div class="list">
+        {% set images = [
+          ('last.jpg', 'The Last Supper', 'A masterpiece of Renaissance art by Leonardo da Vinci.'),
+          ('crp.jpg', 'Abstract Crop', 'A bold exploration of color and form in modern art.'),
+          ('forest.jpg', 'Forest Serenity', 'A tranquil depiction of nature\'s beauty and peace.'),
+          ('mona.jpg', 'Mona Lisa', 'An iconic portrait with an enigmatic smile by da Vinci.'),
+          ('img5.jpg', 'Modern Art', 'A vibrant representation of contemporary creativity.')
+        ] %}
+        {% for image, title, description in images %}
+          <div class="item {% if loop.first %}active{% endif %}">
+            <img src="{{ url_for('static', filename='images/' ~ image) }}" alt="{{ title }}">
+            <div class="content"></div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Thumbnail -->
+      <div class="thumbnail">
+        {% for image, title, _ in images %}
+          <div class="item {% if loop.first %}active{% endif %}">
+            <img src="{{ url_for('static', filename='images/' ~ image) }}" alt="{{ title }}">
+            <button class="explore-btn" data-link="/artwork/{{ title|lower|replace(' ', '-') }}">Explore More</button>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Slider Text Headings and Descriptions -->
+      <div class="slider-text">
+        {% for _, title, description in images %}
+          <div class="text-section {% if loop.first %}active{% endif %}">
+            <h1>{{ title }}</h1>
+            <p>{{ description }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Additional Content with Sideways Layout -->
+    <div class="additional-content">
+      {% set content_blocks = [
+        ("Discover amazing Arts from various Artists", "Experience a curated collection of breathtaking artworks, where creativity knows no limits. From timeless masterpieces to contemporary expressions, discover the brilliance of artists from every corner of the world", "gallery.png"),
+        ("How this helps an artist", "Empowering artists with a global platform to showcase their talent, connect with art enthusiasts, and turn passion into purpose. Every piece tells a story, and every artist finds their voice", "arts.png"),
+        ("We would always love to hear from you", "Your thoughts, ideas, and creativity inspire us. Whether you're an artist, collector, or admirer, we’re here to connect, collaborate, and celebrate the beauty of art together", "help.png")
+      ] %}
+      
+      {% for title, description, image in content_blocks %}
+        <div class="text-block {% if loop.index is odd %}left{% else %}right{% endif %} autoShow">
+          <div class="text">
+            <h2>{{ title }}</h2>
+            <p>{{ description }}</p>
+          </div>
+          <div class="image">
+            <img src="{{ url_for('static', filename='images/' ~ image) }}" alt="{{ title }}">
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Modal Containers and Modals -->
+    <div id="loginFormContainer"></div>
+    <div id="signupFormContainer"></div>
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content"> <!-- Corrected structure -->
+          <!-- Form will be inserted here dynamically -->
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content"> <!-- Corrected structure -->
+          <!-- Form will be inserted here dynamically -->
+        </div>
+      </div>
+    </div>
+    <div id="message-alerter"></div> <!-- For success/error messages -->
+  </div>
+
+{% endblock %}
