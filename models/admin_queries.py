@@ -34,13 +34,25 @@ def get_dashboard_metrics():
         logger.error(f"DB error fetching metrics: {e}")
         return {'error': str(e)}
 
+#
+
 def get_users(search=''):
-    """Fetches users with optional search."""
+    """Fetches users with optional search, sanitized to prevent wildcard abuse."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        
+        # FIX: Escape special SQL characters so they are treated as literals
+        # This prevents a user from searching "%" to dump the entire database
+        if search:
+            search_term = search.replace('\\', '\\\\').replace('%', '\%').replace('_', '\_')
+        else:
+            search_term = ''
+
         query = "SELECT email, name, role FROM users WHERE email LIKE %s OR name LIKE %s"
-        cursor.execute(query, (f'%{search}%', f'%{search}%'))
+        
+        # We wrap the sanitized term in % for the actual wildcard matching
+        cursor.execute(query, (f'%{search_term}%', f'%{search_term}%'))
         return cursor.fetchall()
     except Error as e:
         logger.error(f"DB error fetching users: {e}")
