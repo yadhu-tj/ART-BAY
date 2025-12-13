@@ -29,12 +29,25 @@ def fetch_art_by_id_route(art_id):
 
 @art_bp.route('/delete/<int:art_id>', methods=['DELETE'])
 def remove_artwork_route(art_id):
-    # NOTE: This should also check for ownership or admin role
+    # 1. Checks if user is logged in
     if 'user' not in session:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
-    result = delete_artwork(art_id)
-    return jsonify(result)
+    user = session['user']
+    role = user.get('role')
+    email = user.get('email')
+
+    # 2. Determine permission level
+    # If Admin -> Pass 'None' to skip ownership check
+    # If Artist/User -> Pass 'email' to enforce ownership check
+    owner_email = None if role == 'admin' else email
+
+    # 3. Call the secure function
+    result = delete_artwork(art_id, email=owner_email)
+    
+    # 4. Return appropriate status code
+    status_code = 200 if result['status'] == 'success' else 403
+    return jsonify(result), status_code
 
 @art_bp.route('/filter', methods=['POST'])
 def filter_artworks_route():

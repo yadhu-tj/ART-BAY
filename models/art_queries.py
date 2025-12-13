@@ -19,13 +19,27 @@ def add_art(email, title, description, price, category, image_path):
         logger.error(f"DB Error in add_art: {e}")
         return {"status": "error", "message": str(e)}
 
-def delete_artwork(art_id):
-    """Deletes an artwork by its ID."""
+def delete_artwork(art_id, email=None):
+    """Deletes an artwork. If email is provided, ensures ownership."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM art WHERE art_id = %s", (art_id,))
+        
+        if email:
+            # Secure delete: Enforce ownership (User/Artist)
+            query = "DELETE FROM art WHERE art_id = %s AND email = %s"
+            cursor.execute(query, (art_id, email))
+        else:
+            # Unrestricted delete: Admin only
+            query = "DELETE FROM art WHERE art_id = %s"
+            cursor.execute(query, (art_id,))
+            
         conn.commit()
+        
+        # Check if anything was actually deleted
+        if cursor.rowcount == 0:
+            return {"status": "error", "message": "Artwork not found or permission denied"}
+            
         return {"status": "success", "message": "Artwork deleted successfully"}
     except Error as e:
         get_db_connection().rollback()
