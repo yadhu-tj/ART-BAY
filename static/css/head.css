@@ -1,6 +1,6 @@
 /* ======= HEADER ======= */
 :root {
-  --header-bg: #000000;
+  --header-bg: rgba(0, 0, 0, 0.85);
   --header-text: #ffffff;
   --header-accent: #ff6a00;
   --header-hover: #ddd;
@@ -47,6 +47,7 @@
   color: white;
 }
 
+/* */
 header {
   width: 100%;
   display: flex;
@@ -56,12 +57,26 @@ header {
   gap: clamp(8px, 2vw, 15px);
   padding: 0 clamp(10px, 5%, 50px);
   min-height: 80px;
+  
+  /* --- NEW VISUAL STYLES --- */
   background-color: var(--header-bg);
+  
+  /* The Glassmorphism Magic */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  /* Subtle bottom border for separation */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  /* Make it stick to the top */
+  position: sticky;
+  top: 0;
+  /* ------------------------- */
+
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   border-radius: 0 0 15px 15px;
   z-index: 1000;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 /* ======= LOGO ======= */
