@@ -1,3 +1,14 @@
+//
+function escapeHtml(text) {
+    if (!text) return text;
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     // Elements
     const cartItemsContainer = document.getElementById("cart-items");
@@ -135,22 +146,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 imageSrc = "/static/images/placeholder.jpg";
             }
 
-            cartItem.innerHTML = `
-                <div class="cart-image">
-                    <img src="${imageSrc}" alt="${item.title || 'Artwork'}">
-                </div>
-                <div class="cart-details">
-                    <div class="cart-info">
-                        <h2>${item.title || 'Untitled Artwork'}</h2>
-                        <p class="artist">By ${item.artist_name || 'Unknown Artist'}</p>
-                        <p class="price">₹${parseFloat(item.price).toLocaleString('en-IN')} <span class="qty">× ${item.quantity}</span></p>
-                        <p class="subtotal">Subtotal: ₹${(parseFloat(item.price) * parseInt(item.quantity)).toLocaleString('en-IN')}</p>
-                    </div>
-                    <button class="remove-btn" data-cart-id="${cartId}">
-                        <i class="fas fa-trash-alt"></i> Remove
-                    </button>
-                </div>
-            `;
+            //
+cartItem.innerHTML = `
+    <div class="cart-image">
+        <img src="${imageSrc}" alt="${escapeHtml(item.title || 'Artwork')}">
+    </div>
+    <div class="cart-details">
+        <div class="cart-info">
+            <h2>${escapeHtml(item.title || 'Untitled Artwork')}</h2>
+            <p class="artist">By ${escapeHtml(item.artist_name || 'Unknown Artist')}</p>
+            <p class="price">₹${parseFloat(item.price).toLocaleString('en-IN')} <span class="qty">× ${item.quantity}</span></p>
+            <p class="subtotal">Subtotal: ₹${(parseFloat(item.price) * parseInt(item.quantity)).toLocaleString('en-IN')}</p>
+        </div>
+        <button class="remove-btn" data-cart-id="${cartId}">
+            <i class="fas fa-trash-alt"></i> Remove
+        </button>
+    </div>
+`;
 
             cartItemsContainer.appendChild(cartItem);
             
