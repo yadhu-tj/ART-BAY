@@ -61,3 +61,29 @@ def clear_cart(user_email):
         get_db_connection().rollback()
         logger.error(f"DB error in clear_cart: {e}")
         return {"error": str(e)}
+    
+    #
+
+def update_cart_quantity(cart_id, new_quantity):
+    """
+    Updates the quantity of a cart item. 
+    If quantity drops to 0 or less, it removes the item automatically.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Smart Logic: If quantity is 0, delete it. Otherwise, update it.
+        if new_quantity <= 0:
+            cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
+            message = "Item removed from cart."
+        else:
+            cursor.execute("UPDATE cart SET quantity = %s WHERE cart_id = %s", (new_quantity, cart_id))
+            message = "Quantity updated."
+            
+        conn.commit()
+        return {"status": "success", "message": message}
+    except Error as e:
+        get_db_connection().rollback()
+        logger.error(f"DB error in update_cart_quantity: {e}")
+        return {"status": "error", "message": str(e)}
