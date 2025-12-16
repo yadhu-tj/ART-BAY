@@ -1,71 +1,56 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const signupForm = document.getElementById('signupForm');
-    const loginForm = document.getElementById('loginForm');
+//
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Signup script loaded");
 
-    // Utility to show error message
-    const showError = (id) => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('d-none');
-    };
+    // 1. Target the Signup Link in the Navbar
+    // We look for the link that points to the signup modal
+    const signupLink = document.querySelector('a[data-bs-target="#signupModal"]');
+    
+    // 2. Add the click listener to open the modal via AJAX
+    if (signupLink) {
+        // loadModal(linkElement, containerId, modalId, endpointUrl)
+        // This function lives in head.js and handles the "X-Requested-With" header
+        loadModal(signupLink, 'signup-modal-container', 'signupModal', '/auth/signup');
+    }
+});
 
-    // Utility to hide all error messages
-    const clearErrors = () => {
-        document.querySelectorAll('.error').forEach(error => {
-            error.classList.add('d-none');
-        });
-    };
-
-    // SIGNUP VALIDATION
-    if (signupForm) {
-        signupForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            let isValid = true;
-            clearErrors();
-
+// This function is called by head.js after the modal HTML is injected
+function initializeOTPSignup() {
+    console.log("Initializing Signup OTP Logic");
+    
+    // We need to re-attach listeners because the HTML was just replaced via AJAX
+    const sendOtpBtn = document.getElementById("sendOtpBtn");
+    
+    if (sendOtpBtn) {
+        // Remove old listeners to prevent duplicates (cloning trick)
+        const newBtn = sendOtpBtn.cloneNode(true);
+        sendOtpBtn.parentNode.replaceChild(newBtn, sendOtpBtn);
+        
+        newBtn.addEventListener("click", function() {
+            // Validate Form Data First
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const passwordRegex = /^(?=.*\d).{8,}$/;
-
-            if (name.length < 2) {
-                showError('nameError');
-                isValid = false;
+            
+            // Simple Validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert("Please fill in all fields.");
+                return;
             }
-
-            if (!emailRegex.test(email)) {
-                showError('emailError');
-                isValid = false;
-            }
-
-            if (!passwordRegex.test(password)) {
-                showError('passwordError');
-                isValid = false;
-            }
-
             if (password !== confirmPassword) {
-                showError('confirmPasswordError');
-                isValid = false;
+                alert("Passwords do not match.");
+                return;
             }
 
-            if (isValid) {
-                signupForm.submit(); // proceed to server
-            }
-        });
-    }
-
-    // LOGIN FORM (basic client-side check)
-    if (loginForm) {
-        loginForm.addEventListener('submit', function (e) {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                e.preventDefault(); // block form submission
-                alert('Please enter both email and password.');
+            // If valid, trigger the OTP flow
+            // (Assumes handleSignupOtpSend is defined in otp_signup.js)
+            if (typeof handleSignupOtpSend === 'function') {
+                handleSignupOtpSend(); 
+            } else {
+                console.error("handleSignupOtpSend function missing! Check otp_signup.js");
             }
         });
+        console.log("Signup OTP button listener attached.");
     }
-});
+}

@@ -74,92 +74,76 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    async function loadModal(link, containerId, modalId, endpoint) {
-        console.log(`Attempting to load modal for ${containerId}`);
-        const container = document.getElementById(containerId);
-        if (!link || !container) return;
+//
 
-        link.addEventListener("click", async function (event) {
-            event.preventDefault();
-            closeAllModals();
+async function loadModal(link, containerId, modalId, endpoint) {
+    console.log(`Attempting to load modal for ${containerId}`);
+    const container = document.getElementById(containerId);
+    if (!link || !container) return;
 
-            try {
-                // Show loading indicator
-                const loadingIndicator = document.createElement('div');
-                loadingIndicator.className = 'text-center p-3';
-                loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-                container.innerHTML = '';
-                container.appendChild(loadingIndicator);
+    link.addEventListener("click", async function (event) {
+        event.preventDefault();
+        closeAllModals(); // Ensure other modals are closed
 
-                const response = await fetch(endpoint);
-                if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+        try {
+            // 1. Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'text-center p-3';
+            loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            container.innerHTML = '';
+            container.appendChild(loadingIndicator);
 
-                const html = await response.text();
-                console.log('Loaded HTML content:', html.substring(0, 200) + '...'); // Log first 200 chars
-                container.innerHTML = html;
+            const modalElement = document.getElementById(modalId);
+            const modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.show();
 
-                const modal = document.getElementById(modalId);
-                const modalContent = modal.querySelector('.modal-content');
-                if (modalContent && container.firstChild) {
-                    modalContent.innerHTML = '';
-                    modalContent.appendChild(container.firstChild);
+            // 2. Fetch content with the special header
+            const response = await fetch(endpoint, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Critical for the backend to serve the partial HTML
                 }
+            });
 
-                const modalInstance = new bootstrap.Modal(modal);
-                modalInstance.show();
-                console.log(`Modal ${modalId} loaded successfully`);
+            if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+
+            const html = await response.text();
+            
+            // 3. Insert content safely
+            container.innerHTML = html;
+
+            // 4. CRITICAL FIX: Manually execute any scripts found in the response
+            // This ensures event listeners in signup.js/login.js attach properly
+            const scripts = container.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+
+            console.log(`Modal ${modalId} loaded successfully`);
+
+            // 5. Initialize OTP Logic (with slight delay for DOM readiness)
+            setTimeout(() => {
+                if (modalId === 'loginModal' && typeof initializeOTPLogin === 'function') {
+                    console.log('Initializing Login OTP...');
+                    initializeOTPLogin();
+                }
                 
-                // Initialize OTP functionality if login modal is loaded
-                if (modalId === 'loginModal') {
-                    setTimeout(() => {
-                        console.log('Checking for OTP elements in modal...');
-                        // Search within the modal content specifically
-                        const modalContent = document.querySelector('#loginModal .modal-content');
-                        const emailStep = modalContent ? modalContent.querySelector('#emailStep') : null;
-                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
-                        const passwordStep = modalContent ? modalContent.querySelector('#passwordStep') : null;
-                        console.log('emailStep found:', !!emailStep);
-                        console.log('otpStep found:', !!otpStep);
-                        console.log('passwordStep found:', !!passwordStep);
-                        
-                        if (typeof initializeOTPLogin === 'function') {
-                            initializeOTPLogin();
-                        }
-                    }, 500); // Increased delay to ensure DOM is ready
+                if (modalId === 'signupModal' && typeof initializeOTPSignup === 'function') {
+                    console.log('Initializing Signup OTP...');
+                    initializeOTPSignup();
                 }
-                
-                // Initialize OTP functionality if signup modal is loaded
-                if (modalId === 'signupModal') {
-                    setTimeout(() => {
-                        console.log('Checking for signup OTP elements in modal...');
-                        // Search within the modal content specifically
-                        const modalContent = document.querySelector('#signupModal .modal-content');
-                        console.log('Modal content found:', !!modalContent);
-                        if (modalContent) {
-                            console.log('Modal content HTML:', modalContent.innerHTML.substring(0, 300) + '...');
-                        }
-                        const userInfoStep = modalContent ? modalContent.querySelector('#userInfoStep') : null;
-                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
-                        const successStep = modalContent ? modalContent.querySelector('#successStep') : null;
-                        console.log('userInfoStep found:', !!userInfoStep);
-                        console.log('otpStep found:', !!otpStep);
-                        console.log('successStep found:', !!successStep);
-                        
-                        if (typeof initializeOTPSignup === 'function') {
-                            console.log('Calling initializeOTPSignup...');
-                            initializeOTPSignup();
-                        } else {
-                            console.log('❌ initializeOTPSignup function not found!');
-                        }
-                    }, 500); // Increased delay to ensure DOM is ready
-                }
-            } catch (error) {
-                console.error(`Error loading ${endpoint}:`, error);
-                showMessage(`Failed to load ${endpoint}`, "error");
-            }
-        });
-    }
+            }, 300);
 
+        } catch (error) {
+            console.error(`Error loading ${endpoint}:`, error);
+            container.innerHTML = `<div class="text-danger p-4 text-center">
+                <i class="fas fa-exclamation-circle"></i> Failed to load content.
+            </div>`;
+        }
+    });
+}
     // Mobile dropdown toggle
     if (isMobile) {
         const dropdownToggle = document.querySelector('.user-dropdown .dropbtn');

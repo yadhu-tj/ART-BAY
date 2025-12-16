@@ -1,14 +1,21 @@
+#
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, current_app
 from models.user_queries import add_user, get_user_by_email, upgrade_to_artist
-from models.otp_queries import generate_otp, store_otp, verify_otp, cleanup_expired_otp
+from models.otp_queries import generate_otp, store_otp, verify_otp
 from services.email_service import EmailService
 from werkzeug.security import check_password_hash
 
 # Initialize Blueprint
 auth_bp = Blueprint('auth', __name__, template_folder='templates')
 
-@auth_bp.route('/signup', methods=['POST'])
+# --- MERGED SIGNUP ROUTE (GET & POST) ---
+@auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
+    # Handle GET request (Render Page)
+    if request.method == 'GET':
+        return render_template('auth/signup.html')
+
+    # Handle POST request (Process Signup)
     try:
         name = request.form.get('name')
         email = request.form.get('email')
@@ -28,7 +35,7 @@ def signup():
             return jsonify({
                 "status": "success",
                 "message": result["message"],
-                "redirect": url_for('auth.login_page')
+                "redirect": url_for('auth.login') # Points to this same route now
             }), 200
         
         current_app.logger.error(f"Signup failed: {result.get('error')}")
@@ -37,8 +44,15 @@ def signup():
         current_app.logger.error(f"Signup error: {str(e)}")
         return jsonify({"status": "error", "message": "Internal server error"}), 500
 
-@auth_bp.route('/login', methods=['POST'])
+
+# --- MERGED LOGIN ROUTE (GET & POST) ---
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # Handle GET request (Render Page)
+    if request.method == 'GET':
+        return render_template('auth/login.html')
+
+    # Handle POST request (Process Login)
     try:
         email = request.form.get('email')
         password = request.form.get('password')
@@ -55,12 +69,12 @@ def login():
                 'role': user['role']
             }
             
-            # --- CORRECTED REDIRECTION LOGIC ---
+            # Determine redirect URL
             if user['role'] == 'admin':
                 redirect_url = url_for('admin.dashboard')
             elif user['role'] == 'artist':
                 redirect_url = url_for('artist_dashboard.dashboard')
-            else: # Regular user
+            else:
                 redirect_url = url_for('home')
             
             return jsonify({
@@ -74,17 +88,17 @@ def login():
         current_app.logger.error(f"Login error: {str(e)}")
         return jsonify({"status": "error", "message": "Internal server error"}), 500
 
+
+# --- OTHER ROUTES ---
+
 @auth_bp.route('/admin-login')
 def admin_login_page():
     if 'user' in session and session['user']['role'] == 'admin':
         return redirect(url_for('admin.dashboard'))
     return render_template('auth/admin_login.html')
 
-
-
 @auth_bp.route('/logout')
 def logout():
-    # print("Logout route reached")
     session.pop('user', None)
     return jsonify({'status': 'success', 'message': 'Logged out successfully'})
 
@@ -101,17 +115,14 @@ def upgrade_to_artist_route():
         return jsonify({'status': 'success', 'message': result["message"]})
     return jsonify({'status': 'error', 'message': result.get("error", "An error occurred.")}), 400
 
-
-@auth_bp.route('/login')
-def login_page():
-    return render_template('auth/login.html')
 @auth_bp.route('/artist-login')
 def artist_login_page():
+    # Redirect if already logged in as artist
+    if 'user' in session and session['user'].get('role') == 'artist':
+        return redirect(url_for('artist_dashboard.dashboard'))
     return render_template('auth/artist_login.html')
 
-@auth_bp.route('/signup')
-def signup_page():
-    return render_template('auth/signup.html')
+# --- OTP ROUTES (Kept as is) ---
 
 @auth_bp.route('/send-otp', methods=['POST'])
 def send_otp():
@@ -122,34 +133,24 @@ def send_otp():
         if not email:
             return jsonify({"status": "error", "message": "Email is required"}), 400
 
-        # Check if user exists
         user = get_user_by_email(email)
         if not user:
             return jsonify({"status": "error", "message": "No account found with this email address"}), 404
 
-        # Generate OTP
         otp_code = generate_otp()
-        
-        # Store OTP in database
         store_result = store_otp(email, otp_code)
+        
         if store_result.get('status') != 'success':
             return jsonify({"status": "error", "message": "Failed to generate OTP"}), 500
 
-        # Send OTP email
         email_service = EmailService()
         email_result = email_service.send_otp_email(email, otp_code, user.get('name', ''))
         
         if email_result.get('status') == 'success':
             current_app.logger.info(f"OTP sent successfully to {email}")
-            return jsonify({
-                "status": "success",
-                "message": "OTP sent successfully to your email"
-            }), 200
+            return jsonify({"status": "success", "message": "OTP sent successfully"}), 200
         else:
-            return jsonify({
-                "status": "error",
-                "message": "Failed to send OTP email. Please try again."
-            }), 500
+            return jsonify({"status": "error", "message": "Failed to send OTP email."}), 500
 
     except Exception as e:
         current_app.logger.error(f"Error sending OTP: {str(e)}")
@@ -165,24 +166,20 @@ def verify_otp_login():
         if not email or not otp:
             return jsonify({"status": "error", "message": "Email and OTP are required"}), 400
 
-        # Verify OTP
         verify_result = verify_otp(email, otp)
         if verify_result.get('status') != 'success':
             return jsonify({"status": "error", "message": verify_result.get('message', 'Invalid OTP')}), 400
 
-        # Get user details
         user = get_user_by_email(email)
         if not user:
             return jsonify({"status": "error", "message": "User not found"}), 404
 
-        # Create session
         session['user'] = {
             'name': user['name'],
             'email': user['email'],
             'role': user['role']
         }
         
-        # Determine redirect URL based on user role
         if user['role'] == 'admin':
             redirect_url = url_for('admin.dashboard')
         elif user['role'] == 'artist':
@@ -190,12 +187,7 @@ def verify_otp_login():
         else:
             redirect_url = url_for('home')
         
-        current_app.logger.info(f"OTP login successful for {email}")
-        return jsonify({
-            'status': 'success',
-            'message': 'Login successful!',
-            'redirect': redirect_url
-        }), 200
+        return jsonify({'status': 'success', 'message': 'Login successful!', 'redirect': redirect_url}), 200
 
     except Exception as e:
         current_app.logger.error(f"Error verifying OTP: {str(e)}")
@@ -211,34 +203,23 @@ def send_signup_otp():
         if not email or not name:
             return jsonify({"status": "error", "message": "Email and name are required"}), 400
 
-        # Check if user already exists
         existing_user = get_user_by_email(email)
         if existing_user:
             return jsonify({"status": "error", "message": "An account with this email already exists"}), 409
 
-        # Generate OTP
         otp_code = generate_otp()
-        
-        # Store OTP in database
         store_result = store_otp(email, otp_code)
+        
         if store_result.get('status') != 'success':
             return jsonify({"status": "error", "message": "Failed to generate OTP"}), 500
 
-        # Send OTP email
         email_service = EmailService()
         email_result = email_service.send_otp_email(email, otp_code, name)
         
         if email_result.get('status') == 'success':
-            current_app.logger.info(f"Signup OTP sent successfully to {email}")
-            return jsonify({
-                "status": "success",
-                "message": "OTP sent successfully to your email"
-            }), 200
+            return jsonify({"status": "success", "message": "OTP sent successfully"}), 200
         else:
-            return jsonify({
-                "status": "error",
-                "message": "Failed to send OTP email. Please try again."
-            }), 500
+            return jsonify({"status": "error", "message": "Failed to send OTP email."}), 500
 
     except Exception as e:
         current_app.logger.error(f"Error sending signup OTP: {str(e)}")
@@ -256,29 +237,20 @@ def verify_signup_otp():
         if not all([email, name, password, otp]):
             return jsonify({"status": "error", "message": "All fields are required"}), 400
 
-        # Verify OTP
         verify_result = verify_otp(email, otp)
         if verify_result.get('status') != 'success':
             return jsonify({"status": "error", "message": verify_result.get('message', 'Invalid OTP')}), 400
 
-        # Create the user account
         add_result = add_user(name, email, password)
         if "error" in add_result:
-            # If the specific error is a duplicate, return a 409 Conflict code
             if "already registered" in add_result["error"]:
                 return jsonify({"status": "error", "message": add_result["error"]}), 409
-            # For any other errors, return a 500
             return jsonify({"status": "error", "message": add_result["error"]}), 500
 
-        # Send welcome email
         email_service = EmailService()
         email_service.send_welcome_email(email, name)
         
-        current_app.logger.info(f"Account created successfully for {email}")
-        return jsonify({
-            'status': 'success',
-            'message': 'Account created successfully!'
-        }), 200
+        return jsonify({'status': 'success', 'message': 'Account created successfully!'}), 200
 
     except Exception as e:
         current_app.logger.error(f"Error verifying signup OTP: {str(e)}")
@@ -289,16 +261,3 @@ def check_login():
     if 'user' in session:
         return jsonify({'status': 'success', 'user': session['user']})
     return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
-
-@auth_bp.route('/artist-login')
-def artist_login():
-    if 'user' not in session or session['user']['role'] != 'artist':
-        current_app.logger.info("Redirecting to login due to missing user or non-artist role")
-        return redirect(url_for('auth.artist_login_page'))
-    # return render_template('auth/artist_login.html')
-
-
-
-
-    
-    
