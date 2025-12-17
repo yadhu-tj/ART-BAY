@@ -15,11 +15,11 @@
       <!-- Quick Links Section -->
       <div class="footer-section">
         <h4>Quick Links</h4>
-        <p><a href="#">Home</a></p>
-        <p><a href="#">ARTISTS</a></p>
-        <p><a href="#">Artists' Guide</a></p>
-        <p><a href="#">Customers' Guide</a></p>
-        <p><a href="#">ABOUT US</a></p>
+        <p><a href="{{ url_for('home') }}">Home</a></p>
+        <p><a href="{{ url_for('info.artists_showcase') }}">ARTISTS</a></p>
+        <p><a href="{{ url_for('info.artist_guide') }}">Artists' Guide</a></p>
+        <p><a href="{{ url_for('info.customer_guide') }}">Customers' Guide</a></p>
+        <p><a href="{{ url_for('info.about_us') }}">ABOUT US</a></p>
       </div>
 
       <!-- Social Media Section -->
