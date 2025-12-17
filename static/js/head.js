@@ -1,3 +1,8 @@
+/* Updated static/js/head.js 
+   - Fixed Modal Switching using Event Delegation
+   - Reuses existing loadModal logic for stability
+*/
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded!");
 
@@ -74,76 +79,76 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-//
+    // Modal Loading Logic
+    async function loadModal(link, containerId, modalId, endpoint) {
+        console.log(`Attempting to load modal for ${containerId}`);
+        const container = document.getElementById(containerId);
+        if (!link || !container) return;
 
-async function loadModal(link, containerId, modalId, endpoint) {
-    console.log(`Attempting to load modal for ${containerId}`);
-    const container = document.getElementById(containerId);
-    if (!link || !container) return;
+        link.addEventListener("click", async function (event) {
+            event.preventDefault();
+            closeAllModals(); // Ensure other modals are closed
 
-    link.addEventListener("click", async function (event) {
-        event.preventDefault();
-        closeAllModals(); // Ensure other modals are closed
+            try {
+                // 1. Show loading indicator
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.className = 'text-center p-3';
+                loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                container.innerHTML = '';
+                container.appendChild(loadingIndicator);
 
-        try {
-            // 1. Show loading indicator
-            const loadingIndicator = document.createElement('div');
-            loadingIndicator.className = 'text-center p-3';
-            loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-            container.innerHTML = '';
-            container.appendChild(loadingIndicator);
+                const modalElement = document.getElementById(modalId);
+                const modalInstance = new bootstrap.Modal(modalElement);
+                modalInstance.show();
 
-            const modalElement = document.getElementById(modalId);
-            const modalInstance = new bootstrap.Modal(modalElement);
-            modalInstance.show();
+                // 2. Fetch content with the special header
+                const response = await fetch(endpoint, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest' // Critical for the backend to serve the partial HTML
+                    }
+                });
 
-            // 2. Fetch content with the special header
-            const response = await fetch(endpoint, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest' // Critical for the backend to serve the partial HTML
-                }
-            });
+                if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
 
-            if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
-
-            const html = await response.text();
-            
-            // 3. Insert content safely
-            container.innerHTML = html;
-
-            // 4. CRITICAL FIX: Manually execute any scripts found in the response
-            // This ensures event listeners in signup.js/login.js attach properly
-            const scripts = container.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
-
-            console.log(`Modal ${modalId} loaded successfully`);
-
-            // 5. Initialize OTP Logic (with slight delay for DOM readiness)
-            setTimeout(() => {
-                if (modalId === 'loginModal' && typeof initializeOTPLogin === 'function') {
-                    console.log('Initializing Login OTP...');
-                    initializeOTPLogin();
-                }
+                const html = await response.text();
                 
-                if (modalId === 'signupModal' && typeof initializeOTPSignup === 'function') {
-                    console.log('Initializing Signup OTP...');
-                    initializeOTPSignup();
-                }
-            }, 300);
+                // 3. Insert content safely
+                container.innerHTML = html;
 
-        } catch (error) {
-            console.error(`Error loading ${endpoint}:`, error);
-            container.innerHTML = `<div class="text-danger p-4 text-center">
-                <i class="fas fa-exclamation-circle"></i> Failed to load content.
-            </div>`;
-        }
-    });
-}
+                // 4. CRITICAL FIX: Manually execute any scripts found in the response
+                // This ensures event listeners in signup.js/login.js attach properly
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+
+                console.log(`Modal ${modalId} loaded successfully`);
+
+                // 5. Initialize OTP Logic (with slight delay for DOM readiness)
+                setTimeout(() => {
+                    if (modalId === 'loginModal' && typeof initializeOTPLogin === 'function') {
+                        console.log('Initializing Login OTP...');
+                        initializeOTPLogin();
+                    }
+                    
+                    if (modalId === 'signupModal' && typeof initializeOTPSignup === 'function') {
+                        console.log('Initializing Signup OTP...');
+                        initializeOTPSignup();
+                    }
+                }, 300);
+
+            } catch (error) {
+                console.error(`Error loading ${endpoint}:`, error);
+                container.innerHTML = `<div class="text-danger p-4 text-center">
+                    <i class="fas fa-exclamation-circle"></i> Failed to load content.
+                </div>`;
+            }
+        });
+    }
+
     // Mobile dropdown toggle
     if (isMobile) {
         const dropdownToggle = document.querySelector('.user-dropdown .dropbtn');
@@ -166,7 +171,7 @@ async function loadModal(link, containerId, modalId, endpoint) {
         }
     }
 
-    // Event Listeners
+    // Event Listeners for Modal Cleanup
     document.addEventListener("hidden.bs.modal", removeAllBackdrops);
     document.addEventListener("show.bs.modal", removeAllBackdrops);
 
@@ -179,100 +184,49 @@ async function loadModal(link, containerId, modalId, endpoint) {
         });
     });
 
-    // Setup modal links
+    // Setup modal links (Attach listeners to the navbar buttons)
     loadModal(document.querySelector(".login-link"), "loginFormContainer", "loginModal", "/auth/login");
     loadModal(document.querySelector(".signup-link"), "signupFormContainer", "signupModal", "/auth/signup");
 
-    // Switch between modals
-    document.body.addEventListener("click", async function (event) {
-        const switchModal = async (url, containerId, modalId) => {
-            closeAllModals();
-            try {
-                // Show loading indicator
-                const container = document.getElementById(containerId);
-                const loadingIndicator = document.createElement('div');
-                loadingIndicator.className = 'text-center p-3';
-                loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-                container.innerHTML = '';
-                container.appendChild(loadingIndicator);
+    // ==========================================
+    // FIXED: Switch between modals using Event Delegation
+    // ==========================================
+    document.body.addEventListener("click", function (event) {
+        // Use .closest() to handle clicks on elements inside the link (like icons)
+        const signupSwitch = event.target.closest(".switch-to-signup");
+        const loginSwitch = event.target.closest(".switch-to-login");
+        const registerArtistBtn = event.target.closest(".register-artist");
 
-                const html = await (await fetch(url)).text();
-                container.innerHTML = html;
-                const modal = document.getElementById(modalId);
-                const modalContent = modal.querySelector('.modal-content');
-                if (modalContent && container.firstChild) {
-                    modalContent.innerHTML = '';
-                    modalContent.appendChild(container.firstChild);
-                }
-                new bootstrap.Modal(modal).show();
-                
-                // Initialize OTP functionality if login modal is loaded
-                if (modalId === 'loginModal') {
-                    setTimeout(() => {
-                        console.log('Checking for OTP elements in switchModal...');
-                        // Search within the modal content specifically
-                        const modalContent = document.querySelector('#loginModal .modal-content');
-                        const emailStep = modalContent ? modalContent.querySelector('#emailStep') : null;
-                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
-                        const passwordStep = modalContent ? modalContent.querySelector('#passwordStep') : null;
-                        console.log('emailStep found:', !!emailStep);
-                        console.log('otpStep found:', !!otpStep);
-                        console.log('passwordStep found:', !!passwordStep);
-                        
-                        if (typeof initializeOTPLogin === 'function') {
-                            initializeOTPLogin();
-                        }
-                    }, 500); // Increased delay to ensure DOM is ready
-                }
-                
-                // Initialize OTP functionality if signup modal is loaded
-                if (modalId === 'signupModal') {
-                    setTimeout(() => {
-                        console.log('Checking for signup OTP elements in switchModal...');
-                        // Search within the modal content specifically
-                        const modalContent = document.querySelector('#signupModal .modal-content');
-                        console.log('Modal content found:', !!modalContent);
-                        if (modalContent) {
-                            console.log('Modal content HTML:', modalContent.innerHTML.substring(0, 300) + '...');
-                        }
-                        const userInfoStep = modalContent ? modalContent.querySelector('#userInfoStep') : null;
-                        const otpStep = modalContent ? modalContent.querySelector('#otpStep') : null;
-                        const successStep = modalContent ? modalContent.querySelector('#successStep') : null;
-                        console.log('userInfoStep found:', !!userInfoStep);
-                        console.log('otpStep found:', !!otpStep);
-                        console.log('successStep found:', !!successStep);
-                        
-                        if (typeof initializeOTPSignup === 'function') {
-                            console.log('Calling initializeOTPSignup from switchModal...');
-                            initializeOTPSignup();
-                        } else {
-                            console.log('❌ initializeOTPSignup function not found in switchModal!');
-                        }
-                    }, 500); // Increased delay to ensure DOM is ready
-                }
-            } catch (error) {
-                console.error("Error switching modals:", error);
-                showMessage("Modal load error", "error");
+        if (signupSwitch) {
+            event.preventDefault();
+            console.log("Delegation: Switching to Signup Modal");
+            closeAllModals();
+            // Trigger the actual signup link which handles AJAX/Headers/Scripts correctly
+            const signupLink = document.querySelector(".signup-link");
+            if (signupLink) signupLink.click();
+        } 
+        else if (loginSwitch) {
+            event.preventDefault();
+            console.log("Delegation: Switching to Login Modal");
+            closeAllModals();
+            // Trigger the actual login link which handles AJAX/Headers/Scripts correctly
+            const loginLink = document.querySelector(".login-link");
+            if (loginLink) loginLink.click();
+        } 
+        else if (registerArtistBtn) {
+            event.preventDefault();
+            closeAllModals();
+            const registerModal = document.getElementById("registerArtistModal");
+            if (registerModal) {
+                new bootstrap.Modal(registerModal).show();
             }
-        };
-
-        if (event.target.matches(".switch-to-signup")) {
-            event.preventDefault();
-            switchModal("/auth/signup", "signupFormContainer", "signupModal");
-        } else if (event.target.matches(".switch-to-login")) {
-            event.preventDefault();
-            switchModal("/auth/login", "loginFormContainer", "loginModal");
-        } else if (event.target.closest(".register-artist")) {
-            event.preventDefault();
-            closeAllModals();
-            new bootstrap.Modal(document.getElementById("registerArtistModal")).show();
         }
     });
 
-    // Register Artist
+    // Register Artist Form Handler
     document.addEventListener('submit', async (e) => {
         if (e.target.matches('#registerArtistForm')) {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault(); 
             console.log('Artist form submission triggered');
 
             const artistForm = e.target;
@@ -287,7 +241,6 @@ async function loadModal(link, containerId, modalId, endpoint) {
             // Client-side validation for bio
             const bio = artistForm.querySelector('#artistBio').value.trim();
             if (bio.length < 10) {
-                console.log('Validation failed: Bio too short');
                 showMessage('Please enter a bio with at least 10 characters.', 'error');
                 return;
             }
@@ -295,40 +248,30 @@ async function loadModal(link, containerId, modalId, endpoint) {
             // Disable submit button
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            console.log('Submitting form to:', artistForm.action);
 
             try {
-                console.log('Sending fetch request to:', artistForm.action);
                 const response = await fetch(artistForm.action, {
                     method: 'POST',
                     body: new FormData(artistForm),
                     credentials: 'include'
                 });
 
-                console.log('Fetch response status:', response.status);
                 const data = await response.json();
-                console.log('Server response:', data);
 
                 if (data.status === 'success') {
                     showMessage(data.message, 'success');
                     const modal = bootstrap.Modal.getInstance(document.getElementById('registerArtistModal'));
-                    if (modal) {
-                        console.log('Closing modal');
-                        modal.hide();
-                    }
+                    if (modal) modal.hide();
                 } else {
-                    console.log('Server error:', data.error);
                     showMessage(data.error || 'Application failed. Please try again.', 'error');
                 }
             } catch (error) {
                 console.error('Artist registration error:', error);
                 showMessage('An error occurred during your application. Please try again.', 'error');
             } finally {
-                // Re-enable submit button
                 setTimeout(() => {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = 'Submit Application';
-                    console.log('Submit button re-enabled');
                 }, 2000);
             }
         }
@@ -337,21 +280,19 @@ async function loadModal(link, containerId, modalId, endpoint) {
     // Ensure modal is ready before form interactions
     document.addEventListener('shown.bs.modal', (e) => {
         if (e.target.id === 'registerArtistModal') {
-            console.log('Artist modal shown');
+            console.log('Artist modal shown, form checking...');
             const artistForm = document.getElementById('registerArtistForm');
-            const submitBtn = document.querySelector('button[type="submit"][form="registerArtistForm"]');
-            if (!artistForm || !submitBtn) {
-                console.error('Artist form or submit button not found in modal!');
-            } else {
-                console.log('Artist form and submit button found in modal');
-            }
+            if (!artistForm) console.error('Artist form not found in modal!');
         }
     });
 
-    // Form Submission
+    // General Form Submission (Login/Signup)
     document.body.addEventListener("submit", function (event) {
         const form = event.target.closest("form");
         if (!form) return;
+        // Skip artist form as it's handled above
+        if (form.id === "registerArtistForm") return; 
+
         event.preventDefault();
 
         if (form.id === "signupForm") {
@@ -363,20 +304,9 @@ async function loadModal(link, containerId, modalId, endpoint) {
                 async () => {
                     setTimeout(async () => {
                         closeAllModals();
-                        try {
-                            const html = await (await fetch("/auth/login")).text();
-                            const container = document.getElementById("loginFormContainer");
-                            container.innerHTML = html;
-                            const modalContent = document.getElementById("loginModal").querySelector('.modal-content');
-                            if (modalContent && container.firstChild) {
-                                modalContent.innerHTML = '';
-                                modalContent.appendChild(container.firstChild);
-                                new bootstrap.Modal(document.getElementById("loginModal")).show();
-                            }
-                        } catch (error) {
-                            console.error("Error loading login form after signup:", error);
-                            showMessage("Failed to load login form", "error");
-                        }
+                        // Trigger login modal via the link to ensure clean state
+                        const loginLink = document.querySelector(".login-link");
+                        if (loginLink) loginLink.click();
                     }, 2000);
                 }
             );
@@ -416,7 +346,7 @@ async function loadModal(link, containerId, modalId, endpoint) {
         });
     }
 
-    // Floating Labels (Event Delegation)
+    // Floating Labels UX
     document.body.addEventListener("focusin", function (event) {
         const input = event.target.closest(".form-control");
         if (input && input.closest(".form-floating")) {
@@ -438,49 +368,39 @@ async function loadModal(link, containerId, modalId, endpoint) {
         
         if (!artistHomeLink || !artistDashboardLink) return;
         
-        // Get current page path
         const currentPath = window.location.pathname;
-        
-        // Check if we're on the artist dashboard
         const isOnDashboard = currentPath.includes('/artist-dashboard') || 
                              currentPath.includes('/dashboard') ||
                              document.querySelector('.artist_dashboard__container');
         
-        // Check if we're on the home page
         const isOnHome = currentPath === '/' || 
                         currentPath === '/home' ||
                         document.querySelector('.content-wrapper');
         
         if (isOnDashboard) {
-            // Show "Return Home" link, hide "Artist Dashboard" link
             artistHomeLink.style.display = 'block';
             artistDashboardLink.style.display = 'none';
         } else if (isOnHome) {
-            // Show "Artist Dashboard" link, hide "Return Home" link
             artistHomeLink.style.display = 'none';
             artistDashboardLink.style.display = 'block';
         } else {
-            // On other pages, show both options
             artistHomeLink.style.display = 'block';
             artistDashboardLink.style.display = 'block';
         }
     }
 
-    // Initialize dynamic navigation
     updateArtistNavigation();
     
-    // Update navigation when dropdown is opened
     document.addEventListener('click', function(event) {
         if (event.target.closest('.dropbtn') || event.target.closest('.dropdown-toggle')) {
             setTimeout(updateArtistNavigation, 100);
         }
     });
     
-    // Update navigation on page load and navigation
     window.addEventListener('load', updateArtistNavigation);
     window.addEventListener('popstate', updateArtistNavigation);
     
-    // Artist Dashboard Navigation
+    // Artist Dashboard AJAX Link
     document.querySelectorAll('a[href="/artist/dashboard"]').forEach(link => {
         link.addEventListener("click", async function (event) {
             event.preventDefault();
@@ -511,13 +431,10 @@ async function loadModal(link, containerId, modalId, endpoint) {
 
     // Handle viewport height issues on mobile
     function setVhProperty() {
-        // First we get the viewport height and we multiply it by 1% to get a value for a vh unit
         let vh = window.innerHeight * 0.01;
-        // Then we set the value in the --vh custom property to the root of the document
         document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
 
-    // Set the --vh value initially and on resize
     setVhProperty();
     window.addEventListener('resize', setVhProperty);
 });
