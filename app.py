@@ -19,21 +19,8 @@ def create_app():
     app = Flask(__name__)
 
     # --- THIS IS THE KEY CHANGE ---
-    # Load the default config first
+    # Load the configuration from the Config class
     app.config.from_object(Config)
-    # Then, explicitly override it with environment variables if they exist.
-    # This makes it robust for both local and server environments.
-    app.config.update(
-        SECRET_KEY=os.getenv('SECRET_KEY'),
-        DB_CONFIG={
-            'host': os.getenv('DB_HOST'),
-            'user': os.getenv('DB_USER'),
-            'password': os.getenv('DB_PASSWORD'),
-            'database': os.getenv('DB_NAME')
-        },
-        SENDER_EMAIL=os.getenv('SENDER_EMAIL'),
-        SENDER_PASSWORD=os.getenv('SENDER_PASSWORD')
-    )
     # --- END OF CHANGE ---
 
     # Initialize and register database functions
