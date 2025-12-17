@@ -1,0 +1,126 @@
+/* static/css/info_pages.css */
+:root {
+    --bg-dark: #0a0a0a;
+    --card-bg: #111;
+    --accent: #ff6a00;
+    --text-main: #ffffff;
+    --text-muted: #a0a0a0;
+}
+
+/* General Layout */
+.info-hero {
+    position: relative;
+    padding: 100px 0;
+    background: radial-gradient(circle at top right, #1a1a1a, var(--bg-dark));
+    overflow: hidden;
+}
+
+.info-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: var(--accent);
+    opacity: 0.05;
+    filter: blur(80px);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(45deg, #fff, #888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.accent-text {
+    color: var(--accent);
+}
+
+/* Feature Cards (Guides) */
+.guide-step {
+    background: var(--card-bg);
+    border: 1px solid #222;
+    padding: 2rem;
+    border-radius: 16px;
+    transition: all 0.4s ease;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.guide-step:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(255, 106, 0, 0.1);
+}
+
+.step-number {
+    font-size: 4rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.03);
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    line-height: 1;
+}
+
+/* About Us Timeline */
+.timeline-item {
+    border-left: 2px solid #333;
+    padding-left: 30px;
+    position: relative;
+    padding-bottom: 50px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+/* Artists Showcase Grid */
+.artist-card-creative {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+}
+
+.artist-card-creative img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.artist-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+}
+
+.artist-card-creative:hover img {
+    transform: scale(1.1);
+}
+
+.artist-card-creative:hover .artist-overlay {
+    transform: translateY(0);
+}
