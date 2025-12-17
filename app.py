@@ -21,19 +21,7 @@ def create_app():
     # --- THIS IS THE KEY CHANGE ---
     # Load the default config first
     app.config.from_object(Config)
-    # Then, explicitly override it with environment variables if they exist.
-    # This makes it robust for both local and server environments.
-    app.config.update(
-        SECRET_KEY=os.getenv('SECRET_KEY'),
-        DB_CONFIG={
-            'host': os.getenv('DB_HOST'),
-            'user': os.getenv('DB_USER'),
-            'password': os.getenv('DB_PASSWORD'),
-            'database': os.getenv('DB_NAME')
-        },
-        SENDER_EMAIL=os.getenv('SENDER_EMAIL'),
-        SENDER_PASSWORD=os.getenv('SENDER_PASSWORD')
-    )
+   
     # --- END OF CHANGE ---
 
     # Initialize and register database functions
@@ -48,6 +36,7 @@ def create_app():
     from blueprints.artist_dashboard_routes import artist_dashboard_bp
     from blueprints.checkout_routes import checkout_bp
     from blueprints.admin_routes import admin_bp
+    from blueprints.info_routes import info_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(art_bp, url_prefix='/art')
@@ -56,6 +45,7 @@ def create_app():
     app.register_blueprint(artist_dashboard_bp, url_prefix='/artist-dashboard')
     app.register_blueprint(checkout_bp, url_prefix='/checkout')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(info_bp)
 
     @app.context_processor
     def inject_user():
