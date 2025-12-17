@@ -19,7 +19,7 @@ def create_app():
     app = Flask(__name__)
 
     # --- THIS IS THE KEY CHANGE ---
-    # Load the default config first
+    # Load the configuration from the Config class
     app.config.from_object(Config)
    
     # --- END OF CHANGE ---
