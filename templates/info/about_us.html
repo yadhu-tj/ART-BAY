@@ -1,49 +1,50 @@
 {% extends "base.html" %}
-
-{% block title %}About Us - ART&BAY{% endblock %}
-
-
+{% block title %}Our Story - ART&BAY{% endblock %}
 
 {% block content %}
-<section class="info-hero">
-    <div class="container text-center">
-        <h1 class="display-2 fw-bold text-white mb-2">ART<span class="accent-text">&</span>BAY</h1>
-        <p class="h4 text-muted font-monospace">EST. 2024</p>
-        <div class="mt-5">
-            <p class="lead text-white w-75 mx-auto">
-                "Art is not just decoration. It is a dialogue between the creator and the observer."
-            </p>
-        </div>
+<section class="premium-hero">
+    <div class="hero-glow" style="background: #ffffff; opacity: 0.1;"></div>
+    <div class="container text-center reveal">
+        <h1 class="hero-title" style="font-size: 8rem; letter-spacing: -5px;">ART&BAY</h1>
+        <p class="hero-subtitle mt-3">Est. 2024 • Kochi, India</p>
     </div>
 </section>
 
-<section class="py-5 bg-darker">
+<section class="py-5 position-relative" style="background: #050505;">
+    <div class="timeline-track"></div>
+
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <h2 class="text-white mb-5">The Journey</h2>
-                
-                <div class="timeline-item">
-                    <h3 class="text-white h5">The Inception</h3>
-                    <p class="text-muted">Art&Bay was born from a simple observation: talented artists lacked a platform that treated their work with dignity, while collectors struggled to find authentic pieces online.</p>
-                </div>
-
-                <div class="timeline-item">
-                    <h3 class="text-white h5">Building the Bridge</h3>
-                    <p class="text-muted">We developed a robust platform focusing on User Experience and Artist Freedom. By removing the middleman galleries, we empower artists to set their worth.</p>
-                </div>
-
-                <div class="timeline-item">
-                    <h3 class="text-white h5">The Future</h3>
-                    <p class="text-muted">We are expanding into digital verification and global exhibitions. Art&Bay is not just a store; it is a movement to democratize fine art.</p>
-                </div>
-
-                <div class="mt-5 p-4 border border-secondary rounded bg-black">
-                    <h3 class="accent-text mb-3">Our Mission</h3>
-                    <p class="text-white mb-0">To make exceptional art accessible to everyone, everywhere, while ensuring artists can make a living from their passion.</p>
-                </div>
+        
+        <div class="timeline-card left reveal">
+            <div class="glass-card">
+                <div class="timeline-dot"></div>
+                <h2 class="text-white">The Spark</h2>
+                <p class="text-gray">It began with a frustration. Too many talented artists in India had no platform to showcase their work globally without losing 50% to galleries.</p>
             </div>
         </div>
+
+        <div class="timeline-card right reveal">
+            <div class="glass-card">
+                <div class="timeline-dot"></div>
+                <h2 class="text-white">The Build</h2>
+                <p class="text-gray">We assembled a team of developers and curators. The goal was simple: Create a digital space that feels as premium as a physical gallery.</p>
+            </div>
+        </div>
+
+        <div class="timeline-card left reveal">
+            <div class="glass-card">
+                <div class="timeline-dot"></div>
+                <h2 class="text-white">The Launch</h2>
+                <p class="text-gray">In 2025, ART&BAY went live. We introduced "Smart Escrow" and "Direct-to-Artist" messaging, revolutionizing how art is sold online.</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 reveal position-relative" style="z-index: 2;">
+            <div class="glass-card d-inline-block px-5">
+                <h3 class="text-white mb-0">The Future is <span style="color: var(--accent);">Digital</span></h3>
+            </div>
+        </div>
+
     </div>
 </section>
 {% endblock %}
