@@ -1,59 +1,88 @@
 {% extends "base.html" %}
-
-{% block title %}Our Artists - ART&BAY{% endblock %}
-
+{% block title %}The Collective - ART&BAY{% endblock %}
 
 {% block content %}
-<section class="info-hero text-center">
-    <div class="container position-relative" style="z-index: 2;">
-        <h1 class="section-title">Meet the <span class="accent-text">Creators</span></h1>
-        <p class="lead text-muted mx-auto" style="max-width: 600px;">
-            Discover the visionaries behind the masterpieces. From digital surrealism to classic oil, explore the minds shaping Art&Bay.
+<section class="premium-hero">
+    <div class="hero-glow"></div>
+    <div class="container text-center position-relative reveal">
+        <p class="hero-subtitle">The Visionaries</p>
+        <h1 class="hero-title">Meet the <span style="color: var(--accent);">Collective</span></h1>
+        <p class="lead text-white-50 mt-4 mx-auto" style="max-width: 600px;">
+            A curated selection of the world's most promising digital and traditional artists.
         </p>
     </div>
 </section>
 
-<section class="py-5">
+<section class="py-5" style="background: var(--bg-dark);">
     <div class="container">
         <div class="row g-4">
-            <div class="col-md-4 col-sm-6">
-                <div class="artist-card-creative">
+            <div class="col-lg-4 col-md-6 reveal">
+                <div class="artist-grid-item">
                     <img src="https://images.unsplash.com/photo-1551024601-562963525607?auto=format&fit=crop&w=800&q=80" alt="Artist">
-                    <div class="artist-overlay">
-                        <h4 class="text-white mb-1">Elena V.</h4>
-                        <p class="text-muted small mb-0">Abstract & Digital</p>
-                        <button class="btn btn-sm btn-outline-light mt-2 rounded-pill">View Profile</button>
+                    <div class="artist-info-overlay">
+                        <h3 class="text-white">Elena V.</h3>
+                        <p class="text-white-50">Surrealism & Digital</p>
+                        <button class="btn btn-outline-light rounded-pill btn-sm mt-2">View Portfolio</button>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4 col-sm-6">
-                 <div class="artist-card-creative">
+            <div class="col-lg-4 col-md-6 reveal">
+                <div class="artist-grid-item">
                     <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80" alt="Artist">
-                    <div class="artist-overlay">
-                        <h4 class="text-white mb-1">Marcus Thorne</h4>
-                        <p class="text-muted small mb-0">Oil on Canvas</p>
-                        <button class="btn btn-sm btn-outline-light mt-2 rounded-pill">View Profile</button>
+                    <div class="artist-info-overlay">
+                        <h3 class="text-white">Marcus Thorne</h3>
+                        <p class="text-white-50">Oil on Canvas</p>
+                        <button class="btn btn-outline-light rounded-pill btn-sm mt-2">View Portfolio</button>
                     </div>
                 </div>
             </div>
 
-             <div class="col-md-4 col-sm-6">
-                <div class="artist-card-creative">
-                   <img src="https://images.unsplash.com/photo-1569172122301-bc5008bc09c5?auto=format&fit=crop&w=800&q=80" alt="Artist">
-                   <div class="artist-overlay">
-                       <h4 class="text-white mb-1">Sarah J.</h4>
-                       <p class="text-muted small mb-0">Sculpture</p>
-                       <button class="btn btn-sm btn-outline-light mt-2 rounded-pill">View Profile</button>
-                   </div>
-               </div>
-           </div>
+            <div class="col-lg-4 col-md-6 reveal">
+                <div class="artist-grid-item">
+                    <img src="https://images.unsplash.com/photo-1569172122301-bc5008bc09c5?auto=format&fit=crop&w=800&q=80" alt="Artist">
+                    <div class="artist-info-overlay">
+                        <h3 class="text-white">Sarah J.</h3>
+                        <p class="text-white-50">Modern Sculpture</p>
+                        <button class="btn btn-outline-light rounded-pill btn-sm mt-2">View Portfolio</button>
+                    </div>
+                </div>
+            </div>
+             <div class="col-lg-4 col-md-6 reveal">
+                <div class="artist-grid-item">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80" alt="Artist">
+                    <div class="artist-info-overlay">
+                        <h3 class="text-white">David K.</h3>
+                        <p class="text-white-50">Abstract</p>
+                        <button class="btn btn-outline-light rounded-pill btn-sm mt-2">View Portfolio</button>
+                    </div>
+                </div>
+            </div>
+             <div class="col-lg-4 col-md-6 reveal">
+                <div class="artist-grid-item">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" alt="Artist">
+                    <div class="artist-info-overlay">
+                        <h3 class="text-white">Anna R.</h3>
+                        <p class="text-white-50">Portraiture</p>
+                        <button class="btn btn-outline-light rounded-pill btn-sm mt-2">View Portfolio</button>
+                    </div>
+                </div>
+            </div>
+             <div class="col-lg-4 col-md-6 reveal">
+                <div class="artist-grid-item">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80" alt="Artist">
+                    <div class="artist-info-overlay">
+                        <h3 class="text-white">James L.</h3>
+                        <p class="text-white-50">Street Art</p>
+                        <button class="btn btn-outline-light rounded-pill btn-sm mt-2">View Portfolio</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-           </div>
-        
-        <div class="text-center mt-5">
-            <h3 class="mb-3">Are you an Artist?</h3>
-            <button class="btn btn-primary register-artist">Join the Collective</button>
+        <div class="text-center mt-5 pt-5 reveal">
+            <h2 class="text-white mb-4">Join the Movement</h2>
+            <button class="btn btn-primary btn-lg register-artist">Apply as Artist</button>
         </div>
     </div>
 </section>
