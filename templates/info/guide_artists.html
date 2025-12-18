@@ -1,67 +1,51 @@
 {% extends "base.html" %}
-
 {% block title %}Artist Guide - ART&BAY{% endblock %}
 
-
-
 {% block content %}
-<section class="info-hero">
-    <div class="container">
+<section class="premium-hero">
+    <div class="hero-glow"></div>
+    <div class="container position-relative z-1 reveal">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <h1 class="section-title">Share Your Vision.<br>We Handle the <span class="accent-text">Rest.</span></h1>
-                <p class="lead text-muted">A complete guide to monetizing your creativity on Art&Bay.</p>
+                <p class="hero-subtitle">Monetize Your Passion</p>
+                <h1 class="hero-title">Your Art.<br>Your <span style="color: var(--accent);">Rules.</span></h1>
             </div>
-            <div class="col-lg-6 text-center">
-                <i class="fas fa-paint-brush fa-10x" style="color: #222; text-shadow: 0 0 50px rgba(255, 106, 0, 0.2);"></i>
+            <div class="col-lg-6 text-end d-none d-lg-block">
+                <i class="fas fa-palette" style="font-size: 15rem; color: #1a1a1a; text-shadow: 0 0 80px rgba(255,106,0,0.3);"></i>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5">
+<section class="py-5 bg-black">
     <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="guide-step">
+        <div class="row mb-5 justify-content-center reveal">
+            <div class="col-lg-8">
+                <div class="glass-card">
                     <span class="step-number">01</span>
-                    <h3 class="h4 text-white mb-3 mt-4"><i class="fas fa-user-plus accent-text me-2"></i> Register</h3>
-                    <p class="text-muted">Create your artist profile. Tell us your story, upload your bio, and set up your portfolio identity.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="guide-step">
-                    <span class="step-number">02</span>
-                    <h3 class="h4 text-white mb-3 mt-4"><i class="fas fa-upload accent-text me-2"></i> Upload Art</h3>
-                    <p class="text-muted">Upload high-resolution images of your work. Set your own pricing. You retain full ownership until sold.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="guide-step">
-                    <span class="step-number">03</span>
-                    <h3 class="h4 text-white mb-3 mt-4"><i class="fas fa-wallet accent-text me-2"></i> Get Paid</h3>
-                    <p class="text-muted">When a collector buys your art, we handle the logistics. Funds are transferred securely to your account.</p>
+                    <h3 class="text-white mb-3">Create Your Identity</h3>
+                    <p class="text-gray lead">Build a professional profile that tells your story. Add a bio, profile picture, and social links to connect with collectors on a personal level.</p>
                 </div>
             </div>
         </div>
-        
-        <div class="row justify-content-center mt-5">
+
+        <div class="row mb-5 justify-content-center reveal">
             <div class="col-lg-8">
-                <h2 class="text-center mb-4">Common Questions</h2>
-                <div class="accordion accordion-flush" id="artistFaq">
-                    <div class="accordion-item bg-transparent border-bottom border-secondary">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed bg-transparent text-white shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                What is the commission rate?
-                            </button>
-                        </h2>
-                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#artistFaq">
-                            <div class="accordion-body text-muted">
-                                We charge a flat 10% platform fee on successful sales to cover hosting and marketing. You keep 90%.
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+                <div class="glass-card">
+                    <span class="step-number">02</span>
+                    <h3 class="text-white mb-3">Upload & Price</h3>
+                    <p class="text-gray lead">Upload high-res images of your work. You have total control over pricing. We provide market data to help you decide, but the final tag is yours.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center reveal">
+            <div class="col-lg-8">
+                <div class="glass-card">
+                    <span class="step-number">03</span>
+                    <h3 class="text-white mb-3">Secure Earnings</h3>
+                    <p class="text-gray lead">Once a sale is confirmed, we handle the transaction security. Funds are transferred to your wallet minus our 10% platform fee.</p>
+                </div>
             </div>
         </div>
     </div>
