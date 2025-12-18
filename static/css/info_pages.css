@@ -1,126 +1,171 @@
 /* static/css/info_pages.css */
 :root {
     --bg-dark: #0a0a0a;
-    --card-bg: #111;
+    --bg-card: rgba(30, 30, 30, 0.4);
     --accent: #ff6a00;
-    --text-main: #ffffff;
-    --text-muted: #a0a0a0;
+    --text-white: #ffffff;
+    --text-gray: #a0a0a0;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* General Layout */
-.info-hero {
-    position: relative;
-    padding: 100px 0;
-    background: radial-gradient(circle at top right, #1a1a1a, var(--bg-dark));
-    overflow: hidden;
+/* --- Global Animations --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
 }
 
-.info-hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 600px;
-    height: 600px;
-    background: var(--accent);
-    opacity: 0.05;
-    filter: blur(80px);
-    border-radius: 50%;
-    z-index: 0;
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.section-title {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    background: linear-gradient(45deg, #fff, #888);
+/* --- Typography --- */
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    line-height: 1;
+    background: linear-gradient(to right, #fff, #666);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
 }
 
-.accent-text {
+.hero-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     color: var(--accent);
 }
 
-/* Feature Cards (Guides) */
-.guide-step {
-    background: var(--card-bg);
-    border: 1px solid #222;
-    padding: 2rem;
-    border-radius: 16px;
-    transition: all 0.4s ease;
-    height: 100%;
+/* --- Hero Sections --- */
+.premium-hero {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    z-index: 1;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
 }
 
-.guide-step:hover {
+.hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: var(--accent);
+    filter: blur(150px);
+    opacity: 0.15;
+    border-radius: 50%;
+    animation: pulse 5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.1; }
+    100% { transform: scale(1.2); opacity: 0.2; }
+}
+
+/* --- Glass Cards (Guides) --- */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: var(--glass-border);
+    padding: 3rem;
+    border-radius: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
     transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     border-color: var(--accent);
-    box-shadow: 0 10px 30px rgba(255, 106, 0, 0.1);
 }
 
 .step-number {
-    font-size: 4rem;
+    font-size: 5rem;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.05);
     position: absolute;
-    top: 10px;
+    top: -20px;
     right: 20px;
-    line-height: 1;
 }
 
-/* About Us Timeline */
-.timeline-item {
-    border-left: 2px solid #333;
-    padding-left: 30px;
-    position: relative;
-    padding-bottom: 50px;
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -6px;
-    top: 0;
-    width: 10px;
-    height: 10px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--accent);
-}
-
-/* Artists Showcase Grid */
-.artist-card-creative {
+/* --- Artist Masonry --- */
+.artist-grid-item {
     position: relative;
     overflow: hidden;
-    border-radius: 20px;
-    aspect-ratio: 1/1;
+    border-radius: 15px;
     cursor: pointer;
+    aspect-ratio: 3/4;
 }
 
-.artist-card-creative img {
+.artist-grid-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.7s ease;
+    filter: grayscale(100%);
 }
 
-.artist-overlay {
+.artist-grid-item:hover img {
+    transform: scale(1.1);
+    filter: grayscale(0%);
+}
+
+.artist-info-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
-    right: 0;
+    width: 100%;
+    padding: 30px;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    padding: 20px;
     transform: translateY(100%);
     transition: transform 0.4s ease;
 }
 
-.artist-card-creative:hover img {
-    transform: scale(1.1);
+.artist-grid-item:hover .artist-info-overlay {
+    transform: translateY(0);
 }
 
-.artist-card-creative:hover .artist-overlay {
-    transform: translateY(0);
+/* --- About Timeline --- */
+.timeline-track {
+    position: absolute;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(255,255,255,0.1);
+    transform: translateX(-50%);
+}
+
+.timeline-card {
+    width: 45%;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.timeline-card.left { margin-right: auto; text-align: right; }
+.timeline-card.right { margin-left: auto; }
+
+.timeline-dot {
+    position: absolute;
+    top: 20px;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--accent);
+}
+
+.left .timeline-dot { right: -5.5%; }
+.right .timeline-dot { left: -5.5%; }
+
+/* Mobile Timeline Fix */
+@media (max-width: 768px) {
+    .hero-title { font-size: 3rem; }
+    .timeline-track { left: 20px; }
+    .timeline-card { width: 90%; margin-left: 50px; text-align: left; }
+    .timeline-card.left { margin-right: 0; text-align: left; }
+    .left .timeline-dot, .right .timeline-dot { left: -38px; right: auto; }
 }
