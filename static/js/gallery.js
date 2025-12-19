@@ -280,6 +280,22 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    
+
+    
+
+    // --- CHECK URL FOR SEARCH PARAM ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSearchQuery = urlParams.get('search');
+
+    if (urlSearchQuery && searchInput) {
+        // Pre-fill the search box
+        searchInput.value = urlSearchQuery;
+        
+        // Trigger the search
+    }
+   
+
     // Load initial artworks with loading state
     fetchFilteredArtworks();
     
