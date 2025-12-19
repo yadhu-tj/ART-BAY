@@ -1,3 +1,4 @@
+#
 import logging
 from mysql.connector import Error
 from .database import get_db_connection
@@ -19,7 +20,7 @@ def get_dashboard_metrics():
         cursor.execute("SELECT COUNT(*) AS count FROM art")
         metrics['total_artworks'] = cursor.fetchone()['count']
         
-        # Get pending artists (users with role 'artist' but not approved)
+        # Get pending artists
         cursor.execute("""
             SELECT COUNT(*) AS count 
             FROM users 
@@ -34,25 +35,13 @@ def get_dashboard_metrics():
         logger.error(f"DB error fetching metrics: {e}")
         return {'error': str(e)}
 
-#
-
 def get_users(search=''):
-    """Fetches users with optional search, sanitized to prevent wildcard abuse."""
+    """Fetches users with optional search."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
-        # FIX: Escape special SQL characters so they are treated as literals
-        # This prevents a user from searching "%" to dump the entire database
-        if search:
-            search_term = search.replace('\\', '\\\\').replace('%', '\%').replace('_', '\_')
-        else:
-            search_term = ''
-
         query = "SELECT email, name, role FROM users WHERE email LIKE %s OR name LIKE %s"
-        
-        # We wrap the sanitized term in % for the actual wildcard matching
-        cursor.execute(query, (f'%{search_term}%', f'%{search_term}%'))
+        cursor.execute(query, (f'%{search}%', f'%{search}%'))
         return cursor.fetchall()
     except Error as e:
         logger.error(f"DB error fetching users: {e}")
@@ -126,9 +115,10 @@ def get_orders(search=''):
             logger.warning("Orders table does not exist")
             return []
         
+        # FIX: Changed 'total_amount' to 'total_price' and 'status' to 'order_status'
         query = """
-            SELECT o.order_id, o.email, o.total_amount as total_price, 
-                   o.order_date, o.status as order_status
+            SELECT o.order_id, o.email, o.total_price, 
+                   o.order_date, o.order_status
             FROM orders o 
             WHERE o.email LIKE %s
             ORDER BY o.order_date DESC
@@ -145,9 +135,9 @@ def get_order_details(order_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Get order information
+        # FIX: Changed 'total_amount' to 'total_price' and 'status' to 'order_status'
         cursor.execute("""
-            SELECT order_id, email, total_amount, order_date, status
+            SELECT order_id, email, total_price, order_date, order_status
             FROM orders 
             WHERE order_id = %s
         """, (order_id,))
@@ -156,6 +146,13 @@ def get_order_details(order_id):
         if not order:
             return {'error': 'Order not found'}
         
+        # Remap for frontend consistency if needed, or update frontend to use DB column names
+        # For now, let's keep the keys consistent with what the frontend expects
+        if 'total_price' in order:
+            order['total_amount'] = order['total_price'] # Backwards compatibility for template
+        if 'order_status' in order:
+            order['status'] = order['order_status'] # Backwards compatibility for template
+
         # Get order items
         cursor.execute("""
             SELECT oi.quantity, oi.price_at_purchase, a.title 
@@ -176,10 +173,8 @@ def get_settings():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Check if settings table exists
         cursor.execute("SHOW TABLES LIKE 'settings'")
         if not cursor.fetchone():
-            # Return default settings if table doesn't exist
             return {'artist_approval_required': True}
         
         cursor.execute("SELECT setting_key, setting_value FROM settings")
@@ -187,7 +182,6 @@ def get_settings():
         for row in cursor.fetchall():
             settings[row['setting_key']] = row['setting_value']
         
-        # Set defaults if not found
         if 'artist_approval_required' not in settings:
             settings['artist_approval_required'] = True
             
@@ -202,7 +196,6 @@ def update_settings(settings_data):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Create settings table if it doesn't exist
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS settings (
                 setting_key VARCHAR(50) PRIMARY KEY,
@@ -211,7 +204,6 @@ def update_settings(settings_data):
             )
         """)
         
-        # Update settings
         for key, value in settings_data.items():
             query = """
                 INSERT INTO settings (setting_key, setting_value) 
@@ -232,7 +224,6 @@ def delete_user(email):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # The ON DELETE CASCADE in your database will handle related records.
         cursor.execute("DELETE FROM users WHERE email = %s", (email,))
         conn.commit()
         return {'status': 'success', 'message': 'User deleted successfully.'}
@@ -247,7 +238,6 @@ def get_pending_artists():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Get users with role 'artist' who are not in the approved artists list
         query = """
             SELECT u.name, u.email, u.role
             FROM users u
@@ -259,7 +249,6 @@ def get_pending_artists():
         cursor.execute(query)
         pending_artists = cursor.fetchall()
         
-        # Add bio field (empty for now since it's not in users table)
         for artist in pending_artists:
             artist['bio'] = 'Artist application pending approval'
             
@@ -274,7 +263,6 @@ def approve_artist(email):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # First, ensure the artists table exists
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS artists (
                 email VARCHAR(100) PRIMARY KEY,
@@ -285,7 +273,6 @@ def approve_artist(email):
             )
         """)
         
-        # Add artist to artists table with approved status
         cursor.execute("""
             INSERT INTO artists (email, approved) 
             VALUES (%s, 1) 
