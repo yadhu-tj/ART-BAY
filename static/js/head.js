@@ -5,6 +5,33 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded!");
+    //
+
+    // --- GLOBAL SEARCH LOGIC ---
+    const globalSearchInput = document.getElementById('global-search-input');
+    const globalSearchBtn = document.getElementById('global-search-btn');
+
+    function performGlobalSearch() {
+        const query = globalSearchInput.value.trim();
+        if (query) {
+            // Redirect to the gallery page with the search query as a URL parameter
+            
+            window.location.href = `/gallery?search=${encodeURIComponent(query)}`;
+        }
+    }
+
+    if (globalSearchInput && globalSearchBtn) {
+        // Trigger search on button click
+        globalSearchBtn.addEventListener('click', performGlobalSearch);
+
+        // Trigger search on 'Enter' key press
+        globalSearchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                performGlobalSearch();
+            }
+        });
+    }
+    // ---------------------------
 
     // Mobile Detection
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
