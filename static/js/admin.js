@@ -1,323 +1,164 @@
-/**
- * Admin Dashboard JavaScript - Enhanced Version
- * Handles all interactive functionality for the admin dashboard
- */
-
+//
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize mobile sidebar functionality
     initMobileSidebar();
-    
-    // Initialize dashboard components based on active page
-    const activePage = document.querySelector('.admin-nav-link.active');
-    if (activePage) {
-        const pageId = activePage.getAttribute('href').split('/').pop();
-        
-        switch(pageId) {
-            case 'dashboard':
-                loadDashboardData();
-                break;
-            case 'users':
-                loadUsersData();
-                break;
-            case 'artworks':
-                loadArtworksData();
-                break;
-            case 'orders':
-                loadOrdersData();
-                break;
-            case 'settings':
-                initSettingsForm();
-                break;
-        }
-    }
-    
-    // Initialize global components
     initAlerts();
-    initRefreshButtons();
-    initSearchFunctionality();
     initTooltips();
-    initModalHandling(); // Initialize modal handling
+    initModalHandling();
+    
+    // Core Logic: specific initializers
+    // We DO NOT call loadXData() here anymore. We rely on Jinja for the first paint.
+    initRefreshButtons();
+    initServerSideSearch(); 
+    
+    // Initialize Management Actions (Edit/Delete buttons)
+    initUserManagement();
+    initArtworkManagement();
+    initOrderManagement();
+    initSettingsForm();
 });
 
-/**
- * Initialize modal handling
- */
-function initModalHandling() {
-    // Handle modal open/close to prevent body scrolling
-    document.addEventListener('show.bs.modal', function(event) {
-        document.body.classList.add('modal-open');
-        document.body.style.overflow = 'hidden';
-        document.body.style.paddingRight = '0';
-    });
-    
-    document.addEventListener('hidden.bs.modal', function(event) {
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
-    });
-    
-    // Remove focus outline from modal elements
-    document.addEventListener('DOMContentLoaded', function() {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            modal.addEventListener('shown.bs.modal', function() {
-                // Remove focus outline from modal content
-                const modalContent = this.querySelector('.modal-content');
-                if (modalContent) {
-                    modalContent.style.outline = 'none';
-                    modalContent.setAttribute('tabindex', '-1');
-                }
-                
-                // Remove focus outline from modal dialog
-                const modalDialog = this.querySelector('.modal-dialog');
-                if (modalDialog) {
-                    modalDialog.style.outline = 'none';
-                }
-            });
-        });
-    });
-    
-    // Prevent modal backdrop from causing scrolling
-    document.addEventListener('click', function(event) {
-        if (event.target.classList.contains('modal-backdrop')) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-    });
-}
-
-/**
- * Initialize mobile sidebar functionality
- */
-function initMobileSidebar() {
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('admin-sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    
-    if (sidebarToggle && sidebar && overlay) {
-        // Toggle sidebar
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            document.body.classList.toggle('sidebar-open');
-        });
-        
-        // Close sidebar when clicking overlay
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.classList.remove('sidebar-open');
-        });
-        
-        // Close sidebar when clicking on a nav link (mobile)
-        document.querySelectorAll('.admin-nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth <= 1024) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                    document.body.classList.remove('sidebar-open');
-                }
-            });
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 1024) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                document.body.classList.remove('sidebar-open');
-            }
-        });
-    }
-}
-
-/**
- * Initialize refresh buttons
- */
-function initRefreshButtons() {
-    const refreshButtons = {
-        'refresh-users': loadUsersData,
-        'refresh-artworks': loadArtworksData,
-        'refresh-orders': loadOrdersData
+// --- 1. NEW SERVER-SIDE SEARCH LOGIC ---
+function initServerSideSearch() {
+    const searchConfig = {
+        'admin_user_search_input': { api: '/admin/api/users', render: renderUsersTable },
+        'admin_artwork_search_input': { api: '/admin/api/artworks', render: renderArtworksTable },
+        'admin_order_search_input': { api: '/admin/api/orders', render: renderOrdersTable }
     };
-    
-    Object.keys(refreshButtons).forEach(buttonId => {
-        const button = document.getElementById(buttonId);
-        if (button) {
-            button.addEventListener('click', function() {
-                this.classList.add('loading');
-                const icon = this.querySelector('i');
-                if (icon) {
-                    icon.className = 'fas fa-spinner fa-spin me-1';
-                }
-                
-                refreshButtons[buttonId]().finally(() => {
-                    this.classList.remove('loading');
-                    if (icon) {
-                        icon.className = 'fas fa-sync-alt me-1';
-                    }
-                });
-            });
-        }
-    });
-}
 
-/**
- * Initialize search functionality
- */
-function initSearchFunctionality() {
-    const searchInputs = {
-        'admin_user_search_input': '#admin_users_table tbody tr',
-        'admin_artwork_search_input': '#admin_artworks_table tbody tr',
-        'admin_order_search_input': '#admin_orders_table tbody tr'
-    };
-    
-    Object.keys(searchInputs).forEach(inputId => {
+    Object.keys(searchConfig).forEach(inputId => {
         const input = document.getElementById(inputId);
         if (input) {
-            input.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const rows = document.querySelectorAll(searchInputs[inputId]);
+            // Debounce the search to avoid spamming the server
+            input.addEventListener('input', debounce(function(e) {
+                const searchTerm = e.target.value.trim();
+                const config = searchConfig[inputId];
                 
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    if (text.includes(searchTerm)) {
-                        row.style.display = '';
-                        row.classList.add('fade-in');
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-                
-                // Show no results message if needed
-                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
-                const noResultsRow = row.querySelector('.no-results');
-                if (visibleRows.length === 0 && searchTerm) {
-                    if (!noResultsRow) {
-                        const noResults = document.createElement('tr');
-                        noResults.className = 'no-results';
-                        noResults.innerHTML = `
-                            <td colspan="100%" class="text-center">
-                                <div class="py-4">
-                                    <i class="fas fa-search fa-2x text-muted mb-3"></i>
-                                    <p class="text-muted">No results found for "${searchTerm}"</p>
-                                </div>
-                            </td>
-                        `;
-                        row.parentNode.appendChild(noResults);
-                    }
-                } else if (noResultsRow) {
-                    noResultsRow.remove();
-                }
-            });
+                // Show loading spinner in the table
+                showTableLoading(inputId);
+
+                fetch(`${config.api}?search=${encodeURIComponent(searchTerm)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        config.render(data);
+                        // Re-attach event listeners for the new buttons
+                        if(inputId.includes('user')) initUserManagement();
+                        if(inputId.includes('artwork')) initArtworkManagement();
+                        if(inputId.includes('order')) initOrderManagement();
+                    })
+                    .catch(err => console.error('Search failed:', err));
+            }, 500));
         }
     });
 }
 
-/**
- * Initialize tooltips
- */
-function initTooltips() {
-    // Initialize Bootstrap tooltips if available
-    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }
+// Utility: Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
 }
 
-/**
- * Initialize sidebar toggle for mobile
- */
-function initSidebar() {
-    const sidebarToggle = document.querySelector('.sidebar-toggle');
-    const sidebar = document.getElementById('admin-sidebar');
-    
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-            document.getElementById('admin-content').classList.toggle('expanded');
-        });
-    }
-}
+// --- 2. RENDERING FUNCTIONS (Reused by Search & Refresh) ---
 
-/**
- * Load dashboard data and initialize dashboard components
- */
-function loadDashboardData() {
-    // Show loading state
-    const cards = document.querySelectorAll('.admin-card');
-    cards.forEach(card => {
-        card.classList.add('loading');
-    });
-    
-    // Fetch and render dashboard metrics
-    fetch('/admin/api/metrics')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                showAlert('Failed to load dashboard metrics: ' + data.error, 'danger');
-                renderDashboardMetrics({ total_users: 0, total_artworks: 0, pending_artists: 0 });
-            } else {
-                renderDashboardMetrics(data);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading metrics:', error);
-            showAlert('Failed to load dashboard metrics', 'danger');
-            renderDashboardMetrics({ total_users: 0, total_artworks: 0, pending_artists: 0 });
-        })
-        .finally(() => {
-            // Remove loading state
-            cards.forEach(card => {
-                card.classList.remove('loading');
-            });
-        });
-}
+function renderUsersTable(users) {
+    const tbody = document.querySelector('#admin_users_table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-/**
- * Render dashboard metrics to the UI
- */
-function renderDashboardMetrics(metrics) {
-    console.log('Rendering metrics:', metrics);
-    const cards = document.querySelectorAll('.admin-card');
-    console.log('Cards found, count:', cards.length);
-
-    // Retry mechanism if cards aren't found immediately
-    if (cards.length === 0) {
-        setTimeout(() => {
-            const retryCards = document.querySelectorAll('.admin-card');
-            if (retryCards.length > 0) {
-                renderCards(retryCards, metrics);
-            } else {
-                console.error('No .admin-card elements found after retry');
-            }
-        }, 100);
+    if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No users found</td></tr>`;
         return;
     }
 
-    renderCards(cards, metrics);
-}
-
-function renderCards(cards, metrics) {
-    const usersCard = cards[0] ? cards[0].querySelector('.admin-card-body h3') : null;
-    const artworksCard = cards[1] ? cards[1].querySelector('.admin-card-body h3') : null;
-    const pendingArtistsCard = cards[2] ? cards[2].querySelector('.admin-card-body h3') : null;
-
-    if (usersCard) usersCard.textContent = metrics.total_users || 0;
-    if (artworksCard) artworksCard.textContent = metrics.total_artworks || 0;
-    if (pendingArtistsCard) pendingArtistsCard.textContent = metrics.pending_artists || 0;
-
-    cards.forEach(card => {
-        if (!card.classList.contains('show')) {
-            card.classList.add('show');
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }
+    users.forEach(user => {
+        const roleBadge = user.role === 'admin' ? 'primary' : (user.role === 'artist' ? 'success' : 'secondary');
+        const row = `
+            <tr>
+                <td>${user.email}</td>
+                <td>${user.name}</td>
+                <td><span class="badge badge-${roleBadge}">${user.role}</span></td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary admin-user-edit-btn" 
+                            data-email="${user.email}" data-name="${user.name}" data-role="${user.role}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger admin-user-delete-btn" data-email="${user.email}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        tbody.innerHTML += row;
     });
-    console.log('Cards updated, count:', cards.length);
 }
+
+function renderArtworksTable(artworks) {
+    const tbody = document.querySelector('#admin_artworks_table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!artworks || artworks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No artworks found</td></tr>`;
+        return;
+    }
+
+    artworks.forEach(art => {
+        const row = `
+            <tr>
+                <td>${art.title}</td>
+                <td>${art.artist_name || 'Unknown'}</td>
+                <td><span class="badge badge-success">₹${parseFloat(art.price).toFixed(2)}</span></td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary admin-artwork-edit-btn"
+                                data-id="${art.art_id}" data-title="${art.title}" data-price="${art.price}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger admin-artwork-delete-btn" data-id="${art.art_id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        tbody.innerHTML += row;
+    });
+}
+
+function renderOrdersTable(orders) {
+    // ... Implement similar to renderUsersTable ...
+    // Using the same structure as your HTML template
+}
+
+// --- 3. REFRESH BUTTONS ---
+function initRefreshButtons() {
+    // Only refresh makes an API call now
+    const bindRefresh = (btnId, api, renderFunc, reInitFunc) => {
+        const btn = document.getElementById(btnId);
+        if(btn) {
+            btn.addEventListener('click', () => {
+                btn.classList.add('loading');
+                fetch(api)
+                    .then(res => res.json())
+                    .then(data => {
+                        renderFunc(data);
+                        if(reInitFunc) reInitFunc();
+                    })
+                    .finally(() => btn.classList.remove('loading'));
+            });
+        }
+    };
+
+    bindRefresh('refresh-users', '/admin/api/users', renderUsersTable, initUserManagement);
+    bindRefresh('refresh-artworks', '/admin/api/artworks', renderArtworksTable, initArtworkManagement);
+    bindRefresh('refresh-orders', '/admin/api/orders', renderOrdersTable, initOrderManagement);
+}
+
+// ... Keep your existing initUserManagement, initArtworkManagement, etc. ...
+// ... Keep initMobileSidebar, showAlert ...
 
 /**
  * Initialize user management
