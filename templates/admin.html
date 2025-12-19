@@ -444,7 +444,7 @@
                                                 <td>#{{ order.order_id }}</td>
                                                 <td>{{ order.email }}</td>
                                                 <td>
-                                                    <span class="badge badge-success">₹{{ order.total_price | float | format('%.2f') }}</span>
+                                                    <span class="badge badge-success">₹{{ '%.2f' | format(order.total_price | float) }}</span>
                                                 </td>
                                                 <td>
                                                     <span class="badge badge-{{ 'success' if order.order_status == 'completed' else 'warning' if order.order_status == 'pending' else 'info' }}">
