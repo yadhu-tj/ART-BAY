@@ -128,11 +128,42 @@ function renderArtworksTable(artworks) {
     });
 }
 
-function renderOrdersTable(orders) {
-    // ... Implement similar to renderUsersTable ...
-    // Using the same structure as your HTML template
-}
+//
 
+function renderOrdersTable(orders) {
+    const tbody = document.querySelector('#admin_orders_table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!orders || orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No orders found</td></tr>`;
+        return;
+    }
+
+    orders.forEach(order => {
+        // Determine badge color based on status
+        let badgeClass = 'secondary';
+        if (order.order_status === 'completed') badgeClass = 'success';
+        if (order.order_status === 'pending') badgeClass = 'warning';
+        if (order.order_status === 'cancelled') badgeClass = 'danger';
+
+        const row = `
+            <tr>
+                <td>#${order.order_id}</td>
+                <td>${order.email}</td>
+                <td><span class="badge badge-success">₹${parseFloat(order.total_price).toFixed(2)}</span></td>
+                <td><span class="badge badge-${badgeClass}">${order.order_status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-primary admin-order-view-btn" 
+                            data-id="${order.order_id}" 
+                            title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>`;
+        tbody.innerHTML += row;
+    });
+}
 // --- 3. REFRESH BUTTONS ---
 function initRefreshButtons() {
     // Only refresh makes an API call now
