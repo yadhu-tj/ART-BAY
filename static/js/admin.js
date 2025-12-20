@@ -850,6 +850,7 @@ function loadOrdersData() {
 /**
  * Initialize settings form
  */
+//
 function initSettingsForm() {
     const settingsForm = document.getElementById('admin_settings_form');
     if (settingsForm) {
@@ -857,23 +858,34 @@ function initSettingsForm() {
             e.preventDefault();
             
             const formData = new FormData(this);
+            // Checkbox fix: FormData doesn't send unchecked boxes, so we manually check
+            if(!this.querySelector('[name="setting_artist_approval"]').checked) {
+                formData.append('setting_artist_approval', 'off');
+            } else {
+                 formData.set('setting_artist_approval', 'on');
+            }
+
+            if(!this.querySelector('[name="setting_maintenance_mode"]').checked) {
+                formData.append('setting_maintenance_mode', 'off');
+            } else {
+                 formData.set('setting_maintenance_mode', 'on');
+            }
             
-            // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
             submitBtn.disabled = true;
             
-            fetch('/admin/settings', {
+            fetch('/admin/settings/update', { // Updated URL
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success || data.status === 'success') {
+                if (data.status === 'success') {
                     showAlert('Settings updated successfully', 'success');
                 } else {
-                    showAlert('Error: ' + (data.message || data.error), 'danger');
+                    showAlert('Error: ' + data.message, 'danger');
                 }
             })
             .catch(error => {
@@ -881,7 +893,6 @@ function initSettingsForm() {
                 showAlert('An error occurred', 'danger');
             })
             .finally(() => {
-                // Restore button state
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             });
