@@ -186,6 +186,7 @@ EMAIL_CONFIG = {
 - **Order Management**: Track and manage all orders
 - **Artwork Moderation**: Approve or reject uploaded artwork
 - **Platform Analytics**: View platform statistics and metrics
+- **Advanced Admin Settings:** Configure commission rates, shipping fees, and site maintenance mode dynamically.
 
 ## 🛠️ API Endpoints
 
