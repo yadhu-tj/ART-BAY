@@ -525,31 +525,62 @@
                 </div>
                 {% endif %}
 
-                <!-- Settings -->
-                {% if admin_active_page == 'settings' %}
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="admin-card">
-                            <div class="admin-card-header">
-                                <h5><i class="fas fa-cogs me-2"></i>Settings</h5>
+{% if admin_active_page == 'settings' %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <h5><i class="fas fa-briefcase me-2"></i>Business Logic</h5>
+            </div>
+            <div class="admin-card-body">
+                <form id="admin_settings_form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Platform Commission (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="setting_platform_commission" 
+                                       value="{{ settings.get('platform_commission', '10') if settings else '10' }}">
+                                <span class="input-group-text">%</span>
                             </div>
-                            <div class="admin-card-body">
-                                <form id="admin_settings_form" action="{{ url_for('admin.update_settings') }}" method="POST">
-                                    <div class="mb-3 form-check">
-                                        <input class="form-check-input" type="checkbox" id="admin_setting_artist_approval" name="setting_artist_approval" value="1" {% if settings.get('artist_approval', '1') == '1' %}checked{% endif %}>
-                                        <label class="form-check-label" for="admin_setting_artist_approval">
-                                            <i class="fas fa-user-check me-2"></i>Require Manual Artist Approval
-                                        </label>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-1"></i>Save Settings
-                                    </button>
-                                </form>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Base Shipping Fee (₹)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" name="setting_base_shipping" 
+                                       value="{{ settings.get('base_shipping', '150') if settings else '150' }}">
                             </div>
                         </div>
                     </div>
-                </div>
-                {% endif %}
+                    
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="check_artist" name="setting_artist_approval" 
+                               {% if settings and settings.get('artist_approval') == '1' %}checked{% endif %}>
+                        <label class="form-check-label" for="check_artist">Require Manual Artist Approval</label>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h6>
+                    
+                    <div class="p-3 border border-danger rounded bg-dark-subtle">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="check_maint" name="setting_maintenance_mode"
+                                   {% if settings and settings.get('maintenance_mode') == '1' %}checked{% endif %}>
+                            <label class="form-check-label text-danger fw-bold" for="check_maint">
+                                Enable Maintenance Mode (Shuts down site for users)
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-4">
+                        <i class="fas fa-save me-1"></i>Save All Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
             </div>
         </main>
     </div>
