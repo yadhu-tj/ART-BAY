@@ -339,17 +339,28 @@ def settings():
             metrics={}
         )
 
-@admin_bp.route('/settings', methods=['POST'])
+#
+
+@admin_bp.route('/settings/update', methods=['POST'])  # Changed URL slightly to be specific
 @admin_required
 def update_settings_route():
     try:
         current_app.logger.info("Update settings route accessed")
-        artist_approval = '1' if request.form.get('setting_artist_approval') == '1' else '0'
-        result = update_settings({'artist_approval': artist_approval})
+        
+        # specific business logic
+        settings_data = {
+            'artist_approval': '1' if request.form.get('setting_artist_approval') == 'on' else '0',
+            'maintenance_mode': '1' if request.form.get('setting_maintenance_mode') == 'on' else '0',
+            'platform_commission': request.form.get('setting_platform_commission', '10'),
+            'base_shipping': request.form.get('setting_base_shipping', '150')
+        }
+        
+        result = update_settings(settings_data)
+        
         if 'error' in result:
-            current_app.logger.error(f"Failed to update settings: {result['error']}")
             return jsonify({'status': 'error', 'message': result['error']}), 400
-        return jsonify({'status': 'success', 'message': 'Settings updated successfully'})
+            
+        return jsonify({'status': 'success', 'message': 'Business settings updated successfully'})
     except Exception as e:
         current_app.logger.error(f"Update settings error: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': str(e)}), 500
