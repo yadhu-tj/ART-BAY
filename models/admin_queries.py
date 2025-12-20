@@ -167,35 +167,48 @@ def get_order_details(order_id):
         logger.error(f"DB error fetching order details: {e}")
         return {'error': str(e)}
     
+#
+
 def get_settings():
-    """Fetches admin settings."""
+    """Fetches admin settings with defaults."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
+        # Ensure table exists first
         cursor.execute("SHOW TABLES LIKE 'settings'")
         if not cursor.fetchone():
-            return {'artist_approval_required': True}
+            return {
+                'artist_approval': '1',
+                'platform_commission': '10',
+                'base_shipping': '150',
+                'maintenance_mode': '0'
+            }
         
         cursor.execute("SELECT setting_key, setting_value FROM settings")
         settings = {}
         for row in cursor.fetchall():
             settings[row['setting_key']] = row['setting_value']
         
-        if 'artist_approval_required' not in settings:
-            settings['artist_approval_required'] = True
-            
-        return settings
+        # Merge with defaults to prevent crashes
+        defaults = {
+            'artist_approval': '1',
+            'platform_commission': '10',
+            'base_shipping': '150',
+            'maintenance_mode': '0'
+        }
+        return {**defaults, **settings}
     except Error as e:
         logger.error(f"DB error fetching settings: {e}")
-        return {'artist_approval_required': True}
+        return {}
 
 def update_settings(settings_data):
-    """Updates admin settings."""
+    """Updates multiple admin settings at once."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # Auto-create table if missing
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS settings (
                 setting_key VARCHAR(50) PRIMARY KEY,
