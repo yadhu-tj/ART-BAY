@@ -1452,3 +1452,32 @@ body.modal-open {
   .table td { text-align: right; padding-left: 50%; position: relative; border: none; }
   .table td:before { content: attr(data-label); position: absolute; left: 15px; width: 45%; padding-right: 10px; white-space: nowrap; text-align: left; font-weight: bold; color: var(--text-secondary); }
 }
+
+/* */
+
+/* Settings Page Specifics */
+.bg-dark-subtle {
+    background-color: rgba(220, 53, 69, 0.1); /* Red tint for danger zone */
+}
+
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Danger Switch Red */
+#check_maint:checked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.admin-card-body hr {
+    border-color: var(--border-color);
+    opacity: 0.2;
+}
