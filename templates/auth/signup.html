@@ -4,34 +4,37 @@
 {% block title %}Sign Up - ART&BAY{% endblock %}
 
 {% block content %}
-    {# Only add the outer container if we are on a FULL PAGE (not a modal) #}
-    {% if not request.headers.get('X-Requested-With') == 'XMLHttpRequest' %}
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+{# Only add the outer container if we are on a FULL PAGE (not a modal) #}
+{% if not request.headers.get('X-Requested-With') == 'XMLHttpRequest' %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     {% endif %}
 
     <div class="signup-container">
         <div id="userInfoStep" class="signup-step active">
             <h2 class="text-center mb-4">Create Account</h2>
-            
+
             <form id="signupForm">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
-                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="signup-name" name="name" placeholder="Name" required>
+                    <label for="signup-name">Name</label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Email ID" required>
-                    <label for="email">Email ID</label>
+                    <input type="email" class="form-control" id="signup-email" name="email" placeholder="Email ID"
+                        required>
+                    <label for="signup-email">Email ID</label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="signup-password" name="password"
+                        placeholder="Password" required>
+                    <label for="signup-password">Password</label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
-                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" class="form-control" id="signup-confirmPassword" name="confirmPassword"
+                        placeholder="Confirm Password" required>
+                    <label for="signup-confirmPassword">Confirm Password</label>
                 </div>
 
                 <button type="button" id="sendOtpBtn" class="btn btn-primary w-100">
@@ -46,14 +49,63 @@
                 <p>Already have an account? <a href="/auth/login" class="switch-to-login">Login here</a></p>
             </div>
         </div>
-        
+
         <div id="otpStep" class="signup-step" style="display: none;">
-             <div class="text-center">OTP Form Hidden for brevity</div>
-         </div>
+            <h3 class="text-center mb-4">Verification</h3>
+            <p class="text-center text-muted mb-4">
+                Enter the 6-digit code sent to <br>
+                <strong><span id="userEmail"></span></strong>
+            </p>
+
+            <div class="otp-container mb-4 d-flex justify-content-center gap-2">
+                <input type="text" class="form-control otp-input" maxlength="1" pattern="\d*" inputmode="numeric"
+                    required>
+                <input type="text" class="form-control otp-input" maxlength="1" pattern="\d*" inputmode="numeric"
+                    required>
+                <input type="text" class="form-control otp-input" maxlength="1" pattern="\d*" inputmode="numeric"
+                    required>
+                <input type="text" class="form-control otp-input" maxlength="1" pattern="\d*" inputmode="numeric"
+                    required>
+                <input type="text" class="form-control otp-input" maxlength="1" pattern="\d*" inputmode="numeric"
+                    required>
+                <input type="text" class="form-control otp-input" maxlength="1" pattern="\d*" inputmode="numeric"
+                    required>
+            </div>
+
+            <div class="text-center mb-3" id="otpTimer">
+                <small class="text-muted">Resend OTP in <span id="countdown">10:00</span></small>
+            </div>
+
+            <button type="button" id="verifyOtpBtn" class="btn btn-primary w-100 mb-3" disabled>
+                <span class="btn-text">Verify & Create Account</span>
+                <span class="btn-loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Verifying...
+                </span>
+            </button>
+
+            <button type="button" id="resendOtpBtn" class="btn btn-outline-secondary w-100 mb-3" style="display: none;">
+                Resend OTP
+            </button>
+
+            <button type="button" id="backToSignupBtn" class="btn btn-link w-100 text-decoration-none">
+                <i class="fas fa-arrow-left me-1"></i> Back to Details
+            </button>
+        </div>
+
+        <div id="successStep" class="signup-step text-center" style="display: none;">
+            <div class="success-animation mb-4">
+                <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+            </div>
+            <h3 class="mb-3">Welcome!</h3>
+            <p class="text-muted mb-4">Your account has been successfully created.</p>
+            <button type="button" id="goToLoginBtn" class="btn btn-primary w-100">
+                Go to Login
+            </button>
+        </div>
     </div>
     {# Close the container if we opened it #}
     {% if not request.headers.get('X-Requested-With') == 'XMLHttpRequest' %}
-    </div>
-    {% endif %}
+</div>
+{% endif %}
 
 {% endblock %}
