@@ -20,13 +20,22 @@ def get_dashboard_metrics():
         cursor.execute("SELECT COUNT(*) AS count FROM art")
         metrics['total_artworks'] = cursor.fetchone()['count']
         
+        # Ensure artists table exists to prevent crash
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS artists (
+                email VARCHAR(100) PRIMARY KEY,
+                bio TEXT,
+                profile_pic VARCHAR(255),
+                approved TINYINT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
         # Get pending artists
         cursor.execute("""
             SELECT COUNT(*) AS count 
-            FROM users 
-            WHERE role = 'artist' AND email NOT IN (
-                SELECT email FROM artists WHERE approved = 1
-            )
+            FROM artists 
+            WHERE approved = 0
         """)
         metrics['pending_artists'] = cursor.fetchone()['count']
         
@@ -252,18 +261,16 @@ def get_pending_artists():
         cursor = conn.cursor(dictionary=True)
         
         query = """
-            SELECT u.name, u.email, u.role
+            SELECT u.name, u.email, u.role, a.bio, a.created_at
             FROM users u
-            WHERE u.role = 'artist' 
-            AND u.email NOT IN (
-                SELECT email FROM artists WHERE approved = 1
-            )
+            JOIN artists a ON u.email = a.email
+            WHERE a.approved = 0
         """
         cursor.execute(query)
         pending_artists = cursor.fetchall()
         
-        for artist in pending_artists:
-            artist['bio'] = 'Artist application pending approval'
+        # for artist in pending_artists:
+        #     artist['bio'] = 'Artist application pending approval'
             
         return pending_artists
     except Error as e:
@@ -291,6 +298,9 @@ def approve_artist(email):
             VALUES (%s, 1) 
             ON DUPLICATE KEY UPDATE approved = 1
         """, (email,))
+
+        # ALSO update the user role to 'artist'
+        cursor.execute("UPDATE users SET role = 'artist' WHERE email = %s", (email,))
         
         conn.commit()
         return {'status': 'success', 'message': 'Artist approved successfully.'}
