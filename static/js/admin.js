@@ -1,20 +1,21 @@
 //
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initMobileSidebar();
     initAlerts();
     initTooltips();
     initModalHandling();
-    
+
     // Core Logic: specific initializers
     // We DO NOT call loadXData() here anymore. We rely on Jinja for the first paint.
     initRefreshButtons();
-    initServerSideSearch(); 
-    
+    initServerSideSearch();
+
     // Initialize Management Actions (Edit/Delete buttons)
     initUserManagement();
     initArtworkManagement();
     initOrderManagement();
     initSettingsForm();
+    initPendingArtists(); // Initialize Pending Artists Logic
 });
 
 // --- 1. NEW SERVER-SIDE SEARCH LOGIC ---
@@ -29,10 +30,10 @@ function initServerSideSearch() {
         const input = document.getElementById(inputId);
         if (input) {
             // Debounce the search to avoid spamming the server
-            input.addEventListener('input', debounce(function(e) {
+            input.addEventListener('input', debounce(function (e) {
                 const searchTerm = e.target.value.trim();
                 const config = searchConfig[inputId];
-                
+
                 // Show loading spinner in the table
                 showTableLoading(inputId);
 
@@ -41,9 +42,9 @@ function initServerSideSearch() {
                     .then(data => {
                         config.render(data);
                         // Re-attach event listeners for the new buttons
-                        if(inputId.includes('user')) initUserManagement();
-                        if(inputId.includes('artwork')) initArtworkManagement();
-                        if(inputId.includes('order')) initOrderManagement();
+                        if (inputId.includes('user')) initUserManagement();
+                        if (inputId.includes('artwork')) initArtworkManagement();
+                        if (inputId.includes('order')) initOrderManagement();
                     })
                     .catch(err => console.error('Search failed:', err));
             }, 500));
@@ -54,7 +55,7 @@ function initServerSideSearch() {
 // Utility: Debounce function
 function debounce(func, wait) {
     let timeout;
-    return function() {
+    return function () {
         const context = this, args = arguments;
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), wait);
@@ -169,14 +170,14 @@ function initRefreshButtons() {
     // Only refresh makes an API call now
     const bindRefresh = (btnId, api, renderFunc, reInitFunc) => {
         const btn = document.getElementById(btnId);
-        if(btn) {
+        if (btn) {
             btn.addEventListener('click', () => {
                 btn.classList.add('loading');
                 fetch(api)
                     .then(res => res.json())
                     .then(data => {
                         renderFunc(data);
-                        if(reInitFunc) reInitFunc();
+                        if (reInitFunc) reInitFunc();
                     })
                     .finally(() => btn.classList.remove('loading'));
             });
@@ -198,22 +199,22 @@ function initUserManagement() {
     // User search functionality
     const userSearchInput = document.getElementById('admin_user_search_input');
     if (userSearchInput) {
-        userSearchInput.addEventListener('input', function() {
+        userSearchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll('#admin_users_table tbody tr');
-            
+
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(searchTerm) ? '' : 'none';
             });
         });
     }
-    
+
     // User delete button click
     document.querySelectorAll('.admin-user-delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const email = this.getAttribute('data-email');
-            
+
             if (confirm(`Are you sure you want to delete user with email: ${email}?`)) {
                 // Show loading state
                 this.classList.add('loading');
@@ -221,7 +222,7 @@ function initUserManagement() {
                 if (icon) {
                     icon.className = 'fas fa-spinner fa-spin';
                 }
-                
+
                 // Send delete request
                 fetch('/admin/users/delete', {
                     method: 'POST',
@@ -232,44 +233,44 @@ function initUserManagement() {
                         email: email
                     })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Reload users data
-                        loadUsersData();
-                        
-                        // Show success message
-                        showAlert('User deleted successfully', 'success');
-                    } else {
-                        showAlert('Error: ' + (data.message || 'Failed to delete user'), 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showAlert('An error occurred while deleting the user', 'danger');
-                })
-                .finally(() => {
-                    // Remove loading state
-                    this.classList.remove('loading');
-                    if (icon) {
-                        icon.className = 'fas fa-trash';
-                    }
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Reload users data
+                            loadUsersData();
+
+                            // Show success message
+                            showAlert('User deleted successfully', 'success');
+                        } else {
+                            showAlert('Error: ' + (data.message || 'Failed to delete user'), 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlert('An error occurred while deleting the user', 'danger');
+                    })
+                    .finally(() => {
+                        // Remove loading state
+                        this.classList.remove('loading');
+                        if (icon) {
+                            icon.className = 'fas fa-trash';
+                        }
+                    });
             }
         });
     });
-    
+
     // User edit button click
     document.querySelectorAll('.admin-user-edit-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const email = this.getAttribute('data-email');
             const name = this.getAttribute('data-name');
             const role = this.getAttribute('data-role');
-            
+
             // Populate the edit modal with user data
             document.getElementById('admin_user_edit_email').value = email;
             document.getElementById('admin_user_edit_name').value = name;
-            
+
             // Set the correct role option as selected
             const roleSelect = document.getElementById('admin_user_edit_role');
             for (let i = 0; i < roleSelect.options.length; i++) {
@@ -278,32 +279,32 @@ function initUserManagement() {
                     break;
                 }
             }
-            
+
             // Show the edit modal
             const modal = new bootstrap.Modal(document.getElementById('admin_user_edit_modal'));
             modal.show();
         });
     });
-    
+
     // Add this code for the edit form submission
     const userEditForm = document.getElementById('admin_user_edit_form');
     if (userEditForm) {
         console.log('User edit form found:', userEditForm);
-        userEditForm.addEventListener('submit', function(e) {
+        userEditForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('admin_user_edit_email').value;
             const name = document.getElementById('admin_user_edit_name').value;
             const role = document.getElementById('admin_user_edit_role').value;
-            
+
             console.log('Sending update request with data:', { email, name, role });
-            
+
             // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
             submitBtn.disabled = true;
-            
+
             // Send update request
             fetch('/admin/users/update', {
                 method: 'POST',
@@ -316,36 +317,36 @@ function initUserManagement() {
                     role: role
                 })
             })
-            .then(response => {
-                console.log('Response received:', response);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Data received:', data);
-                // Hide the modal
-                const modalElement = document.getElementById('admin_user_edit_modal');
-                const modal = bootstrap.Modal.getInstance(modalElement);
-                modal.hide();
-                
-                if (data.status === 'success') {
-                    // Reload users data
-                    loadUsersData();
-                    
-                    // Show success message
-                    showAlert('User updated successfully', 'success');
-                } else {
-                    showAlert('Error: ' + (data.message || 'Failed to update user'), 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('An error occurred while updating the user', 'danger');
-            })
-            .finally(() => {
-                // Restore button state
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
+                .then(response => {
+                    console.log('Response received:', response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data received:', data);
+                    // Hide the modal
+                    const modalElement = document.getElementById('admin_user_edit_modal');
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+
+                    if (data.status === 'success') {
+                        // Reload users data
+                        loadUsersData();
+
+                        // Show success message
+                        showAlert('User updated successfully', 'success');
+                    } else {
+                        showAlert('Error: ' + (data.message || 'Failed to update user'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred while updating the user', 'danger');
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
         });
     } else {
         console.error('User edit form not found');
@@ -353,16 +354,16 @@ function initUserManagement() {
 }
 
 // Make sure to call this function when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize artwork management
     initArtworkManagement();
-    
+
     // Initialize order management
     initOrderManagement();
-    
+
     // Initialize user management
     initUserManagement();
-    
+
     // Load users data if on the users page
     if (document.getElementById('admin_users_table')) {
         loadUsersData();
@@ -375,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadUsersData() {
     const usersTable = document.querySelector('#admin_users_table tbody');
     if (!usersTable) return;
-    
+
     // Show loading state
     usersTable.innerHTML = `
         <tr>
@@ -387,13 +388,13 @@ function loadUsersData() {
             </td>
         </tr>
     `;
-    
+
     // Fetch users data
     fetch('/admin/api/users')
         .then(response => response.json())
         .then(users => {
             usersTable.innerHTML = '';
-            
+
             if (users.length === 0) {
                 usersTable.innerHTML = `
                     <tr>
@@ -407,7 +408,7 @@ function loadUsersData() {
                 `;
                 return;
             }
-            
+
             users.forEach(user => {
                 const row = document.createElement('tr');
                 const roleClass = user.role === 'admin' ? 'primary' : user.role === 'artist' ? 'success' : 'secondary';
@@ -436,7 +437,7 @@ function loadUsersData() {
                 `;
                 usersTable.appendChild(row);
             });
-            
+
             // Re-initialize user management for new buttons
             initUserManagement();
         })
@@ -462,60 +463,60 @@ function initArtworkManagement() {
     // Artwork search functionality
     const artworkSearchInput = document.getElementById('admin_artwork_search_input');
     if (artworkSearchInput) {
-        artworkSearchInput.addEventListener('input', function() {
+        artworkSearchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll('#admin_artworks_table tbody tr');
-            
+
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(searchTerm) ? '' : 'none';
             });
         });
     }
-    
+
     // Artwork edit button click
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target && e.target.classList.contains('admin-artwork-edit-btn')) {
             const id = e.target.getAttribute('data-id');
             const title = e.target.getAttribute('data-title');
             const price = e.target.getAttribute('data-price');
-            
+
             document.getElementById('admin_artwork_edit_id').value = id;
             document.getElementById('admin_artwork_edit_title').value = title;
             document.getElementById('admin_artwork_edit_price').value = price;
-            
+
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('admin_artwork_edit_modal'));
             modal.show();
         }
     });
-    
+
     // Artwork delete button click
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target && e.target.classList.contains('admin-artwork-delete-btn')) {
             const id = e.target.getAttribute('data-id');
-            
+
             document.getElementById('admin_artwork_delete_id').value = id;
-            
+
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('admin_artwork_delete_modal'));
             modal.show();
         }
     });
-    
+
     // Artwork save button
     const saveArtworkBtn = document.getElementById('admin_artwork_save_button');
     if (saveArtworkBtn) {
-        saveArtworkBtn.addEventListener('click', function() {
+        saveArtworkBtn.addEventListener('click', function () {
             const id = document.getElementById('admin_artwork_edit_id').value;
             const title = document.getElementById('admin_artwork_edit_title').value;
             const price = document.getElementById('admin_artwork_edit_price').value;
-            
+
             // Show loading state
             const originalText = this.innerHTML;
             this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
             this.disabled = true;
-            
+
             // Send update request
             fetch('/admin/artworks/update', {
                 method: 'POST',
@@ -528,45 +529,45 @@ function initArtworkManagement() {
                     price: price
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success || data.status === 'success') {
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('admin_artwork_edit_modal'));
-                    modal.hide();
-                    
-                    // Reload artworks data
-                    loadArtworksData();
-                    
-                    // Show success message
-                    showAlert('Artwork updated successfully', 'success');
-                } else {
-                    showAlert('Error: ' + (data.message || data.error), 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('An error occurred', 'danger');
-            })
-            .finally(() => {
-                // Restore button state
-                this.innerHTML = originalText;
-                this.disabled = false;
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success || data.status === 'success') {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('admin_artwork_edit_modal'));
+                        modal.hide();
+
+                        // Reload artworks data
+                        loadArtworksData();
+
+                        // Show success message
+                        showAlert('Artwork updated successfully', 'success');
+                    } else {
+                        showAlert('Error: ' + (data.message || data.error), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred', 'danger');
+                })
+                .finally(() => {
+                    // Restore button state
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                });
         });
     }
-    
+
     // Artwork delete confirmation
     const deleteArtworkBtn = document.getElementById('admin_artwork_confirm_delete_button');
     if (deleteArtworkBtn) {
-        deleteArtworkBtn.addEventListener('click', function() {
+        deleteArtworkBtn.addEventListener('click', function () {
             const id = document.getElementById('admin_artwork_delete_id').value;
-            
+
             // Show loading state
             const originalText = this.innerHTML;
             this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
             this.disabled = true;
-            
+
             // Send delete request
             fetch('/admin/artworks/delete', {
                 method: 'POST',
@@ -577,31 +578,31 @@ function initArtworkManagement() {
                     id: id
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success || data.status === 'success') {
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('admin_artwork_delete_modal'));
-                    modal.hide();
-                    
-                    // Reload artworks data
-                    loadArtworksData();
-                    
-                    // Show success message
-                    showAlert('Artwork deleted successfully', 'success');
-                } else {
-                    showAlert('Error: ' + (data.message || data.error), 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('An error occurred', 'danger');
-            })
-            .finally(() => {
-                // Restore button state
-                this.innerHTML = originalText;
-                this.disabled = false;
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success || data.status === 'success') {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('admin_artwork_delete_modal'));
+                        modal.hide();
+
+                        // Reload artworks data
+                        loadArtworksData();
+
+                        // Show success message
+                        showAlert('Artwork deleted successfully', 'success');
+                    } else {
+                        showAlert('Error: ' + (data.message || data.error), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred', 'danger');
+                })
+                .finally(() => {
+                    // Restore button state
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                });
         });
     }
 }
@@ -612,7 +613,7 @@ function initArtworkManagement() {
 function loadArtworksData() {
     const artworksTable = document.querySelector('#admin_artworks_table tbody');
     if (!artworksTable) return;
-    
+
     // Show loading state
     artworksTable.innerHTML = `
         <tr>
@@ -624,13 +625,13 @@ function loadArtworksData() {
             </td>
         </tr>
     `;
-    
+
     // Fetch artworks data
     fetch('/admin/api/artworks')
         .then(response => response.json())
         .then(artworks => {
             artworksTable.innerHTML = '';
-            
+
             if (artworks.length === 0) {
                 artworksTable.innerHTML = `
                     <tr>
@@ -644,7 +645,7 @@ function loadArtworksData() {
                 `;
                 return;
             }
-            
+
             artworks.forEach(artwork => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -672,7 +673,7 @@ function loadArtworksData() {
                 `;
                 artworksTable.appendChild(row);
             });
-            
+
             // Re-initialize artwork management for new buttons
             initArtworkManagement();
         })
@@ -698,27 +699,27 @@ function initOrderManagement() {
     // Order search functionality
     const orderSearchInput = document.getElementById('admin_order_search_input');
     if (orderSearchInput) {
-        orderSearchInput.addEventListener('input', function() {
+        orderSearchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const rows = document.querySelectorAll('#admin_orders_table tbody tr');
-            
+
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(searchTerm) ? '' : 'none';
             });
         });
     }
-    
+
     // Order view button click
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target && e.target.classList.contains('admin-order-view-btn')) {
             const id = e.target.getAttribute('data-id');
-            
+
             // Show loading state
             const originalText = e.target.innerHTML;
             e.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             e.target.disabled = true;
-            
+
             // Fetch order details
             fetch(`/admin/orders/details/${id}`)
                 .then(response => response.json())
@@ -729,7 +730,7 @@ function initOrderManagement() {
                         document.getElementById('admin_order_detail_status').textContent = data.order.order_status;
                         document.getElementById('admin_order_detail_total').textContent = parseFloat(data.order.total_price).toFixed(2);
                         document.getElementById('admin_order_detail_email').textContent = data.order.email;
-                        
+
                         // Populate order items
                         const itemsTable = document.getElementById('admin_order_items');
                         itemsTable.innerHTML = '';
@@ -745,7 +746,7 @@ function initOrderManagement() {
                         } else {
                             itemsTable.innerHTML = '<tr><td colspan="2" class="text-center">No items found</td></tr>';
                         }
-                        
+
                         // Show modal
                         const modal = new bootstrap.Modal(document.getElementById('admin_order_details_modal'));
                         modal.show();
@@ -772,7 +773,7 @@ function initOrderManagement() {
 function loadOrdersData() {
     const ordersTable = document.querySelector('#admin_orders_table tbody');
     if (!ordersTable) return;
-    
+
     // Show loading state
     ordersTable.innerHTML = `
         <tr>
@@ -784,13 +785,13 @@ function loadOrdersData() {
             </td>
         </tr>
     `;
-    
+
     // Fetch orders data
     fetch('/admin/api/orders')
         .then(response => response.json())
         .then(orders => {
             ordersTable.innerHTML = '';
-            
+
             if (orders.length === 0) {
                 ordersTable.innerHTML = `
                     <tr>
@@ -804,10 +805,10 @@ function loadOrdersData() {
                 `;
                 return;
             }
-            
+
             orders.forEach(order => {
-                const statusClass = order.order_status === 'completed' ? 'success' : 
-                                  order.order_status === 'pending' ? 'warning' : 'info';
+                const statusClass = order.order_status === 'completed' ? 'success' :
+                    order.order_status === 'pending' ? 'warning' : 'info';
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>#${order.order_id}</td>
@@ -828,7 +829,7 @@ function loadOrdersData() {
                 `;
                 ordersTable.appendChild(row);
             });
-            
+
             // Re-initialize order management for new buttons
             initOrderManagement();
         })
@@ -854,48 +855,48 @@ function loadOrdersData() {
 function initSettingsForm() {
     const settingsForm = document.getElementById('admin_settings_form');
     if (settingsForm) {
-        settingsForm.addEventListener('submit', function(e) {
+        settingsForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
             // Checkbox fix: FormData doesn't send unchecked boxes, so we manually check
-            if(!this.querySelector('[name="setting_artist_approval"]').checked) {
+            if (!this.querySelector('[name="setting_artist_approval"]').checked) {
                 formData.append('setting_artist_approval', 'off');
             } else {
-                 formData.set('setting_artist_approval', 'on');
+                formData.set('setting_artist_approval', 'on');
             }
 
-            if(!this.querySelector('[name="setting_maintenance_mode"]').checked) {
+            if (!this.querySelector('[name="setting_maintenance_mode"]').checked) {
                 formData.append('setting_maintenance_mode', 'off');
             } else {
-                 formData.set('setting_maintenance_mode', 'on');
+                formData.set('setting_maintenance_mode', 'on');
             }
-            
+
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
             submitBtn.disabled = true;
-            
+
             fetch('/admin/settings/update', { // Updated URL
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('Settings updated successfully', 'success');
-                } else {
-                    showAlert('Error: ' + data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('An error occurred', 'danger');
-            })
-            .finally(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showAlert('Settings updated successfully', 'success');
+                    } else {
+                        showAlert('Error: ' + data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred', 'danger');
+                })
+                .finally(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
         });
     }
 }
@@ -909,17 +910,17 @@ function showAlert(message, type) {
     alertDiv.role = 'alert';
     alertDiv.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    
+
     const container = document.querySelector('.admin-main .container-fluid');
     if (container) {
         container.insertBefore(alertDiv, container.firstChild);
     } else {
         document.body.appendChild(alertDiv);
     }
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
         alertDiv.classList.remove('show');
@@ -932,10 +933,126 @@ function showAlert(message, type) {
  */
 function initAlerts() {
     document.querySelectorAll('.alert .btn-close').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const alert = this.closest('.alert');
             alert.classList.remove('show');
             setTimeout(() => alert.remove(), 150);
         });
     });
+}
+
+/**
+ * Initialize Pending Artists Management
+ */
+function initPendingArtists() {
+    // Refresh button
+    const refreshBtn = document.getElementById('refresh-pending');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function () {
+            this.classList.add('loading');
+            loadPendingArtists(() => this.classList.remove('loading'));
+        });
+    }
+
+    // Initial load if table exists
+    if (document.getElementById('pending_artists_table')) {
+        loadPendingArtists();
+    }
+}
+
+/**
+ * Load Pending Artists Data
+ */
+function loadPendingArtists(callback = null) {
+    const tbody = document.getElementById('pending_artists_tbody');
+    if (!tbody) return;
+
+    fetch('/admin/api/pending_artists')
+        .then(res => res.json())
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error: ${data.error}</td></tr>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No pending approvals</td></tr>`;
+                return;
+            }
+
+            data.forEach(artist => {
+                const row = document.createElement('tr');
+
+                // Format date if possible
+                const dateStr = artist.created_at ? new Date(artist.created_at).toLocaleDateString() : 'N/A';
+
+                row.innerHTML = `
+                    <td>${artist.name}</td>
+                    <td>${artist.email}</td>
+                    <td>${dateStr}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success approve-artist-btn" 
+                                data-email="${artist.email}"
+                                title="Approve Application">
+                            <i class="fas fa-check me-1"></i>Approve
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Re-attach listeners
+            document.querySelectorAll('.approve-artist-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const email = this.getAttribute('data-email');
+                    approveArtist(email, this);
+                });
+            });
+
+        })
+        .catch(err => {
+            console.error(err);
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading data</td></tr>`;
+        })
+        .finally(() => {
+            if (callback) callback();
+        });
+}
+
+/**
+ * Approve Artist
+ */
+function approveArtist(email, btnElement) {
+    if (!confirm(`Approve artist application for ${email}?`)) return;
+
+    const originalHtml = btnElement.innerHTML;
+    btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btnElement.disabled = true;
+
+    fetch('/admin/approve_artist', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert('Artist approved successfully', 'success');
+                loadPendingArtists();
+            } else {
+                showAlert('Error: ' + data.message, 'danger');
+                btnElement.innerHTML = originalHtml;
+                btnElement.disabled = false;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showAlert('Request failed', 'danger');
+            btnElement.innerHTML = originalHtml;
+            btnElement.disabled = false;
+        });
 }
