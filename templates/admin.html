@@ -23,27 +23,32 @@
         <div class="admin-sidebar-body">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="admin-nav-link {% if admin_active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
+                    <a class="admin-nav-link {% if admin_active_page == 'dashboard' %}active{% endif %}"
+                        href="{{ url_for('admin.dashboard') }}">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="admin-nav-link {% if admin_active_page == 'users' %}active{% endif %}" href="{{ url_for('admin.users') }}">
+                    <a class="admin-nav-link {% if admin_active_page == 'users' %}active{% endif %}"
+                        href="{{ url_for('admin.users') }}">
                         <i class="fas fa-users"></i> Users
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="admin-nav-link {% if admin_active_page == 'artworks' %}active{% endif %}" href="{{ url_for('admin.artworks') }}">
+                    <a class="admin-nav-link {% if admin_active_page == 'artworks' %}active{% endif %}"
+                        href="{{ url_for('admin.artworks') }}">
                         <i class="fas fa-palette"></i> Artworks
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="admin-nav-link {% if admin_active_page == 'orders' %}active{% endif %}" href="{{ url_for('admin.orders') }}">
+                    <a class="admin-nav-link {% if admin_active_page == 'orders' %}active{% endif %}"
+                        href="{{ url_for('admin.orders') }}">
                         <i class="fas fa-shopping-cart"></i> Orders
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="admin-nav-link {% if admin_active_page == 'settings' %}active{% endif %}" href="{{ url_for('admin.settings') }}">
+                    <a class="admin-nav-link {% if admin_active_page == 'settings' %}active{% endif %}"
+                        href="{{ url_for('admin.settings') }}">
                         <i class="fas fa-cogs"></i> Settings
                     </a>
                 </li>
@@ -146,6 +151,44 @@
                     No metrics data available. Please check the database connection or try again later.
                 </div>
                 {% endif %}
+
+
+                <!-- Pending Approvals Section -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5><i class="fas fa-user-clock me-2"></i>Pending Artist Approvals</h5>
+                                <div class="header-actions">
+                                    <button class="btn btn-sm btn-primary" id="refresh-pending">
+                                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="admin-card-body">
+                                <div class="table-responsive">
+                                    <table id="pending_artists_table" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Applied At</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pending_artists_tbody">
+                                            <!-- Populated by JS -->
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">Loading pending
+                                                    approvals...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
 
                 <!-- User Management -->
@@ -165,7 +208,8 @@
                                 <div class="mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" id="admin_user_search_input" class="form-control" placeholder="Search users by email or name...">
+                                        <input type="text" id="admin_user_search_input" class="form-control"
+                                            placeholder="Search users by email or name...">
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -185,22 +229,20 @@
                                                 <td>{{ user.email }}</td>
                                                 <td>{{ user.name }}</td>
                                                 <td>
-                                                    <span class="badge badge-{{ 'primary' if user.role == 'admin' else 'success' if user.role == 'artist' else 'secondary' }}">
+                                                    <span
+                                                        class="badge badge-{{ 'primary' if user.role == 'admin' else 'success' if user.role == 'artist' else 'secondary' }}">
                                                         {{ user.role }}
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group" role="group">
                                                         <button class="btn btn-sm btn-primary admin-user-edit-btn"
-                                                                data-email="{{ user.email }}"
-                                                                data-name="{{ user.name }}"
-                                                                data-role="{{ user.role }}"
-                                                                title="Edit User">
+                                                            data-email="{{ user.email }}" data-name="{{ user.name }}"
+                                                            data-role="{{ user.role }}" title="Edit User">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
                                                         <button class="btn btn-sm btn-danger admin-user-delete-btn"
-                                                                data-email="{{ user.email }}"
-                                                                title="Delete User">
+                                                            data-email="{{ user.email }}" title="Delete User">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </div>
@@ -231,7 +273,8 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit User</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                             <form id="admin_user_edit_form">
                                 <div class="modal-body">
@@ -283,7 +326,8 @@
                                 <div class="mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" id="admin_artwork_search_input" class="form-control" placeholder="Search artworks by title or artist...">
+                                        <input type="text" id="admin_artwork_search_input" class="form-control"
+                                            placeholder="Search artworks by title or artist...">
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -303,20 +347,19 @@
                                                 <td>{{ artwork.title }}</td>
                                                 <td>{{ artwork.artist | default('Unknown') }}</td>
                                                 <td>
-                                                    <span class="badge badge-success">₹{{ '%.2f' | format(artwork.price | float) }}</span>
+                                                    <span class="badge badge-success">₹{{ '%.2f' | format(artwork.price
+                                                        | float) }}</span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group" role="group">
                                                         <button class="btn btn-sm btn-primary admin-artwork-edit-btn"
-                                                                data-id="{{ artwork.art_id }}"
-                                                                data-title="{{ artwork.title }}"
-                                                                data-price="{{ artwork.price }}"
-                                                                title="Edit Artwork">
+                                                            data-id="{{ artwork.art_id }}"
+                                                            data-title="{{ artwork.title }}"
+                                                            data-price="{{ artwork.price }}" title="Edit Artwork">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
                                                         <button class="btn btn-sm btn-danger admin-artwork-delete-btn"
-                                                                data-id="{{ artwork.art_id }}"
-                                                                title="Delete Artwork">
+                                                            data-id="{{ artwork.art_id }}" title="Delete Artwork">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </div>
@@ -347,7 +390,8 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Artwork</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form id="admin_artwork_edit_form">
@@ -360,7 +404,8 @@
                                         <label for="admin_artwork_edit_price" class="form-label">Price</label>
                                         <div class="input-group">
                                             <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" id="admin_artwork_edit_price" min="0" step="0.01" required>
+                                            <input type="number" class="form-control" id="admin_artwork_edit_price"
+                                                min="0" step="0.01" required>
                                         </div>
                                     </div>
                                 </form>
@@ -382,8 +427,10 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Delete Artwork</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Delete Artwork
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="text-center">
@@ -423,7 +470,8 @@
                                 <div class="mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" id="admin_order_search_input" class="form-control" placeholder="Search orders by email...">
+                                        <input type="text" id="admin_order_search_input" class="form-control"
+                                            placeholder="Search orders by email...">
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -444,17 +492,18 @@
                                                 <td>#{{ order.order_id }}</td>
                                                 <td>{{ order.email }}</td>
                                                 <td>
-                                                    <span class="badge badge-success">₹{{ '%.2f' | format(order.total_price | float) }}</span>
+                                                    <span class="badge badge-success">₹{{ '%.2f' |
+                                                        format(order.total_price | float) }}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="badge badge-{{ 'success' if order.order_status == 'completed' else 'warning' if order.order_status == 'pending' else 'info' }}">
+                                                    <span
+                                                        class="badge badge-{{ 'success' if order.order_status == 'completed' else 'warning' if order.order_status == 'pending' else 'info' }}">
                                                         {{ order.order_status }}
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <button class="btn btn-sm btn-primary admin-order-view-btn"
-                                                            data-id="{{ order.order_id }}"
-                                                            title="View Details">
+                                                        data-id="{{ order.order_id }}" title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                 </td>
@@ -484,7 +533,8 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title"><i class="fas fa-receipt me-2"></i>Order Details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
@@ -525,62 +575,67 @@
                 </div>
                 {% endif %}
 
-{% if admin_active_page == 'settings' %}
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="admin-card mb-4">
-            <div class="admin-card-header">
-                <h5><i class="fas fa-briefcase me-2"></i>Business Logic</h5>
-            </div>
-            <div class="admin-card-body">
-                <form id="admin_settings_form">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Platform Commission (%)</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" name="setting_platform_commission" 
-                                       value="{{ settings.get('platform_commission', '10') if settings else '10' }}">
-                                <span class="input-group-text">%</span>
+                {% if admin_active_page == 'settings' %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="admin-card mb-4">
+                            <div class="admin-card-header">
+                                <h5><i class="fas fa-briefcase me-2"></i>Business Logic</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form id="admin_settings_form">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Platform Commission (%)</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control"
+                                                    name="setting_platform_commission"
+                                                    value="{{ settings.get('platform_commission', '10') if settings else '10' }}">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Base Shipping Fee (₹)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control" name="setting_base_shipping"
+                                                    value="{{ settings.get('base_shipping', '150') if settings else '150' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="check_artist"
+                                            name="setting_artist_approval" {% if settings and
+                                            settings.get('artist_approval')=='1' %}checked{% endif %}>
+                                        <label class="form-check-label" for="check_artist">Require Manual Artist
+                                            Approval</label>
+                                    </div>
+
+                                    <hr class="my-4">
+                                    <h6 class="text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Danger
+                                        Zone</h6>
+
+                                    <div class="p-3 border border-danger rounded bg-dark-subtle">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="check_maint"
+                                                name="setting_maintenance_mode" {% if settings and
+                                                settings.get('maintenance_mode')=='1' %}checked{% endif %}>
+                                            <label class="form-check-label text-danger fw-bold" for="check_maint">
+                                                Enable Maintenance Mode (Shuts down site for users)
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary mt-4">
+                                        <i class="fas fa-save me-1"></i>Save All Settings
+                                    </button>
+                                </form>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Base Shipping Fee (₹)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">₹</span>
-                                <input type="number" class="form-control" name="setting_base_shipping" 
-                                       value="{{ settings.get('base_shipping', '150') if settings else '150' }}">
-                            </div>
-                        </div>
                     </div>
-                    
-                    <div class="mb-3 form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="check_artist" name="setting_artist_approval" 
-                               {% if settings and settings.get('artist_approval') == '1' %}checked{% endif %}>
-                        <label class="form-check-label" for="check_artist">Require Manual Artist Approval</label>
-                    </div>
-
-                    <hr class="my-4">
-                    <h6 class="text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h6>
-                    
-                    <div class="p-3 border border-danger rounded bg-dark-subtle">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="check_maint" name="setting_maintenance_mode"
-                                   {% if settings and settings.get('maintenance_mode') == '1' %}checked{% endif %}>
-                            <label class="form-check-label text-danger fw-bold" for="check_maint">
-                                Enable Maintenance Mode (Shuts down site for users)
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary mt-4">
-                        <i class="fas fa-save me-1"></i>Save All Settings
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
+                </div>
+                {% endif %}
             </div>
         </main>
     </div>
