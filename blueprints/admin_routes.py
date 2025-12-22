@@ -1,8 +1,39 @@
 from flask import Blueprint, render_template, jsonify, request, session, redirect, url_for, current_app
 from functools import wraps
-from models.admin_queries import get_dashboard_metrics, get_users, update_user, get_artworks, update_artwork, delete_artwork, get_orders, get_order_details, get_settings, update_settings
+from models.admin_queries import (
+    get_dashboard_metrics, get_users, update_user, delete_user,
+    get_artworks, update_artwork, delete_artwork,
+    get_orders, get_order_details,
+    get_settings, update_settings,
+    get_pending_artists, approve_artist
+)
+from models.database import get_db_connection
 
 admin_bp = Blueprint('admin', __name__, template_folder='templates')
+
+@admin_bp.route('/debug/db')
+def debug_db():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Check table
+        cursor.execute("SHOW TABLES LIKE 'artists'")
+        table_exists = cursor.fetchone()
+        
+        # Get data
+        artists = []
+        if table_exists:
+            cursor.execute("SELECT * FROM artists")
+            artists = cursor.fetchall()
+            
+        return jsonify({
+            'table_exists': bool(table_exists),
+            'row_count': len(artists),
+            'rows': artists
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 # Admin-only decorator
 def admin_required(f):
@@ -391,3 +422,40 @@ def debug():
             'error': str(e),
             'session_user': session.get('user', {})
         }), 500
+
+@admin_bp.route('/api/pending_artists', methods=['GET'])
+@admin_required
+def api_pending_artists():
+    try:
+        current_app.logger.info("API pending artists route accessed")
+        pending = get_pending_artists()
+        if 'error' in pending:
+            return jsonify({'error': pending['error']}), 500
+        return jsonify(pending)
+    except Exception as e:
+        current_app.logger.error(f"API pending artists error: {str(e)}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/approve_artist', methods=['POST'])
+@admin_required
+def approve_artist_route():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({'status': 'error', 'message': 'Email is required'}), 400
+            
+        result = approve_artist(email)
+        
+        if 'error' in result:
+             # Check if it's a specific "clean" error or generic
+            if result.get('status') == 'error':
+                 return jsonify(result), 400 # Return as client error if logic failed
+            return jsonify({'status': 'error', 'message': result['error']}), 500
+            
+        return jsonify({'status': 'success', 'message': 'Artist approved successfully'})
+        
+    except Exception as e:
+        current_app.logger.error(f"Approve artist error: {str(e)}", exc_info=True)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
