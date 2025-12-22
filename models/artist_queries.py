@@ -9,6 +9,18 @@ def add_artist_profile(email, bio, profile_pic_filename):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        # Ensure table exists
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS artists (
+                email VARCHAR(100) PRIMARY KEY,
+                bio TEXT,
+                profile_pic VARCHAR(255),
+                approved TINYINT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
         query = "INSERT INTO artists (email, bio, profile_pic) VALUES (%s, %s, %s)"
         cursor.execute(query, (email, bio, profile_pic_filename))
         conn.commit()
