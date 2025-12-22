@@ -18,10 +18,11 @@ def register():
         if get_artist_by_email(email):
             return jsonify({'error': 'You have already submitted an artist application.'}), 400
 
-        # Update the user's role to 'artist' in the database
-        upgrade_result = upgrade_to_artist(email)
-        if 'error' in upgrade_result:
-            return jsonify(upgrade_result), 500
+        # REMOVED: Immediate upgrade to 'artist' role.
+        # User role remains 'user' until admin approval.
+        # upgrade_result = upgrade_to_artist(email)
+        # if 'error' in upgrade_result:
+        #     return jsonify(upgrade_result), 500
 
         # Save artist profile info (bio and picture)
         bio = request.form.get('bio', '')
@@ -33,7 +34,10 @@ def register():
             profile_pic.save(os.path.join(current_app.config['UPLOAD_FOLDER'], profile_pic_filename))
         
         # Add their profile to the artists table (approved will default to 0)
-        add_artist_profile(email, bio, profile_pic_filename)
+        result = add_artist_profile(email, bio, profile_pic_filename)
+        if 'error' in result:
+             current_app.logger.error(f"Failed to add artist profile: {result['error']}")
+             return jsonify({'status': 'error', 'message': result['error']}), 500
 
         # --- KEY CHANGE HERE ---
         # Instead of redirecting, inform the user their application is pending.
