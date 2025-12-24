@@ -1,5 +1,8 @@
 //
 document.addEventListener('DOMContentLoaded', function () {
+    // Prioritize Pending Artists (moved to top to prevent blocking)
+    initPendingArtists();
+
     initMobileSidebar();
     initAlerts();
     initTooltips();
@@ -15,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initArtworkManagement();
     initOrderManagement();
     initSettingsForm();
-    initPendingArtists(); // Initialize Pending Artists Logic
+    // initPendingArtists(); // Moved to top
 });
 
 // --- 1. NEW SERVER-SIDE SEARCH LOGIC ---
