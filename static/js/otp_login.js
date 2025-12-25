@@ -1,7 +1,7 @@
 // Function to initialize Login functionality
 function initializeOTPLogin() {
     console.log('Initializing Login functionality...');
-    
+
     // DOM Elements - Search within modal content
     const modalContent = document.querySelector('#loginModal .modal-content');
     const loginStep = modalContent ? modalContent.querySelector('#loginStep') : null;
@@ -16,18 +16,25 @@ function initializeOTPLogin() {
         return;
     }
 
+    // IDEMPOTENCY CHECK: Prevent double initialization
+    if (loginForm.getAttribute('data-otp-initialized') === 'true') {
+        console.log('Login functionality already initialized, skipping.');
+        return;
+    }
+    loginForm.setAttribute('data-otp-initialized', 'true');
+
     console.log('Login elements found, initializing...');
 
     // Form validation
     function validateForm() {
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
-        
+
         // Clear previous errors
         clearErrors();
-        
+
         let isValid = true;
-        
+
         // Email validation
         if (!email) {
             showFieldError(emailInput, 'Email is required');
@@ -36,22 +43,27 @@ function initializeOTPLogin() {
             showFieldError(emailInput, 'Please enter a valid email address');
             isValid = false;
         }
-        
+
         // Password validation
         if (!password) {
             showFieldError(passwordInput, 'Password is required');
             isValid = false;
         }
-        
+
         return isValid;
     }
 
     function showFieldError(field, message) {
         field.classList.add('is-invalid');
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'invalid-feedback';
+
+        // CHECK if error already exists to prevent stacking
+        let errorDiv = field.parentNode.querySelector('.invalid-feedback');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            field.parentNode.appendChild(errorDiv);
+        }
         errorDiv.textContent = message;
-        field.parentNode.appendChild(errorDiv);
     }
 
     function clearErrors() {
@@ -59,7 +71,7 @@ function initializeOTPLogin() {
         invalidFields.forEach(field => {
             field.classList.remove('is-invalid');
         });
-        
+
         const errorMessages = loginForm.querySelectorAll('.invalid-feedback');
         errorMessages.forEach(error => error.remove());
     }
@@ -72,22 +84,26 @@ function initializeOTPLogin() {
     function showLoading() {
         const btnText = submitBtn.querySelector('.btn-text');
         const btnLoading = submitBtn.querySelector('.btn-loading');
-        
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'inline-block';
+
+        if (btnText) btnText.style.display = 'none';
+        if (btnLoading) btnLoading.style.display = 'inline-block';
         submitBtn.disabled = true;
     }
 
     function hideLoading() {
         const btnText = submitBtn.querySelector('.btn-text');
         const btnLoading = submitBtn.querySelector('.btn-loading');
-        
-        btnText.style.display = 'inline-block';
-        btnLoading.style.display = 'none';
+
+        if (btnText) btnText.style.display = 'inline-block';
+        if (btnLoading) btnLoading.style.display = 'none';
         submitBtn.disabled = false;
     }
 
     function showSuccess(message) {
+        // Remove existing alerts first
+        const existingAlerts = loginForm.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+
         // Create success message
         const successDiv = document.createElement('div');
         successDiv.className = 'alert alert-success mt-3';
@@ -95,9 +111,9 @@ function initializeOTPLogin() {
             <i class="fas fa-check-circle"></i>
             ${message}
         `;
-        
+
         loginForm.appendChild(successDiv);
-        
+
         // Remove after 3 seconds
         setTimeout(() => {
             successDiv.remove();
@@ -105,6 +121,10 @@ function initializeOTPLogin() {
     }
 
     function showError(message) {
+        // Remove existing alerts first
+        const existingAlerts = loginForm.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+
         // Create error message
         const errorDiv = document.createElement('div');
         errorDiv.className = 'alert alert-danger mt-3';
@@ -112,9 +132,9 @@ function initializeOTPLogin() {
             <i class="fas fa-exclamation-circle"></i>
             ${message}
         `;
-        
+
         loginForm.appendChild(errorDiv);
-        
+
         // Remove after 5 seconds
         setTimeout(() => {
             errorDiv.remove();
@@ -122,24 +142,24 @@ function initializeOTPLogin() {
     }
 
     // Form submission handler
-    loginForm.addEventListener('submit', async function(e) {
+    loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
-        
+
         showLoading();
-        
+
         try {
             const formData = new FormData(loginForm);
             const response = await fetch('/auth/login', {
                 method: 'POST',
                 body: formData
             });
-            
+
             const result = await response.json();
-            
+
             if (response.ok) {
                 showSuccess('Login successful! Redirecting...');
                 // Redirect after a short delay
@@ -158,7 +178,7 @@ function initializeOTPLogin() {
     });
 
     // Real-time validation
-    emailInput.addEventListener('blur', function() {
+    emailInput.addEventListener('blur', function () {
         const email = this.value.trim();
         if (email && !isValidEmail(email)) {
             showFieldError(this, 'Please enter a valid email address');
@@ -169,7 +189,7 @@ function initializeOTPLogin() {
         }
     });
 
-    passwordInput.addEventListener('blur', function() {
+    passwordInput.addEventListener('blur', function () {
         const password = this.value.trim();
         if (!password) {
             showFieldError(this, 'Password is required');
@@ -181,42 +201,15 @@ function initializeOTPLogin() {
     });
 
     // Clear errors on input
-    emailInput.addEventListener('input', function() {
+    emailInput.addEventListener('input', function () {
         this.classList.remove('is-invalid');
         const errorDiv = this.parentNode.querySelector('.invalid-feedback');
         if (errorDiv) errorDiv.remove();
     });
 
-    passwordInput.addEventListener('input', function() {
+    passwordInput.addEventListener('input', function () {
         this.classList.remove('is-invalid');
         const errorDiv = this.parentNode.querySelector('.invalid-feedback');
         if (errorDiv) errorDiv.remove();
     });
 }
-
-// Initialize on DOM content loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Login JavaScript loaded');
-    initializeOTPLogin();
-});
-
-// Also initialize when modal content is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                const loginContainer = document.querySelector('.login-container');
-                if (loginContainer) {
-                    console.log('Login content detected, initializing...');
-                    setTimeout(initializeOTPLogin, 100);
-                }
-            }
-        });
-    });
-    
-    const loginFormContainer = document.getElementById('loginFormContainer');
-    if (loginFormContainer) {
-        observer.observe(loginFormContainer, { childList: true, subtree: true });
-    }
-});
- 
