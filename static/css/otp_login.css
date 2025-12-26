@@ -1,49 +1,215 @@
-/* Login Styles */
+/* Modern Login Styles */
+:root {
+    --primary-color: #ff6a00;
+    --primary-hover: #ff8c00;
+    --bg-dark: #121212;
+    --glass-bg: rgba(20, 20, 20, 0.85);
+    /* Darker, more solid glass */
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --input-bg: rgba(0, 0, 0, 0.3);
+    --input-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+}
+
+/* Remove default Bootstrap modal styles to prevent double-layering */
+#loginModal .modal-dialog {
+    max-width: 420px;
+    /* Match container width for perfect alignment */
+}
+
+#loginModal .modal-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#loginModal .modal-body {
+    padding: 0;
+    /* Remove default bootstrap padding */
+}
+
+#loginModal .modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 1056;
+    /* Ensure it's above the container */
+}
+
+/* Fix "White Dot" Close Button */
+#loginModal .btn-close {
+    background: none;
+    /* Remove default SVG white background if any */
+    color: var(--text-secondary);
+    opacity: 0.8;
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    background-image: none;
+    /* Kill standard bootstrap icon */
+}
+
+#loginModal .btn-close::before {
+    content: "\f00d";
+    /* FontAwesome X icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: var(--text-secondary);
+}
+
+#loginModal .btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+/* Main Container Card */
 .login-container {
-    max-width: 400px;
+    max-width: 420px;
+    width: 100%;
     margin: 0 auto;
+    padding: 2.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    /* For inner glow effects */
 }
 
-/* Fix Input Text Color for Dark Modal */
-#loginModal .form-control {
-    background-color: #2b2b2b; /* Dark background */
-    color: #ffffff;            /* White text */
-    border: 1px solid #444;
+/* Add a subtle top spotlight effect */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.5), transparent);
 }
 
-#loginModal .form-control:focus {
-    background-color: #333;
-    color: #ffffff;            /* Keep white on focus */
-    border-color: #ff6b6b;     /* Distinct focus border */
-    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+.login-container h2 {
+    color: var(--text-primary);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem !important;
+    text-align: center;
 }
 
-/* Ensure placeholder is visible but distinct */
-#loginModal .form-control::placeholder {
-    color: #aaa;
+.login-container p.text-muted {
+    color: var(--text-secondary) !important;
+    font-size: 0.95rem;
+    margin-bottom: 2rem !important;
+    text-align: center;
 }
 
-/* Floating Label Fix for Dark Mode */
-#loginModal .form-floating label {
-    color: #aaa;
+/* Modern Input Fields */
+.login-container .form-floating {
+    margin-bottom: 1.25rem !important;
 }
 
-#loginModal .form-floating > .form-control:focus ~ label,
-#loginModal .form-floating > .form-control:not(:placeholder-shown) ~ label {
-    color: #ff6b6b; /* Highlight color for active label */
+.login-container .form-control {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    height: 52px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
-/* ... existing styles ... */
+.login-container .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.login-container .form-control::placeholder {
+    color: transparent;
+}
+
+/* Floating Labels */
+.login-container .form-floating label {
+    color: var(--text-secondary);
+    padding-left: 15px;
+}
+
+.login-container .form-floating>.form-control:focus~label,
+.login-container .form-floating>.form-control:not(:placeholder-shown)~label {
+    color: var(--primary-color);
+    transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+    background-color: transparent;
+    /* Ensure label doesn't cover input border */
+}
+
+/* Vibrant Orange Gradient Button */
+.btn-primary {
+    background: linear-gradient(90deg, #ff6a00, #ff9000);
+    /* Vibrant Orange Gradient */
+    border: none;
+    border-radius: 12px;
+    height: 52px;
+    font-weight: 700;
+    /* Bolder text */
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #fff;
+    box-shadow: 0 5px 20px rgba(255, 106, 0, 0.3);
+    /* Orange Glow */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(90deg, #ff9000, #ff6a00);
+    /* Reverse gradient on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 106, 0, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Links */
+.switch-to-signup {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.switch-to-signup:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Animations */
 .login-step {
     transition: all 0.3s ease;
 }
 
-.login-step.active {
-    display: block;
-}
-
 .step-transition {
-    animation: fadeIn 0.3s ease-in-out;
+    animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
@@ -51,116 +217,38 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Button Loading States */
+/* Loading Spinner */
 .btn-loading {
     display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Form Validation Styles */
+/* Error Handling */
 .form-control.is-invalid {
-    border-color: #dc3545 !important; /* Force red border on error */
-}
-
-.form-control.is-valid {
-    border-color: #28a745;
+    border-color: #ff4d4d;
+    background-image: none;
 }
 
 .invalid-feedback {
-    display: block;
-    color: #ff4d4d; /* Bright red for dark bg */
-    font-size: 12px;
+    color: #ff4d4d;
+    font-size: 0.85rem;
     margin-top: 5px;
+    margin-left: 5px;
 }
 
-.valid-feedback {
-    display: block;
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875em;
-    color: #28a745;
-}
-
-/* Success Animation */
-.success-animation {
-    animation: successPulse 0.6s ease-in-out;
-}
-
-@keyframes successPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-/* Error Animation */
-.error-animation {
-    animation: errorShake 0.6s ease-in-out;
-}
-
-@keyframes errorShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-8px); }
-    75% { transform: translateX(8px); }
-}
-
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 480px) {
     .login-container {
-        padding: 0 15px;
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
     }
-}
-
-/* Loading Spinner */
-.spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #ffffff;
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Loading Animation */
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-}
-
-/* Alert Styles */
-.alert {
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-top: 16px;
-    border: none;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border-left: 4px solid #28a745;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-left: 4px solid #dc3545;
-}
-
-.alert i {
-    margin-right: 8px;
 }
