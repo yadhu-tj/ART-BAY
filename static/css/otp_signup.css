@@ -1,19 +1,298 @@
-/* Signup OTP Styles */
-.signup-container {
-    max-width: 400px;
-    margin: 0 auto;
+/* Modern Signup & OTP Styles */
+:root {
+    --primary-color: #ff6a00;
+    --primary-hover: #ff8c00;
+    --bg-dark: #121212;
+    --glass-bg: rgba(20, 20, 20, 0.85);
+    /* Darker, more solid glass */
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --input-bg: rgba(0, 0, 0, 0.3);
+    --input-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
 }
 
+/* Remove default Bootstrap modal styles */
+#signupModal .modal-dialog {
+    max-width: 440px;
+    /* Match container width */
+}
+
+#signupModal .modal-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#signupModal .modal-body {
+    padding: 0;
+}
+
+#signupModal .modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 1056;
+}
+
+/* Fix "White Dot" Close Button */
+#signupModal .btn-close {
+    background: none;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    background-image: none;
+}
+
+#signupModal .btn-close::before {
+    content: "\f00d";
+    /* FontAwesome X icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: var(--text-secondary);
+}
+
+#signupModal .btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+/* Main Container Card */
+.signup-container {
+    max-width: 440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle spotlight */
+.signup-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.5), transparent);
+}
+
+.signup-container h2,
+.signup-container h3 {
+    color: var(--text-primary);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 20px !important;
+    text-align: center;
+}
+
+.signup-container p.text-muted {
+    color: var(--text-secondary) !important;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* Modern Input Fields */
+.signup-step .form-floating {
+    margin-bottom: 1.25rem !important;
+}
+
+.signup-step .form-control {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    height: 52px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.signup-step .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.signup-step .form-control::placeholder {
+    color: transparent;
+}
+
+/* Floating Labels */
+.signup-step .form-floating label {
+    color: var(--text-secondary);
+    padding-left: 15px;
+}
+
+.signup-step .form-floating>.form-control:focus~label,
+.signup-step .form-floating>.form-control:not(:placeholder-shown)~label {
+    color: var(--primary-color);
+    transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+    background-color: transparent;
+}
+
+/* OTP Input Styles */
+.otp-input-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.otp-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.otp-input {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.otp-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 106, 0, 0.3);
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.08);
+    outline: none;
+}
+
+.otp-input.filled {
+    border-color: rgba(40, 167, 69, 0.6);
+    background-color: rgba(40, 167, 69, 0.08);
+}
+
+.otp-input.error {
+    border-color: #ff4d4d;
+    background-color: rgba(220, 53, 69, 0.08);
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Vibrant Buttons */
+.btn-primary {
+    background: linear-gradient(90deg, #ff6a00, #ff9000);
+    border: none;
+    border-radius: 12px;
+    height: 52px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 5px 20px rgba(255, 106, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 10px;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(90deg, #ff9000, #ff6a00);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 106, 0, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #444;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Secondary Button */
+.btn-outline-secondary {
+    color: var(--text-secondary);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    height: 48px;
+    font-weight: 600;
+}
+
+.btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.btn-link {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.btn-link:hover {
+    color: var(--text-primary);
+}
+
+/* Timer */
+#otpTimer {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px !important;
+}
+
+#resendOtpBtn {
+    color: var(--primary-color);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#resendOtpBtn:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Success Step */
+#successStep .fa-check-circle {
+    color: #28a745;
+    font-size: 5rem !important;
+    filter: drop-shadow(0 0 10px rgba(40, 167, 69, 0.4));
+    margin-bottom: 20px;
+}
+
+/* Loading Spinner */
+.btn-loading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Animations */
 .signup-step {
     transition: all 0.3s ease;
 }
 
 .signup-step.active {
     display: block;
-}
-
-.step-transition {
-    animation: fadeIn 0.3s ease-in-out;
+    animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
@@ -21,172 +300,39 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* OTP Input Styles */
-.otp-input-container {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
+/* Validation */
+.form-control.is-invalid {
+    border-color: #ff4d4d;
+    background-image: none;
 }
 
-.otp-inputs {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
+.invalid-feedback {
+    color: #ff4d4d;
+    font-size: 0.85rem;
+    margin-top: 5px;
 }
 
-.otp-input {
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background: #fff;
-    transition: all 0.3s ease;
-    color: #333;
-}
-
-.otp-input:focus {
-    border-color: #ff6a00;
-    box-shadow: 0 0 0 0.2rem rgba(255, 106, 0, 0.25);
-    outline: none;
-}
-
-.otp-input.filled {
-    border-color: #28a745;
-    background-color: #f8fff9;
-}
-
-.otp-input.error {
-    border-color: #dc3545;
-    background-color: #fff5f5;
-    animation: shake 0.5s ease-in-out;
-}
-
-/* Text Selection Styling */
-.otp-input::selection {
-    background-color: #ff6a00;
-    color: #fff;
-}
-
-.otp-input::-moz-selection {
-    background-color: #ff6a00;
-    color: #fff;
-}
-
-/* Autofill Styling */
-.otp-input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 30px #fff inset !important;
-    -webkit-text-fill-color: #333 !important;
-}
-
-.otp-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 30px #fff inset !important;
-    -webkit-text-fill-color: #333 !important;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-}
-
-/* Button Loading States */
-.btn-loading {
-    display: none;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Timer Styles */
-#otpTimer {
-    font-size: 14px;
-    color: #666;
-}
-
-#resendOtpBtn {
-    font-size: 14px;
-    color: #ff6a00;
-    text-decoration: none;
-}
-
-#resendOtpBtn:hover {
-    color: #e55a00;
-    text-decoration: underline;
-}
-
-/* Success Step */
-#successStep .fas.fa-check-circle {
-    color: #28a745;
-}
-
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 480px) {
-    .otp-input {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
+    .signup-container {
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
     }
-    
+
+    .otp-input {
+        width: 40px;
+        height: 48px;
+        font-size: 1.1rem;
+    }
+
     .otp-inputs {
         gap: 8px;
     }
 }
-
-/* Form Validation */
-.form-control.is-invalid {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-}
-
-.invalid-feedback {
-    display: block;
-    color: #dc3545;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-/* Loading Animation */
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-}
-
-/* User Email Display */
-#userEmail {
-    color: #ff6a00;
-    font-weight: 600;
-}
-
-/* Back Button */
-#backToSignupBtn {
-    border-color: #6c757d;
-    color: #6c757d;
-}
-
-#backToSignupBtn:hover {
-    background-color: #6c757d;
-    border-color: #6c757d;
-    color: white;
-}
-
-/* Go to Login Button */
-#goToLoginBtn {
-    background-color: #ff6a00;
-    border-color: #ff6a00;
-}
-
-#goToLoginBtn:hover {
-    background-color: #e55a00;
-    border-color: #e55a00;
-} 
