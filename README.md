@@ -255,9 +255,11 @@ EMAIL_CONFIG = {
 
 ### **Dark Theme Design**
 - Modern dark color scheme
-- Orange accent colors for highlights
+- Orange accent colors for highlights (Linear Gradients)
 - Consistent typography with Google Fonts
 - Smooth animations and transitions
+- **Glassmorphism Effects**: Premium glass-like transparency for modals and cards
+
 
 ### **Responsive Design**
 - Mobile-first approach
@@ -311,6 +313,8 @@ For support and questions:
 - **v1.1.0** - Added OTP verification and enhanced security
 - **v1.2.0** - Improved checkout system and cart management
 - **v1.3.0** - Added artist dashboard and admin panel
+- **v1.4.0** - UI Modernization: New Glassmorphism design for authentication modals with improved animations and simplified UX
+
 
 ---
 
