@@ -41,9 +41,27 @@ def remove_from_cart(cart_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
-        conn.commit()
-        return {"message": "Item removed from cart."}
+        
+        # Check current quantity first
+        cursor.execute("SELECT quantity FROM cart WHERE cart_id = %s", (cart_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            current_quantity = result[0]
+            if current_quantity > 1:
+                # Decrement if more than 1
+                cursor.execute("UPDATE cart SET quantity = quantity - 1 WHERE cart_id = %s", (cart_id,))
+                message = "Item quantity decreased."
+            else:
+                # Delete if 1 or less (or if logic dictates)
+                cursor.execute("DELETE FROM cart WHERE cart_id = %s", (cart_id,))
+                message = "Item removed from cart."
+            
+            conn.commit()
+            return {"message": message}
+        else:
+            return {"error": "Item not found in cart."}
+            
     except Error as e:
         get_db_connection().rollback()
         logger.error(f"DB error in remove_from_cart: {e}")
