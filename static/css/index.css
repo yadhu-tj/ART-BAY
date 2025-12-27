@@ -271,6 +271,7 @@ body {
         opacity: 0;
         transform: translateY(50px) scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -331,7 +332,7 @@ body {
         padding: 8px 12px;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 6px;
-        
+
     }
 
     .slider-text {
@@ -565,7 +566,8 @@ body {
 }
 
 /* High DPI Displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
     .slider .list .item img {
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
@@ -575,4 +577,147 @@ body {
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
     }
+
+}
+
+/* Global Button Styles - Orange Gradient Override */
+.btn-primary {
+    background: linear-gradient(90deg, #ff6a00, #ff9000) !important;
+    border: none !important;
+    border-radius: 12px;
+    height: 52px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #fff !important;
+    box-shadow: 0 5px 20px rgba(255, 106, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(90deg, #ff9000, #ff6a00) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 106, 0, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    background: #444 !important;
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Global Modal Fixes - Force Glassmorphism Container Visibility */
+#loginModal .modal-content,
+#signupModal .modal-content {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#loginModal .modal-body,
+#signupModal .modal-body {
+    padding: 0 !important;
+}
+
+#loginModal .modal-header,
+#signupModal .modal-header {
+    border-bottom: none !important;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 1056;
+}
+
+#loginModal .btn-close,
+#signupModal .btn-close {
+    color: rgba(255, 255, 255, 0.8) !important;
+    filter: invert(1) brightness(200%);
+}
+
+/* Global Authentication Container Styles - Fallback/Override */
+.login-container,
+.signup-container {
+    max-width: 440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2.5rem;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+}
+
+.login-container::before,
+.signup-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.5), transparent);
+}
+
+.login-container h2,
+.signup-container h2,
+.signup-container h3 {
+    color: #fff;
+    margin-bottom: 20px !important;
+    text-align: center;
+}
+
+.login-container .form-control,
+.signup-container .form-control {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-container .form-control:focus,
+.signup-container .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 1px #ff6a00;
+    color: #fff;
+}
+
+/* OTP Inputs */
+.otp-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.otp-input {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+}
+
+.otp-input:focus {
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 2px rgba(255, 106, 0, 0.3);
+    outline: none;
 }
