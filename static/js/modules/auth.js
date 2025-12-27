@@ -30,33 +30,9 @@ export function initAuth() {
 
         event.preventDefault();
 
-        if (form.id === "signupForm") {
-            handleFormSubmission(
-                form,
-                "/auth/signup",
-                "Successfully signed up! Please log in.",
-                "Signup failed",
-                async () => {
-                    setTimeout(async () => {
-                        closeAllModals();
-                        const loginLink = document.querySelector(".login-link");
-                        if (loginLink) loginLink.click();
-                    }, 2000);
-                }
-            );
-        } else if (form.id === "loginForm") {
-            handleFormSubmission(
-                form,
-                "/auth/login",
-                "Successfully logged in!",
-                "Login failed",
-                (data) => {
-                    setTimeout(() => {
-                        closeAllModals();
-                        if (data.redirect) window.location.href = data.redirect;
-                    }, 2000);
-                }
-            );
-        }
+        // Login and Signup are now handled by otp_login.js and otp_signup.js dedicated controllers
+        // We return early to prevent double submission or duplicate messages.
+        if (form.id === "signupForm" || form.id === "loginForm") return;
+
     });
 }
