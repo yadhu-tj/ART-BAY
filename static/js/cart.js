@@ -22,39 +22,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Show loading state
     function showLoading() {
-        if(loadingElement) {
+        if (loadingElement) {
             loadingElement.style.display = "flex";
         }
-        if(cartItemsContainer) {
+        if (cartItemsContainer) {
             cartItemsContainer.style.display = "none";
         }
-        if(cartSummary) {
+        if (cartSummary) {
             cartSummary.style.display = "none";
         }
     }
 
     // Hide loading state
     function hideLoading() {
-        if(loadingElement) {
+        if (loadingElement) {
             loadingElement.style.display = "none";
         }
-        if(cartItemsContainer) {
+        if (cartItemsContainer) {
             cartItemsContainer.style.display = "flex";
         }
-        if(cartSummary) {
+        if (cartSummary) {
             cartSummary.style.display = "block";
         }
     }
 
     // Fetch cart items
     function fetchCartItems() {
-        if(!cartItemsContainer) {
+        if (!cartItemsContainer) {
             console.error("Cart items container not found");
             return;
         }
-        
+
         showLoading();
-        
+
         fetch("/cart/items", {
             method: "GET",
             headers: {
@@ -63,50 +63,50 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             credentials: "include"
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to fetch cart items (${response.status})`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Cart data received:", data); // Debug log
-            
-            if (data.status === "success") {
-                const items = data.cart_items || [];
-                const totalPrice = data.total_price || 
-                                (items.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0));
-                
-                // Cache in localStorage
-                localStorage.setItem('cart', JSON.stringify(items));
-                console.log('Cached cart state:', items); // Debug log
-                
-                updateCartUI(items, totalPrice);
-            } else {
-                throw new Error(data.message || "Unknown error");
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching cart:", error);
-            showToast(`Error: ${error.message}`, "error", 5000);
-            
-            if(cartItemsContainer) {
-                cartItemsContainer.innerHTML = `
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch cart items (${response.status})`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Cart data received:", data); // Debug log
+
+                if (data.status === "success") {
+                    const items = data.cart_items || [];
+                    const totalPrice = data.total_price ||
+                        (items.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0));
+
+                    // Cache in localStorage
+                    localStorage.setItem('cart', JSON.stringify(items));
+                    console.log('Cached cart state:', items); // Debug log
+
+                    updateCartUI(items, totalPrice);
+                } else {
+                    throw new Error(data.message || "Unknown error");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching cart:", error);
+                showToast(`Error: ${error.message}`, "error", 5000);
+
+                if (cartItemsContainer) {
+                    cartItemsContainer.innerHTML = `
                     <div class="empty-cart">
                         <i class="fas fa-exclamation-circle"></i>
                         <p>Failed to load your cart.</p>
                         <button onclick="window.location.reload()" class="retry-btn">Retry</button>
                     </div>`;
-            }
-            
-            hideLoading();
-        });
+                }
+
+                hideLoading();
+            });
     }
 
     // Update cart UI
     function updateCartUI(cartItems, totalPrice) {
-        if(!cartItemsContainer) return;
-        
+        if (!cartItemsContainer) return;
+
         cartItemsContainer.innerHTML = "";
         hideLoading();
 
@@ -118,36 +118,36 @@ document.addEventListener("DOMContentLoaded", function () {
                         <i class="fas fa-palette"></i> Explore Gallery
                     </a>
                 </div>`;
-            
-            if(cartSummary) {
+
+            if (cartSummary) {
                 cartSummary.style.display = "none";
             }
             localStorage.setItem('cart', JSON.stringify([]));
             return;
         }
 
-        if(cartSummary) {
+        if (cartSummary) {
             cartSummary.style.display = "block";
         }
-        
+
         cartItems.forEach((item, index) => {
             const cartItem = document.createElement("div");
             cartItem.classList.add("cart-item");
-            
+
             const cartId = item.cart_id || '';
             cartItem.dataset.id = cartId;
-            
+
             let imageSrc;
             if (item.image_path) {
-                imageSrc = item.image_path.startsWith('/static/uploads/') 
-                    ? item.image_path 
+                imageSrc = item.image_path.startsWith('/static/uploads/')
+                    ? item.image_path
                     : `/static/uploads/${item.image_path.split('/').pop()}`;
             } else {
                 imageSrc = "/static/images/placeholder.jpg";
             }
 
             //
-cartItem.innerHTML = `
+            cartItem.innerHTML = `
     <div class="cart-image">
         <img src="${imageSrc}" alt="${escapeHtml(item.title || 'Artwork')}">
     </div>
@@ -165,13 +165,13 @@ cartItem.innerHTML = `
 `;
 
             cartItemsContainer.appendChild(cartItem);
-            
+
             setTimeout(() => {
                 cartItem.style.opacity = "0";
                 cartItem.style.transform = "translateY(20px)";
-                
+
                 void cartItem.offsetWidth;
-                
+
                 cartItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
                 cartItem.style.opacity = "1";
                 cartItem.style.transform = "translateY(0)";
@@ -183,11 +183,11 @@ cartItem.innerHTML = `
 
     // Update total price
     function updateTotalPrice(price) {
-        if(!totalPriceElement) return;
-        
+        if (!totalPriceElement) return;
+
         const validPrice = parseFloat(price) || 0;
         const currentPrice = parseFloat(totalPriceElement.textContent.replace(/[^\d.]/g, '')) || 0;
-        
+
         animateNumber(currentPrice, validPrice, 700, value => {
             totalPriceElement.textContent = `Total: ₹${value.toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
@@ -199,20 +199,20 @@ cartItem.innerHTML = `
     // Number animation
     function animateNumber(from, to, duration, callback) {
         const startTime = performance.now();
-        
+
         function updateValue(currentTime) {
             const elapsedTime = currentTime - startTime;
             const progress = Math.min(elapsedTime / duration, 1);
             const easedProgress = easeOutQuart(progress);
             const current = from + (to - from) * easedProgress;
-            
+
             callback(current);
-            
+
             if (progress < 1) {
                 requestAnimationFrame(updateValue);
             }
         }
-        
+
         requestAnimationFrame(updateValue);
     }
 
@@ -228,48 +228,58 @@ cartItem.innerHTML = `
             showToast("Error: Missing cart ID for removal", "error");
             return;
         }
-        
+
         console.log("Removing item with cart ID:", cartId); // Debug log
-        
-        cartItemElement.classList.add('removing');
-        
+
         const formData = new FormData();
         formData.append('cart_id', cartId);
-        
+
+        // Optimistic UI update: Wait for server response, but prepare logic
+
         fetch("/cart/remove", {
             method: "POST",
             body: formData,
             credentials: "include"
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`Failed to remove item (${response.status}): ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Remove response:", data); // Debug log
-            
-            showToast("Item removed from cart", "success");
-            
-            // Update localStorage
-            let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-            cartItems = cartItems.filter(item => item.cart_id !== cartId);
-            localStorage.setItem('cart', JSON.stringify(cartItems));
-            console.log('Updated cart state:', cartItems); // Debug log
-            
-            setTimeout(() => {
-                fetchCartItems();
-            }, 500);
-        })
-        .catch(error => {
-            console.error("Remove error:", error);
-            
-            cartItemElement.classList.remove('removing');
-            showToast(`Error: ${error.message}`, "error");
-        });
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Failed to remove item (${response.status}): ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Remove response:", data); // Debug log
+
+                // Logic: If message implies full removal, animate out. Otherwise, just refresh data.
+                // Backend returns "Item removed from cart." for full removal
+                // Returns "Item quantity decreased." for decrement.
+
+                if (data.message === "Item quantity decreased.") {
+                    showToast("Quantity updated", "success");
+                    // Refresh cart to show new quantity
+                    fetchCartItems();
+                } else {
+                    // Full removal
+                    cartItemElement.classList.add('removing');
+                    showToast("Item removed from cart", "success");
+
+                    // Update localStorage
+                    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+                    cartItems = cartItems.filter(item => item.cart_id !== cartId);
+                    localStorage.setItem('cart', JSON.stringify(cartItems));
+
+                    setTimeout(() => {
+                        fetchCartItems();
+                    }, 500);
+                }
+            })
+            .catch(error => {
+                console.error("Remove error:", error);
+                cartItemElement.classList.remove('removing');
+                showToast(`Error: ${error.message}`, "error");
+            });
     }
 
     // Toast notification
@@ -279,27 +289,27 @@ cartItem.innerHTML = `
             toast.classList.remove("show");
             setTimeout(() => toast.remove(), 300);
         });
-        
+
         const toast = document.createElement("div");
         toast.className = `toast-notification ${type}`;
-        
+
         let icon = type === "success" ? "check-circle" : "exclamation-circle";
-        
+
         toast.innerHTML = `
             <div class="toast-icon"><i class="fas fa-${icon}"></i></div>
             <div class="toast-content">${message}</div>
             <div class="toast-close"><i class="fas fa-times"></i></div>
         `;
-        
+
         document.body.appendChild(toast);
-        
+
         setTimeout(() => toast.classList.add('show'), 10);
-        
+
         const dismissTimeout = setTimeout(() => {
             toast.classList.remove("show");
             setTimeout(() => toast.remove(), 300);
         }, duration);
-        
+
         const closeBtn = toast.querySelector(".toast-close");
         if (closeBtn) {
             closeBtn.addEventListener("click", () => {
@@ -332,13 +342,13 @@ cartItem.innerHTML = `
     }
 
     // Event delegation
-    document.addEventListener("click", function(event) {
+    document.addEventListener("click", function (event) {
         // Remove button
         if (event.target.closest(".remove-btn")) {
             const removeBtn = event.target.closest(".remove-btn");
             const cartId = removeBtn.getAttribute("data-cart-id");
             const cartItem = removeBtn.closest(".cart-item");
-            
+
             if (cartId && cartItem) {
                 removeFromCart(cartId, cartItem);
             } else {
@@ -346,7 +356,7 @@ cartItem.innerHTML = `
                 showToast("Error: Unable to identify cart item", "error");
             }
         }
-        
+
         // Close modal when clicking outside
         if (event.target === orderModal) {
             hideModal();
@@ -359,9 +369,9 @@ cartItem.innerHTML = `
             event.preventDefault();
             const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
             const email = document.getElementById('email_input') ? document.getElementById('email_input').value : '';
-            
+
             console.log('Checkout form submitted, cart:', cartItems, 'email:', email); // Debug log
-            
+
             if (cartItems.length === 0) {
                 showToast('Your cart is empty!', 'error');
                 setTimeout(() => {
@@ -385,16 +395,16 @@ cartItem.innerHTML = `
     if (shippingForm) {
         shippingForm.addEventListener('submit', async (e) => {
             e.preventDefault(); // Prevent default form submission
-            
+
             const form = e.target;
             const formData = new FormData(form);
-            
+
             try {
                 const response = await fetch(form.action, {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 if (response.ok) {
                     // Show success modal
                     showModal();
@@ -416,10 +426,10 @@ cartItem.innerHTML = `
             window.location.href = '/';
         });
     }
-    
+
     // Initialize
     fetchCartItems();
-    
+
     // Make function available globally
     window.retryLoadCart = fetchCartItems;
 });
