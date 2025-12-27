@@ -3,6 +3,15 @@
 
 {% block title %}Sign Up - ART&BAY{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/otp_signup.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/otp_signup.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 {# Only add the outer container if we are on a FULL PAGE (not a modal) #}
 {% if not request.headers.get('X-Requested-With') == 'XMLHttpRequest' %}
