@@ -101,30 +101,18 @@ export function initArtist() {
 
     // Dashboard AJAX Link
     document.querySelectorAll('a[href="/artist/dashboard"]').forEach(link => {
-        link.addEventListener("click", async function (event) {
-            event.preventDefault();
+        link.addEventListener("click", function (event) {
+            // Standard navigation is preferred over document.write
+            // The spinner will show briefly before the page unloads
             const originalHtml = link.innerHTML;
             link.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-
-            try {
-                const response = await fetch("/artist/dashboard", {
-                    credentials: 'include'
-                });
-
-                if (response.redirected) {
-                    window.location.href = response.url;
-                } else {
-                    const html = await response.text();
-                    document.open();
-                    document.write(html);
-                    document.close();
-                }
-            } catch (error) {
-                console.error("Dashboard access error:", error);
-                showMessage("Failed to load dashboard", "error");
-            } finally {
-                link.innerHTML = originalHtml;
-            }
+            // Allow default navigation to proceed? No, listeners prevent default usually.
+            // But we can just set location.
+            // Note: We don't preventDefault if we want it to follow link, but we want to show spinner first?
+            // If we don't preventDefault, the spinner might not render before nav starts.
+            // Ideally:
+            event.preventDefault();
+            window.location.href = this.href;
         });
     });
 }
