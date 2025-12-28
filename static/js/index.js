@@ -8,6 +8,8 @@ let itemActive = 0;
 
 // Function to update the active slide
 function setActiveSlide(index) {
+    if (items.length === 0) return; // Prevent error if no items
+
     // Remove active and transitioning classes
     items.forEach(item => item.classList.remove('active'));
     thumbnails.forEach(thumb => {
@@ -24,15 +26,15 @@ function setActiveSlide(index) {
     itemActive = index;
 
     // Add active class to the current slide, thumbnail, button, and text
-    items[itemActive].classList.add('active');
-    thumbnails[itemActive].classList.add('active');
-    buttons[itemActive].style.opacity = '1'; // Show the active button
-    texts[itemActive].classList.add('active');
+    if (items[itemActive]) items[itemActive].classList.add('active');
+    if (thumbnails[itemActive]) thumbnails[itemActive].classList.add('active');
+    if (buttons[itemActive]) buttons[itemActive].style.opacity = '1'; // Show the active button
+    if (texts[itemActive]) texts[itemActive].classList.add('active');
 
     // Apply transitioning effect to the previous slide
     let prevIndex = itemActive > 0 ? itemActive - 1 : countItem - 1;
-    thumbnails[prevIndex].classList.add('transitioning');
-    buttons[prevIndex].classList.add('transitioning');
+    if (thumbnails[prevIndex]) thumbnails[prevIndex].classList.add('transitioning');
+    if (buttons[prevIndex]) buttons[prevIndex].classList.add('transitioning');
 }
 
 // Function to go to the next slide
@@ -41,8 +43,11 @@ function nextSlide() {
     setActiveSlide(newIndex);
 }
 
-// Set up automatic sliding every 5 seconds
-let refreshInterval = setInterval(nextSlide, 5000);
+// Set up automatic sliding every 5 seconds only if items exist
+let refreshInterval;
+if (items.length > 0) {
+    refreshInterval = setInterval(nextSlide, 5000);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the first slide

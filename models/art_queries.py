@@ -86,9 +86,32 @@ def get_filtered_artworks(filters):
             like_term = f"%{filters['search']}%"
             params.extend([like_term, like_term])
         
-        # Add other filters for category, price etc. here if needed
+        # Filter by Category (Media)
+        if filters.get('media'):
+            sql += " AND a.category = %s"
+            params.append(filters['media'])
 
-        sql += " ORDER BY a.created_at " + ("ASC" if filters.get('sort') == 'oldest' else "DESC")
+        # Filter by Price Range
+        price_range = filters.get('price')
+        if price_range:
+            if price_range == '0-500':
+                sql += " AND a.price BETWEEN 0 AND 500"
+            elif price_range == '501-1000':
+                sql += " AND a.price BETWEEN 501 AND 1000"
+            elif price_range == '1001+':
+                sql += " AND a.price > 1000"
+
+        # Sorting Logic
+        sort_option = filters.get('sort', 'newest')
+        if sort_option == 'price-low':
+            sql += " ORDER BY a.price ASC"
+        elif sort_option == 'price-high':
+            sql += " ORDER BY a.price DESC"
+        elif sort_option == 'oldest':
+            sql += " ORDER BY a.created_at ASC"
+        else:
+            # Default to newest
+            sql += " ORDER BY a.created_at DESC"
 
         cursor.execute(sql, params)
         return {"artworks": cursor.fetchall()}

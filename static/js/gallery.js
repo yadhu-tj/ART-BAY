@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             filterDropdown.classList.toggle('show');
-            
+
             // Change the button arrow direction
             if (filterDropdown.classList.contains('show')) {
                 filterBtn.style.transform = 'translateY(2px)';
@@ -38,12 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('view-btn')) {
             viewArtwork(e.target.dataset.artId);
         }
-        
+
         // Add to cart functionality
         if (e.target.classList.contains('add-cart-btn')) {
             addToCart(e.target.dataset.artId, e.target);
         }
-        
+
         // Image click for quick view
         if (e.target.matches('.gallery-item img')) {
             viewArtwork(e.target.dataset.artId);
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function fetchFilteredArtworks() {
         // Show loading state
         galleryGrid.innerHTML = '<div class="art-loading"></div>';
-        
+
         // Collect filter data
         const filterData = {
             sort: document.getElementById('sort-filter')?.value || "newest",
@@ -69,25 +69,25 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(filterData)
         })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Server response error');
-            }
-            return res.json();
-        })
-        .then(data => {
-            updateGallery(data.artworks);
-            filterDropdown.classList.remove('show'); // Close dropdown after apply
-            filterBtn.style.transform = 'translateY(0)';
-        })
-        .catch(err => {
-            console.error('Fetch error:', err);
-            galleryGrid.innerHTML = `
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Server response error');
+                }
+                return res.json();
+            })
+            .then(data => {
+                updateGallery(data.artworks);
+                filterDropdown.classList.remove('show'); // Close dropdown after apply
+                filterBtn.style.transform = 'translateY(0)';
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                galleryGrid.innerHTML = `
                 <div class="error-message">
                     <p>Failed to load artworks. Please try again later.</p>
                     <button onclick="fetchFilteredArtworks()" class="view-btn">Retry</button>
                 </div>`;
-        });
+            });
     }
 
     // Update gallery with staggered fade-in animation
@@ -95,7 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
         galleryGrid.innerHTML = '';
 
         if (!artworks || artworks.length === 0) {
-            galleryGrid.innerHTML = `<p class="no-results">No artworks found matching your criteria.</p>`;
+            galleryGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>No Masterpieces Found</h3>
+                    <p>We couldn't find any artwork matching your filters. Try adjusting your search or categories.</p>
+                    <button class="reset-filters-btn" onclick="document.getElementById('search-filter').value=''; document.getElementById('price-filter').value=''; document.getElementById('media-filter').value=''; document.getElementById('search-filter').dispatchEvent(new Event('input'));">
+                        <i class="fas fa-undo"></i> Clear All Filters
+                    </button>
+                </div>
+            `;
             return;
         }
 
@@ -128,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             item.style.opacity = 0;
             item.style.transform = 'translateY(20px)';
             galleryGrid.appendChild(item);
-            
+
             // Stagger the fade-in animations
             setTimeout(() => {
                 item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -141,10 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // View artwork details
     function viewArtwork(artId) {
         if (!artId) return showToast('Artwork ID not found', 'error');
-        
+
         // Add a subtle loading effect before navigation
         document.body.style.cursor = 'wait';
-        
+
         // Navigate to artwork detail page
         setTimeout(() => {
             window.location.href = `/art/${artId}`;
@@ -155,10 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add to cart with improved UI feedback
     function addToCart(artId, button = null) {
         if (!artId) return showToast('Invalid artwork', 'error');
-        
+
         // Store original button text for restoration
         const originalText = button ? button.textContent : 'Add to Cart';
-        
+
         // Disable button and show loading state
         if (button) {
             button.disabled = true;
@@ -172,42 +183,42 @@ document.addEventListener('DOMContentLoaded', () => {
             credentials: 'include',
             body: JSON.stringify({ art_id: artId })
         })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Failed to add to cart');
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (button) {
-                button.textContent = '✓ Added';
-                
-                // Reset button state
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }, 2000);
-            }
-            
-            // Show success message
-            showToast(data.message || 'Artwork added to cart');
-            updateCartCounter();
-        })
-        .catch(err => {
-            console.error('Add to cart error:', err);
-            
-            if (button) {
-                button.textContent = 'Failed! Try Again';
-                
-                // Reset button state
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }, 2000);
-            }
-            
-            showToast('Failed to add to cart', 'error');
-        });
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Failed to add to cart');
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (button) {
+                    button.textContent = '✓ Added';
+
+                    // Reset button state
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }, 2000);
+                }
+
+                // Show success message
+                showToast(data.message || 'Artwork added to cart');
+                updateCartCounter();
+            })
+            .catch(err => {
+                console.error('Add to cart error:', err);
+
+                if (button) {
+                    button.textContent = 'Failed! Try Again';
+
+                    // Reset button state
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }, 2000);
+                }
+
+                showToast('Failed to add to cart', 'error');
+            });
     }
 
     // Update cart counter in the navbar if it exists
@@ -230,15 +241,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove any existing toasts
         const existingToasts = document.querySelectorAll('.toast-notification');
         existingToasts.forEach(toast => toast.remove());
-        
+
         // Create new toast
         const toast = document.createElement('div');
         toast.className = `toast-notification ${type}`;
         toast.innerHTML = `<p>${message}</p>`;
-        
+
         // Add to DOM
         document.body.appendChild(toast);
-        
+
         // Trigger entrance animation
         requestAnimationFrame(() => {
             toast.style.opacity = '1';
@@ -251,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toast.style.transform = 'translateY(-20px)';
             setTimeout(() => toast.remove(), 300); // Remove after transition
         }, duration);
-        
+
         // Allow manually dismissing by clicking
         toast.addEventListener('click', () => {
             clearTimeout(dismissTimeout);
@@ -280,25 +291,33 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    
 
-    
 
-    // --- CHECK URL FOR SEARCH PARAM ---
+
+
+    // --- CHECK URL FOR SEARCH/CATEGORY PARAM ---
     const urlParams = new URLSearchParams(window.location.search);
     const urlSearchQuery = urlParams.get('search');
+    const urlCategoryQuery = urlParams.get('category'); // Read category from URL
 
     if (urlSearchQuery && searchInput) {
         // Pre-fill the search box
         searchInput.value = urlSearchQuery;
-        
-        // Trigger the search
     }
-   
+
+    if (urlCategoryQuery) {
+        const mediaFilter = document.getElementById('media-filter');
+        if (mediaFilter) {
+            // Set the dropdown value to match the URL category
+            // This ensures filter logic picks it up
+            mediaFilter.value = urlCategoryQuery;
+        }
+    }
+
 
     // Load initial artworks with loading state
     fetchFilteredArtworks();
-    
+
     // Add smooth scroll to top when filter is applied
     filters.forEach(filter => {
         filter.addEventListener('change', () => {
@@ -308,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-    
+
     // Add loading animation for images
     window.addEventListener('load', () => {
         const images = document.querySelectorAll('.gallery-item img');
