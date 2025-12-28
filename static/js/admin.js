@@ -18,8 +18,35 @@ document.addEventListener('DOMContentLoaded', function () {
     initArtworkManagement();
     initOrderManagement();
     initSettingsForm();
+    initLogout(); // Add this
     // initPendingArtists(); // Moved to top
 });
+
+function initLogout() {
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            fetch('/auth/logout?mode=json')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = '/';
+                    } else {
+                        showAlert('Logout failed', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    // Fallback to direct navigation if fetch fails (though it likely won't fix the JSON issue if the server returns JSON, but good for robust handling)
+                    if (confirm('Logout encountered an error. Force reload?')) {
+                        window.location.href = '/';
+                    }
+                });
+        });
+    }
+}
 
 // --- 1. NEW SERVER-SIDE SEARCH LOGIC ---
 function initServerSideSearch() {

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/admin.js', v=3) }}"></script>
+<script src="{{ url_for('static', filename='js/admin.js', v=4) }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -58,7 +58,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="admin-nav-link" href="{{ url_for('auth.logout') }}">
+                    <a class="admin-nav-link" href="{{ url_for('auth.logout') }}" id="admin-logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </li>
