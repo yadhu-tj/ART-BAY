@@ -100,7 +100,13 @@ def admin_login_page():
 @auth_bp.route('/logout')
 def logout():
     session.pop('user', None)
-    return jsonify({'status': 'success', 'message': 'Logged out successfully'})
+    
+    # Check if client specifically requested JSON
+    if request.args.get('mode') == 'json':
+        return jsonify({'status': 'success', 'message': 'Logged out successfully'})
+        
+    # Default behavior for standard links: Redirect home
+    return redirect(url_for('home'))
 
 @auth_bp.route('/upgrade-to-artist', methods=['POST'])
 def upgrade_to_artist_route():

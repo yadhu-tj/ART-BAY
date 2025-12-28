@@ -8,7 +8,7 @@ export function initAuth() {
         logoutBtn.addEventListener("click", async (event) => {
             event.preventDefault();
             try {
-                const response = await fetch("/auth/logout");
+                const response = await fetch("/auth/logout?mode=json");
                 const data = await response.json();
                 if (data.status === "success") {
                     window.location.href = "/";
