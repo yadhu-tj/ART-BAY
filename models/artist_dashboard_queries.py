@@ -51,11 +51,36 @@ def update_artwork_price(art_id, artist_email, new_price):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        logger.info(f"Attempting update: ArtID={art_id}, Email={artist_email}, NewPrice={new_price}")
+        
+        # Restore security check
         query = "UPDATE art SET price = %s WHERE art_id = %s AND email = %s"
         cursor.execute(query, (new_price, art_id, artist_email))
         conn.commit()
-        return cursor.rowcount > 0 # True if updated
+        
+        rows_affected = cursor.rowcount
+        logger.info(f"Rows affected: {rows_affected}")
+        
+        return rows_affected > 0 # True if updated
     except Error as e:
         get_db_connection().rollback()
         logger.error(f"DB error in update_artwork_price: {e}")
+        return False
+
+def update_artwork_details(art_id, artist_email, title, description, price, category):
+    """Updates artwork details (title, description, price, category), ensuring ownership."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            UPDATE art 
+            SET title = %s, description = %s, price = %s, category = %s
+            WHERE art_id = %s AND email = %s
+        """
+        cursor.execute(query, (title, description, price, category, art_id, artist_email))
+        conn.commit()
+        return cursor.rowcount > 0
+    except Error as e:
+        get_db_connection().rollback()
+        logger.error(f"DB error in update_artwork_details: {e}")
         return False

@@ -3,8 +3,8 @@
 {% block title %}Artist Dashboard - ART&BAY{% endblock %}
 
 {% block head %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/artist_dashboard.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/artist_dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -24,17 +24,17 @@
     </div>
 
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="artist_dashboard__flash-container">
-                {% for message in messages %}
-                    <div class="artist_dashboard__flash-message">
-                        <i class="fas fa-info-circle"></i>
-                        <span>{{ message }}</span>
-                        <button class="artist_dashboard__flash-close">&times;</button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="artist_dashboard__flash-container">
+        {% for message in messages %}
+        <div class="artist_dashboard__flash-message">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ message }}</span>
+            <button class="artist_dashboard__flash-close">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <div class="artist_dashboard__stats">
@@ -68,10 +68,12 @@
                         <img src="{{ url_for('static', filename='Uploads/' ~ art.image_path) }}" alt="{{ art.title }}">
                     </td>
                     <td class="artist_dashboard__actions">
-                        <a href="{{ url_for('artist_dashboard.edit_price', art_id=art.art_id) }}" class="artist_dashboard__edit-btn">
-                            <i class="fas fa-edit"></i> Edit Price
+                        <a href="{{ url_for('artist_dashboard.edit_art', art_id=art.art_id) }}"
+                            class="artist_dashboard__edit-btn">
+                            <i class="fas fa-edit"></i> Edit
                         </a>
-                        <form action="{{ url_for('artist_dashboard.delete_art', art_id=art.art_id) }}" method="POST" class="artist_dashboard__delete-form">
+                        <form action="{{ url_for('artist_dashboard.delete_art', art_id=art.art_id) }}" method="POST"
+                            class="artist_dashboard__delete-form">
                             <button type="submit" class="artist_dashboard__delete-btn">
                                 <i class="fas fa-trash-alt"></i> Delete
                             </button>
@@ -85,7 +87,8 @@
                         <div class="artist_dashboard__empty-state">
                             <i class="fas fa-paint-brush artist_dashboard__empty-icon"></i>
                             <p>You haven't added any artwork yet.</p>
-                            <a href="{{ url_for('artist_dashboard.add_art') }}" class="artist_dashboard__add-first-btn">Add Your First Artwork</a>
+                            <a href="{{ url_for('artist_dashboard.add_art') }}"
+                                class="artist_dashboard__add-first-btn">Add Your First Artwork</a>
                         </div>
                     </td>
                 </tr>

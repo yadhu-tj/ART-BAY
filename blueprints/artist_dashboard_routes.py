@@ -7,7 +7,8 @@ from models.artist_dashboard_queries import (
     get_artworks_by_artist,
     add_artwork,
     delete_artwork_for_artist,
-    update_artwork_price
+    update_artwork_price,
+    update_artwork_details
 )
 
 # Setup logging
@@ -46,7 +47,13 @@ def dashboard():
 @artist_required
 def add_art():
     if request.method == 'POST':
+        logger.info("Processing Add Art POST request")
         file = request.files.get('image')
+        if not file:
+             logger.warning("No file part in request")
+        elif not allowed_file(file.filename):
+             logger.warning(f"File validation failed for: {file.filename}")
+
         if not file or not allowed_file(file.filename):
             flash('Invalid or missing image file.')
             return redirect(request.url)
@@ -72,12 +79,13 @@ def add_art():
             return redirect(url_for('artist_dashboard.dashboard'))
 
         except ValueError:
+            logger.error("Invalid price format")
             flash('Price must be a valid number.')
         except Exception as e:
-            logger.error(f"Error adding artwork: {e}")
+            logger.error(f"Error adding artwork: {e}", exc_info=True)
             flash('An unexpected error occurred.')
         
-        return redirect(url_for('artist_dashboard.add_art_route'))
+        return redirect(url_for('artist_dashboard.add_art'))
 
     return render_template('add_art.html')
 
@@ -140,3 +148,39 @@ def edit_price(art_id):
     # If the page is being VIEWED (GET request)
     # You will need an 'edit_price.html' template for this
     return render_template('edit_price.html', art=artwork_to_edit)
+
+@artist_dashboard_bp.route('/edit_art/<int:art_id>', methods=['GET', 'POST'])
+@artist_required
+def edit_art(art_id):
+    artist_email = session['user']['email']
+
+    # Get artwork and verify ownership
+    artworks = get_artworks_by_artist(artist_email)
+    artwork_to_edit = next((art for art in artworks if art['art_id'] == art_id), None)
+
+    if not artwork_to_edit:
+        flash('Art not found or you do not have permission to edit it.')
+        return redirect(url_for('artist_dashboard.dashboard'))
+
+    if request.method == 'POST':
+        try:
+            title = request.form['title']
+            description = request.form['description']
+            price = float(request.form['price'])
+            category = request.form['category']
+            
+            success = update_artwork_details(art_id, artist_email, title, description, price, category)
+            
+            if success:
+                flash('Artwork details updated successfully!')
+                return redirect(url_for('artist_dashboard.dashboard'))
+            else:
+                flash('Error updating artwork.')
+                
+        except ValueError:
+            flash('Price must be a valid number.')
+        except Exception as e:
+            logger.error(f"Error updating artwork: {e}", exc_info=True)
+            flash('An unexpected error occurred.')
+            
+    return render_template('edit_art.html', art=artwork_to_edit)
