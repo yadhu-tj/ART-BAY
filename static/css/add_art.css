@@ -1,196 +1,232 @@
-.add-art-container {
-    max-width: 600px;
-    margin: 60px auto;
-    padding: 30px;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 25px rgba(255, 106, 0, 0.1);
-    color: #f0f0f0;
+/* Modern Add Art Page - Black & Orange Theme */
+:root {
+    --primary-orange: #ff6a00;
+    --primary-orange-hover: #ff9000;
+    --dark-bg: #000000;
+    --card-bg: #111111;
+    --input-bg: #1a1a1a;
+    --text-color: #f0f0f0;
+    --text-muted: #aaaaaa;
+    --border-color: #333333;
 }
 
-h1 {
-    text-align: center;
-    font-family: 'Playfair Display', serif;
-    color: #fff;
-    font-size: 28px;
-    margin-bottom: 25px;
-    text-shadow: 0 0 6px rgba(255, 106, 0, 0.2);
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+}
+
+/* Main Split Layout */
+.add-art-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    margin-top: 80px;
+    width: 100%;
+    padding: 2rem;
+    gap: 3rem;
+    /* Space between the two boxes */
+}
+
+/* Common Box Style */
+.art-preview-section,
+.art-details-section {
+    flex: 0 0 auto;
+    /* Stop growing/shrinking */
+    width: 450px;
+    height: 600px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Upload Box */
+.upload-area {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #444;
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Form Box */
+.art-form-box {
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    background-color: transparent;
+    /* No background needed if we just conform */
+    border: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Remove separate max-widths since parent controls it */
+.art-details-section .art-form-box {
+    max-width: none;
+    max-height: none;
+    border: none;
+}
+
+/* Custom Scrollbar for form box */
+.art-form-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.art-form-box::-webkit-scrollbar-track {
+    background: #000;
+}
+
+.art-form-box::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+.art-form-box::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-orange);
+}
+
+/* Compact Form Styling */
+.form-header {
+    margin-bottom: 1.5rem;
+}
+
+.form-header h1 {
+    font-size: 2rem;
+    /* Smaller title */
+    margin-bottom: 0.2rem;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1.2rem;
+    /* Tighter spacing */
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
+.form-label {
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.form-control {
+    padding: 0.6rem 0.8rem;
+    /* Smaller inputs */
+    font-size: 0.95rem;
+    height: auto;
+}
+
+textarea.form-control {
+    min-height: 80px;
+    /* Smaller textarea */
+}
+
+.price-wrapper input {
+    padding-left: 2rem;
+    font-size: 1.1rem;
+}
+
+.currency-symbol {
+    left: 0.8rem;
+    font-size: 1rem;
+}
+
+/* Submit Actions */
+.form-actions {
+    margin-top: 3rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.submit-btn {
+    flex: 1;
+    background: linear-gradient(90deg, #ff6a00, #ff9000);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #ccc;
-    font-size: 15px;
-}
-
-.form-group input,
-.form-group textarea,
-.custom-select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-    color: #fff;
-    border-radius: 10px;
-    font-size: 15px;
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.custom-select:focus {
-    outline: none;
-    border-color: #ff6a00;
-    box-shadow: 0 0 8px rgba(255, 106, 0, 0.3);
-}
-
-.form-group textarea {
-    height: 120px;
-    resize: vertical;
-}
-
-.form-group input[type="file"] {
-    padding: 8px;
-    background: none;
-    color: #ccc;
-    border: none;
-}
-
-.custom-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #ffddb3; /* Light orange text */
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-size: 15px;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ff944d' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 12px;
-    transition: border-color 0.2s ease;
-}
-
-/* Style dropdown options */
-.custom-select option {
-    background-color: #1a1a1a;
-    color: #ffddb3;
-}
-
-
-#imagePreview {
-    margin-top: 12px;
-    text-align: center;
-}
-
-#imagePreview img {
-    max-width: 200px;
-    max-height: 200px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(255, 106, 0, 0.1);
-}
-
-button[type="submit"] {
-    background: linear-gradient(135deg, #ff6a00, #ffaa00);
-    color: #000;
-    border: none;
-    padding: 14px 0;
     border-radius: 12px;
     cursor: pointer;
-    width: 100%;
-    font-size: 17px;
-    font-weight: bold;
-    font-family: 'Cinzel', serif;
-    box-shadow: 0 6px 16px rgba(255, 106, 0, 0.4);
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
-button[type="submit"]:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 20px rgba(255, 106, 0, 0.6);
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
 }
 
-button[type="submit"]:disabled {
-    background: #444;
-    color: #888;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-.back-btn {
-    display: block;
-    text-align: center;
-    margin-top: 22px;
-    color: #ff944d;
-    font-size: 15px;
+.cancel-btn {
+    padding: 1rem 1.5rem;
+    color: var(--text-muted);
     text-decoration: none;
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
-.back-btn:hover {
-    text-decoration: underline;
-    color: #ffaa00;
+.cancel-btn:hover {
+    color: white;
 }
 
-.flash-messages {
-    margin-bottom: 20px;
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+    .add-art-wrapper {
+        flex-direction: column;
+        height: auto;
+        min-height: auto;
+    }
+
+    .art-preview-section {
+        width: 100%;
+        height: 400px;
+        /* Fixed height for image preview area on mobile */
+        padding: 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .upload-area {
+        max-height: 100%;
+    }
+
+    .art-details-section {
+        width: 100%;
+        overflow-y: visible;
+        /* Let it scroll naturally */
+        padding: 2rem 1.5rem;
+    }
 }
 
-.flash-message {
-    background: rgba(40, 167, 69, 0.1);
-    color: #a7e6b0;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 6px 0;
-    border: 1px solid rgba(40, 167, 69, 0.2);
-    font-size: 15px;
-}
+@media (max-width: 480px) {
+    .art-preview-section {
+        height: 300px;
+        padding: 1rem;
+    }
 
-.error {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 8px rgba(220, 53, 69, 0.3);
-}
+    .art-details-section {
+        padding: 1.5rem 1rem;
+    }
 
-.error-message {
-    color: #ff6a6a;
-    font-size: 14px;
-    margin-top: 5px;
-}
-.toast-message {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #1f1f1f;
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.3s ease;
-    z-index: 9999;
-    font-weight: bold;
-}
+    .form-header h1 {
+        font-size: 2rem;
+    }
 
-.toast-message.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.toast-message.success {
-    background-color: #28a745;
-}
-
-.toast-message.error {
-    background-color: #dc3545;
+    .submit-btn {
+        font-size: 1rem;
+        padding: 0.8rem 1.5rem;
+    }
 }

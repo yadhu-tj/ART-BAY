@@ -3,8 +3,98 @@
 {% block title %}Add New Artwork - ART&BAY{% endblock %}
 
 {% block head %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_art.css') }}">
+{{ super() }}
+<style>
+    .add-art-container {
+        max-width: 600px;
+        margin: 120px auto 50px;
+        padding: 30px;
+        background-color: #111;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        color: #fff;
+    }
+
+    .add-art-container h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-family: 'Playfair Display', serif;
+        color: #ff6a00;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #ddd;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        background-color: #222;
+        border: 1px solid #444;
+        border-radius: 5px;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #ff6a00;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #ff6a00, #ff9000);
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #aaa;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        color: #ff6a00;
+    }
+
+    /* Flash messages */
+    .flash-messages {
+        margin-bottom: 20px;
+    }
+
+    .flash-message {
+        padding: 10px;
+        background-color: rgba(255, 106, 0, 0.2);
+        border: 1px solid #ff6a00;
+        border-radius: 5px;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,20 +102,17 @@
     <h1>Add New Artwork</h1>
 
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for message in messages %}
-                    <p class="flash-message">{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for message in messages %}
+        <p class="flash-message">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
-    <form id="addArtForm" 
-          action="{{ url_for('artist_dashboard.add_art') }}" 
-          method="POST" 
-          enctype="multipart/form-data" 
-          data-redirect="{{ url_for('artist_dashboard.dashboard') }}">
+    <form id="addArtForm" action="{{ url_for('artist_dashboard.add_art') }}" method="POST"
+        enctype="multipart/form-data">
         <div class="form-group">
             <label for="title">Title *</label>
             <input type="text" id="title" name="title" required>
@@ -33,7 +120,7 @@
 
         <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" name="description"></textarea>
+            <textarea id="description" name="description" rows="4"></textarea>
         </div>
 
         <div class="form-group">
@@ -43,7 +130,7 @@
 
         <div class="form-group">
             <label for="category">Category</label>
-            <select id="category" name="category" class="custom-select">
+            <select id="category" name="category">
                 <option value="">Select a category</option>
                 <option value="Painting">Painting</option>
                 <option value="Sculpture">Sculpture</option>
@@ -54,15 +141,26 @@
 
         <div class="form-group">
             <label for="image">Image *</label>
-            <input type="file" id="image" name="image" accept=".png,.jpg,.jpeg" required>
-            <div id="imagePreview"></div>
+            <input type="file" id="image" name="image" accept=".png,.jpg,.jpeg" required
+                style="padding: 10px; height: auto;">
         </div>
 
-        <button type="submit" id="submitBtn">Add Artwork</button>
+        <button type="button" class="submit-btn" onclick="submitArtForm()">Add Artwork</button>
     </form>
 
-    <a href="{{ url_for('artist_dashboard.dashboard') }}" class="back-btn">← Go to Dashboard</a>
-</div>
+    <script>
+        function submitArtForm() {
+            const form = document.getElementById('addArtForm');
+            const btn = document.querySelector('.submit-btn');
 
-<script src="{{ url_for('static', filename='js/add_art.js') }}"></script>
+            if (form.reportValidity()) {
+                btn.disabled = true;
+                btn.innerHTML = 'Adding...';
+                form.submit();
+            }
+        }
+    </script>
+
+    <a href="{{ url_for('artist_dashboard.dashboard') }}" class="back-link">← Back to Dashboard</a>
+</div>
 {% endblock %}
