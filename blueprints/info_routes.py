@@ -19,3 +19,11 @@ def customer_guide():
 @info_bp.route('/about')
 def about_us():
     return render_template('info/about_us.html')
+
+@info_bp.route('/inspiration')
+def inspiration():
+    return render_template('info/inspiration.html')
+
+@info_bp.route('/art-advisory')
+def art_advisory():
+    return render_template('info/art_advisory.html')
