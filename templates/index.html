@@ -18,8 +18,8 @@
     ("Sculpture", url_for('gallery', category='Sculpture')),
     ("Drawings", url_for('gallery', category='Drawings')),
     ("Digital", url_for('gallery', category='Digital')),
-    ("Inspiration", url_for('gallery')),
-    ("Art Advisory", url_for('gallery'))
+    ("Inspiration", url_for('info.inspiration')),
+    ("Art Advisory", url_for('info.art_advisory'))
     ] %}
 
     {% for category, link in categories %}
