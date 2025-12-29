@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Inspiration - ART&BAY{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/inspiration.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION with Video Background Effect -->
+<section class="inspiration-hero">
+    <div class="video-bg">
+        <div class="video-placeholder"></div>
+        <!-- Ideally, an actual <video> tag goes here -->
+    </div>
+
+    <div class="hero-content">
+        <h1 class="hero-title">Fuel Your <span>Creativity</span></h1>
+        <p class="hero-subtitle">Curated collections for the modern connoisseur.</p>
+        <a href="#featured" class="btn-explore">Explore Collections</a>
+    </div>
+
+    <div class="scroll-indicator">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+    </div>
+</section>
+
+<!-- SCROLLING MARQUEE -->
+<div class="trending-strip">
+    <div class="marquee-content">
+        <span class="tag-item">ABSTRACT</span>
+        <span class="tag-item">MINIMALISM</span>
+        <span class="tag-item">SURREALISM</span>
+        <span class="tag-item">POP ART</span>
+        <span class="tag-item">IMPRESSIONISM</span>
+        <span class="tag-item">DIGITAL</span>
+        <span class="tag-item">ABSTRACT</span> <!-- Duplicate for seamless loop -->
+        <span class="tag-item">MINIMALISM</span>
+        <span class="tag-item">SURREALISM</span>
+        <span class="tag-item">POP ART</span>
+        <span class="tag-item">IMPRESSIONISM</span>
+        <span class="tag-item">DIGITAL</span>
+    </div>
+</div>
+
+<!-- FEATURED EDITORIAL SECTION -->
+<section id="featured" class="featured-magazine">
+    <div class="mag-visual">
+        <img src="{{ url_for('static', filename='images/forest.jpg') }}" alt="Featured Artist" class="mag-img-main">
+        <div class="floating-card">
+            <h4>"Whispers of Nature"</h4>
+            <p>An exclusive look into how organic forms are reshaping modern digital landscapes.</p>
+        </div>
+    </div>
+    <div class="mag-content">
+        <h2>The Renaissance of <br> <span style="color: var(--gold);">Calmness</span></h2>
+        <p>In a world of constant noise, artists are turning to serenity. Discover our latest collection focusing on
+            muted tones, soft light, and the quiet power of nature.</p>
+        <a href="{{ url_for('gallery', category='Painting') }}" class="btn-explore"
+            style="opacity: 1; animation: none; color: #fff; border-color: #fff;">View The Collection</a>
+    </div>
+</section>
+
+<!-- MASONRY GRID OF INSPIRATION -->
+<section class="masonry-section">
+    <div class="text-center mb-5">
+        <h2 style="font-family: 'Playfair Display'; font-size: 3rem; margin-bottom: 10px;">Visual Moodboard</h2>
+        <p style="color: grey;">Hand-picked for your daily dose of art.</p>
+    </div>
+
+    <div class="masonry-grid">
+        <!-- Item 1 -->
+        <div class="masonry-item">
+            <img src="{{ url_for('static', filename='images/last.jpg') }}" alt="Art">
+            <div class="overlay">
+                <h3>Renaissance Revival</h3>
+                <p>Classic techniques, modern subjects.</p>
+            </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="masonry-item">
+            <img src="{{ url_for('static', filename='images/crp.jpg') }}" alt="Art">
+            <div class="overlay">
+                <h3>Bold Abstraction</h3>
+                <p>Color that speaks.</p>
+            </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="masonry-item">
+            <img src="{{ url_for('static', filename='images/img5.jpg') }}" alt="Art">
+            <div class="overlay">
+                <h3>Digital Dreams</h3>
+                <p>Future aesthetics.</p>
+            </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="masonry-item">
+            <img src="{{ url_for('static', filename='images/mona.jpg') }}" alt="Art">
+            <div class="overlay">
+                <h3>Iconic Portraits</h3>
+                <p>The face of art.</p>
+            </div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="masonry-item">
+            <img src="{{ url_for('static', filename='images/forest.jpg') }}" alt="Art">
+            <div class="overlay">
+                <h3>Nature's Palette</h3>
+                <p>Earth tones & textures.</p>
+            </div>
+        </div>
+
+        <!-- Item 6 (Reused for demo) -->
+        <div class="masonry-item">
+            <img src="{{ url_for('static', filename='images/last.jpg') }}" alt="Art">
+            <div class="overlay">
+                <h3>Timeless</h3>
+                <p>History reimagined.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('gallery') }}" class="btn-explore" style="opacity: 1; animation: none;">Browse Full
+            Gallery</a>
+    </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section
+    style="background: url('{{ url_for('static', filename='images/crp.jpg') }}') center/cover fixed; padding: 150px 0; position: relative;">
+    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.7);"></div>
+    <div class="container text-center" style="position: relative; z-index: 2;">
+        <h2 style="font-family: 'Playfair Display'; font-size: 4rem; color: #fff; mb-4">Start Your Collection</h2>
+        <p style="font-size: 1.2rem; color: #ccc; max-width: 600px; margin: 0 auto 40px auto;">Great collections start
+            with a single piece that speaks to you. Find yours today.</p>
+        <a href="{{ url_for('info.art_advisory') }}" class="btn-explore cta-btn"
+            style="opacity: 1; animation: none;">Talk to an Advisor</a>
+    </div>
+</section>
+
+{% endblock %}
