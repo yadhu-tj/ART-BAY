@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Art Advisory - ART&BAY{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/art_advisory.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="advisory-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-text-container">
+        <p class="pre-title">Exclusive Advisory Services</p>
+        <h1 class="main-title">Curating Legacy <br> Collections</h1>
+        <p class="hero-desc">Expert guidance for discerning collectors, corporate entities, and investors seeking to
+            acquire artwork of significant cultural and financial value.</p>
+        <a href="#consultation" class="submit-btn"
+            style="text-decoration:none; display:inline-block; width:auto;">Request Consultation</a>
+    </div>
+</section>
+
+<!-- SERVICES GRID -->
+<section class="services-section">
+    <div class="section-header">
+        <h2 class="section-title">Our Expertise</h2>
+        <p style="color:#aaa; max-width:600px; margin:0 auto;">Comprehensive advisory services tailored to your specific
+            aesthetic and investment goals.</p>
+    </div>
+
+    <div class="services-grid">
+        <!-- Card 1 -->
+        <div class="service-card">
+            <div class="card-icon"><i class="fas fa-home"></i></div>
+            <h3 class="card-title">Residential Curation</h3>
+            <p class="card-text">Transform your private residence into a sanctuary of expression. We work with interior
+                designers to source pieces that harmonize with your architectural narrative.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="service-card">
+            <div class="card-icon"><i class="fas fa-building"></i></div>
+            <h3 class="card-title">Corporate Collections</h3>
+            <p class="card-text">Define your brand identity through art. We curate impactful collections for
+                headquarters requiring statements of innovation and culture.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="service-card">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <h3 class="card-title">Investment Advisory</h3>
+            <p class="card-text">Data-driven market analysis to identify blue-chip opportunities and emerging talents
+                with high appreciation potential.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PROCESS TIMELINE -->
+<section class="process-section">
+    <div class="section-header">
+        <h2 class="section-title">The Approach</h2>
+    </div>
+
+    <div class="steps-container">
+        <div class="steps-line"></div>
+
+        <div class="step-item">
+            <div class="step-number">01</div>
+            <h4 class="step-title">Discovery</h4>
+            <p class="step-desc">Understanding your vision, budget, and space requirements.</p>
+        </div>
+
+        <div class="step-item">
+            <div class="step-number">02</div>
+            <h4 class="step-title">Sourcing</h4>
+            <p class="step-desc">Accessing our global network to find the perfect pieces.</p>
+        </div>
+
+        <div class="step-item">
+            <div class="step-number">03</div>
+            <h4 class="step-title">Acquisition</h4>
+            <p class="step-desc">Negotiation, authentication, and secure transaction management.</p>
+        </div>
+
+        <div class="step-item">
+            <div class="step-number">04</div>
+            <h4 class="step-title">Installation</h4>
+            <p class="step-desc">White-glove delivery and professional curation in your space.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CONSULTATION FORM -->
+<section id="consultation" class="advisory-cta">
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+        <div class="cta-text-side">
+            <p class="pre-title" style="color:#FFA500;">Begin the Conversation</p>
+            <h2 class="section-title" style="margin-bottom:30px; text-align:left;">Start Your Journey</h2>
+            <p style="color:#ccc; line-height:1.8; margin-bottom:40px;">Whether you are making your first acquisition or
+                expanding an established collection, our team is ready to guide you. Fill out the form, and a senior
+                advisor will contact you within 24 hours.</p>
+
+            <div style="display:flex; align-items:center; color:#fff; margin-bottom:20px;">
+                <i class="fas fa-envelope" style="color:#FFA500; margin-right:15px;"></i> advisory@artbay.com
+            </div>
+            <div style="display:flex; align-items:center; color:#fff;">
+                <i class="fas fa-phone" style="color:#FFA500; margin-right:15px;"></i> +1 (800) ART-BAY-VIP
+            </div>
+        </div>
+
+        <div class="cta-form-side">
+            <form>
+                <div>
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-field" placeholder="John Doe">
+                </div>
+
+                <div>
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-field" placeholder="john@example.com">
+                </div>
+
+                <div>
+                    <label class="form-label">Interest Areas</label>
+                    <input type="text" class="form-field" placeholder="Contemporary, Sculpture, Investment...">
+                </div>
+
+                <button type="button" class="submit-btn"
+                    onclick="alert('Thank you. An advisor will contact you shortly.')">Submit Inquiry</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
