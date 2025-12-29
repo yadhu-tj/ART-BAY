@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // Update gallery with staggered fade-in animation
+    // Update gallery with smooth batch rendering
     function updateGallery(artworks) {
         galleryGrid.innerHTML = '';
 
@@ -110,10 +110,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Create and append each artwork with staggered animation
-        artworks.forEach((artwork, index) => {
+        const fragment = document.createDocumentFragment();
+        const itemsToAnimate = [];
+
+        artworks.forEach((artwork) => {
             const item = document.createElement('div');
             item.className = 'gallery-item';
+            // Set initial state for animation
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
             item.dataset.date = artwork.created_at;
             item.dataset.price = artwork.price;
             item.dataset.media = artwork.category;
@@ -122,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const artistName = artwork.artist_name || artwork.email;
 
             item.innerHTML = `
-                <img src="${imageSrc}" alt="${artwork.title}" data-art-id="${artwork.art_id}">
+                <img src="${imageSrc}" alt="${artwork.title}" loading="lazy" data-art-id="${artwork.art_id}">
                 <div class="item-info">
                     <h3>${artwork.title}</h3>
                     <p class="description">${artwork.description || 'No description available'}</p>
@@ -135,17 +142,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Set initial opacity to 0
-            item.style.opacity = 0;
-            item.style.transform = 'translateY(20px)';
-            galleryGrid.appendChild(item);
+            fragment.appendChild(item);
+            itemsToAnimate.push(item);
+        });
 
-            // Stagger the fade-in animations
-            setTimeout(() => {
-                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                item.style.opacity = 1;
-                item.style.transform = 'translateY(0)';
-            }, index * 100); // Stagger by 100ms per item
+        // Append all items at once to prevent layout thrashing
+        galleryGrid.appendChild(fragment);
+
+        // Smoothly animate items in
+        requestAnimationFrame(() => {
+            itemsToAnimate.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 50); // Faster stagger (50ms) for snappier feel
+            });
         });
     }
 
