@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
 {% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
-  <script src="{{ url_for('static', filename='js/gallery.js') }}" defer></script>
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+<script src="{{ url_for('static', filename='js/gallery.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
 <div class="page-container">
     <h1 class="gallery-title">Art Gallery</h1>
-    
+
     <!-- Filter Dropdown -->
     <div class="filter-container">
         <button class="filter-btn">Filter Options</button>
@@ -18,7 +18,7 @@
                 <label for="search-filter">Search</label>
                 <input type="text" id="search-filter" placeholder="Search artworks..." class="filter">
             </div>
-            
+
             <div class="filter-group">
                 <label for="sort-filter">Sort By</label>
                 <select id="sort-filter" class="filter">
@@ -28,7 +28,7 @@
                     <option value="price-high">Price: High to Low</option>
                 </select>
             </div>
-            
+
             <div class="filter-group">
                 <label for="price-filter">Price Range</label>
                 <select id="price-filter" class="filter">
@@ -38,7 +38,7 @@
                     <option value="1001+">$1001+</option>
                 </select>
             </div>
-            
+
             <div class="filter-group">
                 <label for="media-filter">Media Type</label>
                 <select id="media-filter" class="filter">
@@ -47,6 +47,8 @@
                     <option value="Digital">Digital</option>
                     <option value="Sculpture">Sculpture</option>
                     <option value="Photography">Photography</option>
+                    <option value="Drawings">Drawings</option>
+                    <option value="Prints">Prints</option>
                 </select>
             </div>
         </div>
@@ -55,24 +57,21 @@
     <!-- Masonry Grid -->
     <div class="gallery-grid" id="gallery-grid">
         {% for artwork in artworks %}
-            <div class="gallery-item" 
-                 data-date="{{ artwork.created_at }}"
-                 data-price="{{ artwork.price }}"
-                 data-media="{{ artwork.category }}">
-                <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" 
-                     alt="{{ artwork.title }}"
-                     data-art-id="{{ artwork.art_id }}">
-                <div class="item-info">
-                    <h3>{{ artwork.title }}</h3>
-                    <p class="description">{{ artwork.description }}</p>
-                    <p class="price">${{ artwork.price }}</p>
-                    <p class="artist">Artist: {{ artwork.artist_name if artwork.artist_name else artwork.email }}</p>
-                    <div class="btn-container">
-                        <button class="view-btn" data-art-id="{{ artwork.art_id }}">View Details</button>
-                        <button class="add-cart-btn" data-art-id="{{ artwork.art_id }}">Add to Cart</button>
-                    </div>
+        <div class="gallery-item" data-date="{{ artwork.created_at }}" data-price="{{ artwork.price }}"
+            data-media="{{ artwork.category }}">
+            <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="{{ artwork.title }}"
+                data-art-id="{{ artwork.art_id }}">
+            <div class="item-info">
+                <h3>{{ artwork.title }}</h3>
+                <p class="description">{{ artwork.description }}</p>
+                <p class="price">${{ artwork.price }}</p>
+                <p class="artist">Artist: {{ artwork.artist_name if artwork.artist_name else artwork.email }}</p>
+                <div class="btn-container">
+                    <button class="view-btn" data-art-id="{{ artwork.art_id }}">View Details</button>
+                    <button class="add-cart-btn" data-art-id="{{ artwork.art_id }}">Add to Cart</button>
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>
