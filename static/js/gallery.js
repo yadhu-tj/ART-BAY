@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Load initial artworks with loading state
-    fetchFilteredArtworks();
+    // fetchFilteredArtworks(); // DISABLED: Server-Side Rendering handles initial state now.
 
     // Add smooth scroll to top when filter is applied
     filters.forEach(filter => {
