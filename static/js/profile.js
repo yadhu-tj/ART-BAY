@@ -161,6 +161,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- SHIPPING ADDRESS ---
+    const addAddressBtn = document.getElementById('add-new-address-card');
+    if (addAddressBtn) {
+        addAddressBtn.addEventListener('click', () => {
+            // Simple prompt for now, or a modal. Let's do a modal injection.
+            const modalHtml = `
+                <div class="modal-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; display:flex; justify-content:center; align-items:center;">
+                    <div class="glass-card" style="width:400px; background:#222; border:1px solid #444;">
+                        <h3>Add New Address</h3>
+                        <form id="new-address-form" style="display:flex; flex-direction:column; gap:10px;">
+                            <input type="text" name="name" placeholder="Full Name" class="form-input" required>
+                            <input type="text" name="address" placeholder="Address Line" class="form-input" required>
+                            <input type="text" name="city" placeholder="City" class="form-input" required>
+                            <input type="text" name="zipcode" placeholder="Zip Code" class="form-input" required>
+                            <input type="text" name="country" placeholder="Country" class="form-input" required>
+                            <input type="text" name="phone" placeholder="Phone" class="form-input" required>
+                            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                                <button type="button" class="dark-btn" style="background:#444;" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                                <button type="submit" class="dark-btn" style="background:var(--accent-orange); border:none;">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            document.getElementById('new-address-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    // Reuse checkout/submit-shipping or create new specific profile endpoint?
+                    // Usually safer to create new one or ensure checkout one works without cart context.
+                    // Let's assume we need a new one: /profile/add-address
+                    const response = await fetch('/profile/add-address', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        alert('Address added!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Failed to add address");
+                }
+            });
+        });
+    }
+
     // --- PASSWORD CHANGE ---
     const passwordForm = document.getElementById('password-form');
     if (passwordForm) {

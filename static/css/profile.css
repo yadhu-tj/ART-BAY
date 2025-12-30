@@ -329,3 +329,12 @@
         margin-bottom: 30px;
     }
 }
+
+/* Utility Classes */
+.text-success {
+    color: #4caf50 !important;
+}
+
+.text-warning {
+    color: #ff9800 !important;
+}
