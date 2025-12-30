@@ -59,7 +59,7 @@
         {% for artwork in artworks %}
         <div class="gallery-item" data-date="{{ artwork.created_at }}" data-price="{{ artwork.price }}"
             data-media="{{ artwork.category }}">
-            <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="{{ artwork.title }}"
+            <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="{{ artwork.title }}" loading="lazy"
                 data-art-id="{{ artwork.art_id }}">
             <div class="item-info">
                 <h3>{{ artwork.title }}</h3>
@@ -71,6 +71,17 @@
                     <button class="add-cart-btn" data-art-id="{{ artwork.art_id }}">Add to Cart</button>
                 </div>
             </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>No Masterpieces Found</h3>
+            <p>We couldn't find any artwork matching your filters. Try adjusting your search or categories.</p>
+            <a href="{{ url_for('gallery') }}" class="reset-filters-btn" style="text-decoration: none;">
+                <i class="fas fa-undo"></i> Clear All Filters
+            </a>
         </div>
         {% endfor %}
     </div>
