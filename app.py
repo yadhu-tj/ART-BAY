@@ -37,6 +37,7 @@ def create_app():
     from blueprints.checkout_routes import checkout_bp
     from blueprints.admin_routes import admin_bp
     from blueprints.info_routes import info_bp
+    from blueprints.user_routes import user_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(art_bp, url_prefix='/art')
@@ -46,6 +47,7 @@ def create_app():
     app.register_blueprint(checkout_bp, url_prefix='/checkout')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(info_bp)
+    app.register_blueprint(user_bp, url_prefix='/profile')
 
     @app.context_processor
     def inject_user():
@@ -57,8 +59,20 @@ def create_app():
 
     @app.route('/gallery')
     def gallery():
-        from models.art_queries import get_all_artworks
-        artworks = get_all_artworks()
+        from flask import request
+        from models.art_queries import get_filtered_artworks
+        
+        # Capture all filter params from URL
+        filters = {
+            'media': request.args.get('category') or request.args.get('media'),
+            'search': request.args.get('search'),
+            'price': request.args.get('price'),
+            'sort': request.args.get('sort', 'newest')
+        }
+            
+        result = get_filtered_artworks(filters)
+        artworks = result.get('artworks', [])
+        
         return render_template('gallery.html', artworks=artworks)
 
     @app.errorhandler(404)
