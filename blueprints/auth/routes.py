@@ -25,6 +25,14 @@ def signup():
         if not all([name, email, password, confirm_password]):
             return jsonify({"status": "error", "message": "All fields are required!"}), 400
 
+        # Input Length Validation
+        if len(name) > 100:
+            return jsonify({"status": "error", "message": "Name is too long (max 100 characters)"}), 400
+        if len(email) > 120:
+            return jsonify({"status": "error", "message": "Email is too long (max 120 characters)"}), 400
+        if len(password) > 128:
+            return jsonify({"status": "error", "message": "Password is too long (max 128 characters)"}), 400
+
         if password != confirm_password:
             return jsonify({"status": "error", "message": "Passwords do not match!"}), 400
 
