@@ -140,3 +140,35 @@ def change_password():
     result = update_user_password(email, new_hash)
     
     return jsonify(result)
+
+@user_bp.route('/add-address', methods=['POST'])
+def add_address():
+    """Adds a new shipping address."""
+    if 'user' not in session:
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+    
+    from models.checkout_queries import add_shipping_info
+    
+    email = session['user']['email']
+    data = request.json
+    
+    # Simple validation
+    required = ['name', 'address', 'city', 'zipcode', 'country']
+    if not all(field in data for field in required):
+         return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
+         
+    # Call existing model function
+    new_id = add_shipping_info(
+        email, 
+        data['name'], 
+        data['address'], 
+        data['city'], 
+        data['zipcode'], 
+        data['country'], 
+        data.get('phone', 'N/A')
+    )
+    
+    if new_id:
+        return jsonify({'status': 'success', 'message': 'Address added!'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Database error'}), 500

@@ -121,7 +121,7 @@ def get_user_orders_with_items(email):
         # Assuming 'created_at' exists in orders. If not, remove ORDER BY.
         # We need to left join just in case art was deleted, but usually inner join is fine if integrity maintained.
         sql = """
-            SELECT o.order_id, o.total_price, o.order_status, o.created_at,
+            SELECT o.order_id, o.total_price, o.order_status, o.order_date,
                    oi.art_id, oi.price_at_purchase,
                    a.title, a.image_path
             FROM orders o
@@ -142,12 +142,12 @@ def get_user_orders_with_items(email):
                     'order_id': oid,
                     'total_price': row['total_price'],
                     'status': row['order_status'],
-                    'date': row.get('created_at'), # Might be None if column missing
-                    'items': []
+                    'date': row.get('order_date'), # Fixed column name
+                    'order_items': []
                 }
             
             if row['art_id']: # If order has items
-                orders[oid]['items'].append({
+                orders[oid]['order_items'].append({
                     'title': row['title'],
                     'image': row['image_path'],
                     'price': row['price_at_purchase']
@@ -163,7 +163,7 @@ def get_user_addresses(email):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        sql = "SELECT * FROM shipping_info WHERE email = %s ORDER BY id DESC"
+        sql = "SELECT * FROM shipping_info WHERE email = %s ORDER BY shipping_id DESC"
         cursor.execute(sql, (email,))
         return cursor.fetchall()
     except Error as e:
