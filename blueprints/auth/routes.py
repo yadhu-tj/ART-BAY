@@ -275,3 +275,5 @@ def check_login():
     if 'user' in session:
         return jsonify({'status': 'success', 'user': session['user']})
     return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+
+    
