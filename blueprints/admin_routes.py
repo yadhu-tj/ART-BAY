@@ -5,7 +5,7 @@ from models.admin_queries import (
     get_artworks, update_artwork, delete_artwork,
     get_orders, get_order_details,
     get_settings, update_settings,
-    get_pending_artists, approve_artist
+    get_pending_artists, approve_artist, update_order_status
 )
 from models.database import get_db_connection
 
@@ -336,6 +336,26 @@ def order_details_route(order_id):
         return jsonify({'status': 'success', 'order': order})
     except Exception as e:
         current_app.logger.error(f"Order details error: {str(e)}", exc_info=True)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@admin_bp.route('/orders/update_status', methods=['POST'])
+@admin_required
+def update_order_status_route():
+    try:
+        data = request.get_json()
+        order_id = data.get('order_id')
+        status = data.get('status')
+        
+        if not order_id or not status:
+            return jsonify({'status': 'error', 'message': 'Order ID and status are required'}), 400
+            
+        result = update_order_status(order_id, status)
+        if 'error' in result:
+            return jsonify({'status': 'error', 'message': result['error']}), 400
+            
+        return jsonify(result)
+    except Exception as e:
+        current_app.logger.error(f"Update order status error: {str(e)}", exc_info=True)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @admin_bp.route('/settings')
