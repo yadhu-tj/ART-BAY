@@ -5,7 +5,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
 from models.user_queries import (
     get_user_by_email, update_user_profile, update_profile_pic, 
-    update_user_password, get_user_orders_with_items, get_user_addresses
+    update_user_password, get_user_orders_with_items, get_user_addresses,
+    confirm_order_receipt
 )
 from config.config import Config
 
@@ -172,3 +173,13 @@ def add_address():
         return jsonify({'status': 'success', 'message': 'Address added!'})
     else:
         return jsonify({'status': 'error', 'message': 'Database error'}), 500
+
+@user_bp.route('/orders/confirm/<int:order_id>', methods=['POST'])
+def confirm_order(order_id):
+    """Allows a user to confirm they've received an order."""
+    if 'user' not in session:
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
+    
+    email = session['user']['email']
+    result = confirm_order_receipt(order_id, email)
+    return jsonify(result)
