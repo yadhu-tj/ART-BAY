@@ -502,7 +502,7 @@
                                                 </td>
                                                 <td>
                                                     <span
-                                                        class="badge badge-{{ 'success' if order.order_status == 'completed' else 'warning' if order.order_status == 'pending' else 'info' }}">
+                                                        class="badge badge-{{ 'success' if order.order_status == 'received' else 'primary' if order.order_status == 'shipped' else 'warning' if order.order_status == 'pending' else 'info' }}">
                                                         {{ order.order_status }}
                                                     </span>
                                                 </td>
@@ -534,46 +534,88 @@
 
                 <!-- Order Details Modal -->
                 <div class="modal fade" id="admin_order_details_modal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title"><i class="fas fa-receipt me-2"></i>Order Details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content glass-modal">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title">
+                                    <span class="icon-box me-2"><i class="fas fa-receipt"></i></span>
+                                    Order #<span id="admin_order_detail_id"></span>
+                                </h5>
+                                <button type="button" class="btn-close-custom" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6><i class="fas fa-info-circle me-2"></i>Order Information</h6>
-                                        <p><strong>Order ID:</strong> <span id="admin_order_detail_id"></span></p>
-                                        <p><strong>Status:</strong> <span id="admin_order_detail_status"></span></p>
-                                        <p><strong>Total:</strong> ₹<span id="admin_order_detail_total"></span></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6><i class="fas fa-user me-2"></i>Customer Information</h6>
-                                        <p><strong>Email:</strong> <span id="admin_order_detail_email"></span></p>
+                                <!-- Status & Total Banner -->
+                                <div class="order-status-banner mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="status-group">
+                                            <span
+                                                class="text-muted text-uppercase text-xs fw-bold d-block mb-1">Status</span>
+                                            <span id="admin_order_detail_status" class="badge-status-large"></span>
+                                        </div>
+                                        <div class="total-group text-end">
+                                            <span class="text-muted text-uppercase text-xs fw-bold d-block mb-1">Total
+                                                Amount</span>
+                                            <span class="h3 mb-0 text-white">₹<span
+                                                    id="admin_order_detail_total"></span></span>
+                                        </div>
                                     </div>
                                 </div>
-                                <hr>
-                                <h6><i class="fas fa-list me-2"></i>Order Items</h6>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Artwork</th>
-                                                <th>Price</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="admin_order_items">
-                                            <!-- Populated by admin.js -->
-                                        </tbody>
-                                    </table>
+
+                                <div class="row g-4 mb-4">
+                                    <!-- Customer Info Card -->
+                                    <div class="col-md-5">
+                                        <div class="info-card h-100">
+                                            <div class="card-header-sm">
+                                                <i class="fas fa-user-circle me-2"></i>Customer Details
+                                            </div>
+                                            <div class="card-body-sm">
+                                                <div class="info-row">
+                                                    <span class="info-label">Email</span>
+                                                    <span id="admin_order_detail_email"
+                                                        class="info-value text-break"></span>
+                                                </div>
+                                                <!-- Add more customer fields here if available in data, e.g. Phone, Name -->
+                                                <div class="info-row mt-3">
+                                                    <span class="info-label">Date</span>
+                                                    <span id="admin_order_detail_date" class="info-value"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Order Items -->
+                                    <div class="col-md-7">
+                                        <div class="info-card h-100">
+                                            <div class="card-header-sm">
+                                                <i class="fas fa-box-open me-2"></i>Order Items
+                                            </div>
+                                            <div class="card-body-sm p-0">
+                                                <div class="table-responsive"
+                                                    style="max-height: 250px; overflow-y: auto;">
+                                                    <table class="table table-hover align-middle mb-0 custom-table">
+                                                        <thead class="sticky-top bg-dark-subtle">
+                                                            <tr>
+                                                                <th>Artwork</th>
+                                                                <th class="text-end">Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="admin_order_items">
+                                                            <!-- Populated by admin.js -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-1"></i>Close
-                                </button>
+                            <div class="modal-footer border-0 pt-0">
+                                <div id="admin_order_actions_container" class="d-flex gap-2"></div>
+                                <button type="button" class="btn btn-secondary-custom"
+                                    data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
