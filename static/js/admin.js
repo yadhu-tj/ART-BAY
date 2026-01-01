@@ -174,7 +174,8 @@ function renderOrdersTable(orders) {
     orders.forEach(order => {
         // Determine badge color based on status
         let badgeClass = 'secondary';
-        if (order.order_status === 'completed') badgeClass = 'success';
+        if (order.order_status === 'received') badgeClass = 'success';
+        if (order.order_status === 'shipped') badgeClass = 'primary';
         if (order.order_status === 'pending') badgeClass = 'warning';
         if (order.order_status === 'cancelled') badgeClass = 'danger';
 
@@ -757,9 +758,25 @@ function initOrderManagement() {
                     if (data.status === 'success') {
                         // Populate order details modal
                         document.getElementById('admin_order_detail_id').textContent = data.order.order_id;
-                        document.getElementById('admin_order_detail_status').textContent = data.order.order_status;
+
+                        // Status with Color Handling
+                        const statusEl = document.getElementById('admin_order_detail_status');
+                        statusEl.textContent = data.order.order_status;
+                        // Reset classes
+                        statusEl.className = 'badge-status-large';
+                        // Add specific color class
+                        if (data.order.order_status) {
+                            statusEl.classList.add('status-' + data.order.order_status.toLowerCase());
+                        }
+
                         document.getElementById('admin_order_detail_total').textContent = parseFloat(data.order.total_price).toFixed(2);
                         document.getElementById('admin_order_detail_email').textContent = data.order.email;
+
+                        // Format and display date
+                        if (data.order.order_date) {
+                            const date = new Date(data.order.order_date);
+                            document.getElementById('admin_order_detail_date').textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
 
                         // Populate order items
                         const itemsTable = document.getElementById('admin_order_items');
@@ -768,17 +785,41 @@ function initOrderManagement() {
                             data.order.items.forEach(item => {
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
-                                    <td>${item.title}</td>
-                                    <td>₹${parseFloat(item.price).toFixed(2)}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-box me-3" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                            <div>
+                                                <span class="d-block fw-bold text-white">${item.title}</span>
+                                                <span class="text-muted text-xs">Qty: ${item.quantity}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end fw-bold">₹${parseFloat(item.price ? item.price : 0).toFixed(2)}</td>
                                 `;
                                 itemsTable.appendChild(row);
                             });
                         } else {
-                            itemsTable.innerHTML = '<tr><td colspan="2" class="text-center">No items found</td></tr>';
+                            itemsTable.innerHTML = '<tr><td colspan="2" class="text-center text-muted py-4">No items found</td></tr>';
                         }
 
                         // Show modal
                         const modal = new bootstrap.Modal(document.getElementById('admin_order_details_modal'));
+
+                        // Add Status Update Actions
+                        const actionContainer = document.getElementById('admin_order_actions_container');
+                        if (actionContainer) {
+                            actionContainer.innerHTML = '';
+                            if (data.order.order_status === 'pending') {
+                                const shipBtn = document.createElement('button');
+                                shipBtn.className = 'btn btn-primary me-2';
+                                shipBtn.innerHTML = '<i class="fas fa-shipping-fast me-1"></i>Mark as Shipped';
+                                shipBtn.onclick = () => updateOrderStatus(data.order.order_id, 'shipped');
+                                actionContainer.appendChild(shipBtn);
+                            }
+                        }
+
                         modal.show();
                     } else {
                         showAlert('Error: ' + (data.message || data.error), 'danger');
@@ -795,6 +836,33 @@ function initOrderManagement() {
                 });
         }
     });
+}
+
+function updateOrderStatus(orderId, status) {
+    if (!confirm(`Are you sure you want to mark this order as ${status}?`)) return;
+
+    fetch('/admin/orders/update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId, status: status })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert(data.message, 'success');
+                // Reload data
+                loadOrdersData();
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('admin_order_details_modal'));
+                if (modal) modal.hide();
+            } else {
+                showAlert('Error: ' + data.message, 'danger');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showAlert('Request failed', 'danger');
+        });
 }
 
 /**
@@ -847,7 +915,7 @@ function loadOrdersData() {
                         <span class="badge badge-success">₹${parseFloat(order.total_price).toFixed(2)}</span>
                     </td>
                     <td>
-                        <span class="badge badge-${statusClass}">${order.order_status}</span>
+                        <span class="badge badge-${order.order_status === 'received' ? 'success' : order.order_status === 'shipped' ? 'primary' : order.order_status === 'pending' ? 'warning' : 'info'}">${order.order_status}</span>
                     </td>
                     <td>
                         <button class="btn btn-sm btn-primary admin-order-view-btn" 
