@@ -187,3 +187,5 @@ def confirm_order_receipt(order_id, email):
         get_db_connection().rollback()
         logger.error(f"DB error in confirm_order_receipt: {e}")
         return {"status": "error", "message": str(e)}
+
+        
