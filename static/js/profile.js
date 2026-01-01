@@ -254,5 +254,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
 
+// --- CONFIRM RECEIPT ---
+document.addEventListener('click', async (e) => {
+    const confirmBtn = e.target.closest('.confirm-receipt-btn');
+    if (confirmBtn) {
+        const orderId = confirmBtn.getAttribute('data-id');
+        if (confirm('Are you sure you have received this order? This action cannot be undone.')) {
+            try {
+                const response = await fetch(`/profile/orders/confirm/${orderId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Order receipt confirmed! Thank you for your purchase.');
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (err) {
+                console.error('Error confirming receipt:', err);
+                alert('Failed to confirm receipt.');
+            }
+        }
+    }
 });
