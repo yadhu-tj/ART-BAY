@@ -164,7 +164,7 @@ def get_order_details(order_id):
 
         # Get order items
         cursor.execute("""
-            SELECT oi.quantity, oi.price_at_purchase, a.title 
+            SELECT oi.quantity, oi.price_at_purchase AS price, a.title 
             FROM order_items oi 
             JOIN art a ON oi.art_id = a.art_id 
             WHERE oi.order_id = %s
@@ -308,3 +308,20 @@ def approve_artist(email):
         conn.rollback()
         logger.error(f"DB error approving artist: {e}")
         return {'status': 'error', 'message': str(e)}
+
+def update_order_status(order_id, status):
+    """Updates the status of an order (e.g., 'shipped', 'completed', 'cancelled')."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = "UPDATE orders SET order_status = %s WHERE order_id = %s"
+        cursor.execute(query, (status, order_id))
+        conn.commit()
+        if cursor.rowcount > 0:
+            return {'status': 'success', 'message': f'Order status updated to {status}.'}
+        else:
+            return {'status': 'error', 'message': 'Order not found.'}
+    except Error as e:
+        conn.rollback()
+        logger.error(f"DB error updating order status: {e}")
+        return {'error': str(e)}

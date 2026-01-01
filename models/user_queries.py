@@ -169,3 +169,21 @@ def get_user_addresses(email):
     except Error as e:
         logger.error(f"DB error in get_user_addresses: {e}")
         return []
+
+def confirm_order_receipt(order_id, email):
+    """Updates the order status to 'received' by the user."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Ensure the order belongs to the user and is in 'shipped' status
+        query = "UPDATE orders SET order_status = 'received' WHERE order_id = %s AND email = %s AND order_status = 'shipped'"
+        cursor.execute(query, (order_id, email))
+        conn.commit()
+        if cursor.rowcount > 0:
+            return {"status": "success", "message": "Order marked as received."}
+        else:
+            return {"status": "error", "message": "Order not found, already received, or not yet shipped."}
+    except Error as e:
+        get_db_connection().rollback()
+        logger.error(f"DB error in confirm_order_receipt: {e}")
+        return {"status": "error", "message": str(e)}
