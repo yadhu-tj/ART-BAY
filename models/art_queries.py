@@ -72,6 +72,24 @@ def get_art_by_id(art_id):
         logger.error(f"DB error in get_art_by_id: {e}")
         return {"error": str(e)}
 
+def get_art_details(art_id):
+    """Fetches full artwork details including artist name."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        query = """
+            SELECT a.*, u.name as artist_name, ar.bio as artist_bio, ar.profile_pic 
+            FROM art a
+            JOIN users u ON a.email = u.email 
+            LEFT JOIN artists ar ON a.email = ar.email
+            WHERE a.art_id = %s
+        """
+        cursor.execute(query, (art_id,))
+        return cursor.fetchone()
+    except Error as e:
+        logger.error(f"DB error in get_art_details: {e}")
+        return {"error": str(e)}
+
 def get_filtered_artworks(filters):
     """Fetches artworks with dynamic search, filter, and sort options."""
     try:
