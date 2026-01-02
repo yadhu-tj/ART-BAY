@@ -1,0 +1,303 @@
+/* V2 Premium Art Details - Immersive Design */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+    --bg-deep: #0a0a0a;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --accent-gold: #D4AF37;
+    --accent-orange: #ff6b35;
+    --glass-surface: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --blur-strength: 20px;
+}
+
+body {
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- Layout Architecture --- */
+.art-details-container {
+    display: grid;
+    grid-template-columns: 1fr 450px;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* --- Left Side: The Visual --- */
+.art-visual-stage {
+    position: relative;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.ambient-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.ambient-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(60px) brightness(0.4);
+    transform: scale(1.2);
+    /* Subtle slow zoom animation */
+    animation: drift 30s infinite alternate ease-in-out;
+}
+
+@keyframes drift {
+    from {
+        transform: scale(1.2);
+    }
+
+    to {
+        transform: scale(1.3);
+    }
+}
+
+.main-stage-image {
+    position: relative;
+    z-index: 2;
+    max-width: 85%;
+    max-height: 85vh;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    /* Entrance Animation */
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    animation: entranceReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.2s;
+}
+
+@keyframes entranceReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* --- Right Side: The Narrative --- */
+.art-narrative-panel {
+    background: rgba(10, 10, 10, 0.95);
+    border-left: 1px solid var(--glass-border);
+    padding: 3rem 2.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    backdrop-filter: blur(var(--blur-strength));
+}
+
+/* Custom Scrollbar */
+.art-narrative-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.art-narrative-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+/* Typography & Content */
+.artist-identity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.4s;
+}
+
+.avatar-ring {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+}
+
+.artist-avatar,
+.artist-initial {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background: #222;
+    /* Center initial text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.artist-name {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.title-block {
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.5s;
+}
+
+.art-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    line-height: 1.1;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(90deg, #fff, #aaa);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.art-category {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-orange);
+    font-weight: 600;
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1.5rem 0;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.6s;
+}
+
+.spec-item .label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+}
+
+.spec-item .value {
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.description-block {
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.7s;
+}
+
+.description-block p {
+    line-height: 1.8;
+    color: #ccc;
+    font-size: 1rem;
+}
+
+/* Purchase Zone */
+.purchase-dock {
+    margin-top: auto;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.8s;
+}
+
+.price-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 1.2rem;
+    background: white;
+    color: black;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-btn:hover {
+    background: var(--accent-orange);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+/* Animations */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tooltip for Image */
+.main-stage-image:hover {
+    transform: scale(1.02);
+    transition: transform 0.5s ease;
+}
+
+/* Responsive - Mobile Stack */
+@media (max-width: 1024px) {
+    .art-details-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .art-visual-stage {
+        height: 60vh;
+        padding: 2rem;
+    }
+
+    .main-stage-image {
+        max-height: 50vh;
+        max-width: 100%;
+    }
+
+    .art-narrative-panel {
+        padding: 2rem;
+        box-shadow: none;
+        border-left: none;
+        border-top: 1px solid var(--glass-border);
+    }
+}
