@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, render_template
 from models.art_queries import (
     add_art, get_all_artworks, get_art_by_id,
-    delete_artwork, get_filtered_artworks
+    delete_artwork, get_filtered_artworks, get_art_details
 )
 
 art_bp = Blueprint("art", __name__, url_prefix="/art")
@@ -26,6 +26,16 @@ def fetch_all_artworks_route():
 def fetch_art_by_id_route(art_id):
     artwork = get_art_by_id(art_id)
     return jsonify(artwork)
+
+@art_bp.route('/view/<int:art_id>', methods=['GET'])
+def view_art_details_route(art_id):
+    artwork = get_art_details(art_id)
+    if not artwork or "error" in artwork:
+        # Check if it was a DB error or just not found
+        if artwork and "error" in artwork:
+             print(f"Error fetching art details: {artwork['error']}")
+        return render_template('404.html'), 404
+    return render_template('art_details.html', artwork=artwork)
 
 @art_bp.route('/delete/<int:art_id>', methods=['DELETE'])
 def remove_artwork_route(art_id):
