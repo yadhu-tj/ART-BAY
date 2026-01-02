@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Navigate to artwork detail page
         setTimeout(() => {
-            window.location.href = `/art/${artId}`;
+            window.location.href = `/art/view/${artId}`;
             document.body.style.cursor = 'default';
         }, 300);
     }
