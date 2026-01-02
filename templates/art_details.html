@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/art_details.css') }}">
+<script src="{{ url_for('static', filename='js/art_details.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="art-details-container">
+
+    <!-- Left: Immersive Visual Stage -->
+    <div class="art-visual-stage">
+        <div class="ambient-background">
+            <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="" class="ambient-img">
+        </div>
+        <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="{{ artwork.title }}"
+            class="main-stage-image" id="mainArtImage">
+    </div>
+
+    <!-- Right: Narrative Panel -->
+    <div class="art-narrative-panel">
+
+        <!-- Artist Identity -->
+        <div class="artist-identity">
+            <div class="avatar-ring">
+                {% if artwork.profile_pic %}
+                <!-- Added /static/uploads/ prefix assumption, ensure DB stores filename only or full path? 
+                     Typically user uploads are filename only. -->
+                <img src="/static/uploads/{{ artwork.profile_pic.split('/')[-1] }}" alt="{{ artwork.artist_name }}"
+                    class="artist-avatar">
+                {% else %}
+                <div class="artist-initial">{{ artwork.artist_name[0] | upper }}</div>
+                {% endif %}
+            </div>
+            <span class="artist-name">{{ artwork.artist_name }}</span>
+        </div>
+
+        <!-- Title Block -->
+        <div class="title-block">
+            <h1 class="art-title">{{ artwork.title }}</h1>
+            <span class="art-category">{{ artwork.category }}</span>
+        </div>
+
+        <!-- Specs Grid -->
+        <div class="specs-grid">
+            <div class="spec-item">
+                <span class="label">Date Created</span>
+                <span class="value">{{ artwork.created_at.strftime('%Y') if artwork.created_at else 'N/A' }}</span>
+            </div>
+            <div class="spec-item">
+                <span class="label">Artist Status</span>
+                <span class="value">Verified</span>
+            </div>
+            <!-- Add more specs if available in future -->
+        </div>
+
+        <!-- Description -->
+        <div class="description-block">
+            <p>{{ artwork.description }}</p>
+            {% if artwork.artist_bio %}
+            <br>
+            <p style="font-style: italic; opacity: 0.8; font-size: 0.9rem;">
+                <strong>About the Artist:</strong> {{ artwork.artist_bio }}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Purchase Action -->
+        <div class="purchase-dock">
+            <span class="price-display">${{ artwork.price }}</span>
+
+            <button class="action-btn add-to-cart-btn" data-art-id="{{ artwork.art_id }}">
+                <span>Acquire Artwork</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
