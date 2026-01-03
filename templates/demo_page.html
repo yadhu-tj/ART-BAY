@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Whispers - Art Gallery</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --text-white: #ffffff;
+            --text-grey: #b0b0b0;
+            --accent-orange: #ff7b42;
+            --card-border: #a86e4e;
+            --bg-dark: #1a1a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            /* Align content to bottom for the card */
+        }
+
+        /* --- Gallery Atmosphere --- */
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 30%, #2a2a2a 0%, #0d0d0d 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Simulated Spotlights */
+        .spotlight {
+            position: absolute;
+            top: 0;
+            width: 300px;
+            height: 600px;
+            background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.15), transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .center-light {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            opacity: 0.8;
+        }
+
+        .left-light {
+            left: 15%;
+            transform: rotate(-10deg);
+            opacity: 0.5;
+        }
+
+        .right-light {
+            right: 15%;
+            transform: rotate(10deg);
+            opacity: 0.5;
+        }
+
+        /* --- Paintings --- */
+        .paintings-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 100px;
+            margin-bottom: 150px;
+            /* Make space for the card */
+            z-index: 2;
+        }
+
+        .frame {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            background: #000;
+            padding: 5px;
+            /* Frame border thickness */
+        }
+
+        .center-frame {
+            width: 400px;
+            height: 550px;
+        }
+
+        .side-frame {
+            width: 200px;
+            height: 250px;
+            opacity: 0.7;
+            /* Side paintings are slightly darker/less focused */
+        }
+
+        .canvas {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* CSS Art to mimic the abstract paintings */
+        .art-center {
+            background: linear-gradient(135deg, #0b1a26 0%, #005f73 40%, #ee9b00 60%, #9b2226 100%);
+            filter: contrast(1.2) brightness(0.9);
+        }
+
+        .art-left {
+            background: linear-gradient(45deg, #001219, #0a9396, #94d2bd);
+        }
+
+        .art-right {
+            background: linear-gradient(225deg, #001219, #e9d8a6, #ca6702);
+        }
+
+        /* --- UI Card --- */
+        .ui-card {
+            position: absolute;
+            bottom: 40px;
+            width: 700px;
+            padding: 30px;
+            border-radius: 20px;
+            background: rgba(30, 30, 30, 0.6);
+            /* Semi-transparent */
+            backdrop-filter: blur(10px);
+            /* Glassmorphism */
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            color: var(--text-white);
+            z-index: 10;
+        }
+
+        .tag-container {
+            position: absolute;
+            top: -12px;
+            left: 30px;
+        }
+
+        .tag {
+            background-color: var(--accent-orange);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        /* Left Column: Title & Story */
+        .title-section {
+            flex: 2;
+        }
+
+        .art-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .artist-name {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .story-text {
+            font-size: 0.7rem;
+            color: var(--text-grey);
+            line-height: 1.4;
+            opacity: 0.8;
+        }
+
+        /* Middle Column: Specs */
+        .details-section {
+            flex: 1;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 20px;
+            margin: 0 20px;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-grey);
+            margin-bottom: 10px;
+        }
+
+        .specs {
+            display: flex;
+            justify-content: space-between;
+            text-align: left;
+            font-size: 0.65rem;
+            color: var(--text-grey);
+            gap: 15px;
+        }
+
+        .spec-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Right Column: Action */
+        .action-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .investment-label {
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            color: var(--text-white);
+        }
+
+        .acquire-btn {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+
+        .acquire-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Decorative Sparkle */
+        .sparkle-icon {
+            position: absolute;
+            bottom: -40px;
+            right: -40px;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.5);
+            transform: rotate(15deg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="gallery-container">
+        <div class="spotlight left-light"></div>
+        <div class="spotlight center-light"></div>
+        <div class="spotlight right-light"></div>
+
+        <div class="paintings-wrapper">
+            <div class="frame side-frame">
+                <div class="canvas art-left"></div>
+            </div>
+
+            <div class="frame center-frame">
+                <div class="canvas art-center"></div>
+            </div>
+
+            <div class="frame side-frame">
+                <div class="canvas art-right"></div>
+            </div>
+        </div>
+
+        <div class="ui-card">
+            <div class="card-content">
+
+                <div class="tag-container">
+                    <span class="tag">Oil on Canvas</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="title-section">
+                        <h1 class="art-title">ETERNAL WHISPERS</h1>
+                        <p class="artist-name">by ANASTASIA</p>
+                        <p class="story-text">
+                            Story behind the piece.<br>
+                            beyond words lies a narrative<br>
+                            woven into the reality of your dreams.
+                        </p>
+                    </div>
+
+                    <div class="details-section">
+                        <h3 class="section-label">SIZE & MEDIUM</h3>
+                        <div class="specs">
+                            <div class="spec-col">
+                                <span>Height: 48 inches</span>
+                                <span>Width: 30 inches</span>
+                            </div>
+                            <div class="spec-col">
+                                <span>Depth: 2 inches</span>
+                                <span>Medium: Oil Canvas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <span class="investment-label">Investment:</span>
+                        <button id="acquireBtn" class="acquire-btn">Acquire Artwork</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sparkle-icon">✦</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const acquireBtn = document.getElementById('acquireBtn');
+
+            acquireBtn.addEventListener('click', () => {
+                // Simple animation or alert to simulate action
+                acquireBtn.textContent = "Processing...";
+                acquireBtn.style.backgroundColor = "#ff7b42"; // Orange
+                acquireBtn.style.color = "white";
+
+                setTimeout(() => {
+                    alert("Thank you for your interest in 'Eternal Whispers'. A curator will contact you shortly.");
+                    acquireBtn.textContent = "Acquire Artwork";
+                    acquireBtn.style.backgroundColor = "white";
+                    acquireBtn.style.color = "black";
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+
+</html>
