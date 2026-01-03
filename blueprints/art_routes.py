@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify, session, render_template
 from models.art_queries import (
     add_art, get_all_artworks, get_art_by_id,
-    delete_artwork, get_filtered_artworks, get_art_details
+    delete_artwork, get_filtered_artworks, get_art_details,
+    get_neighbor_artworks
 )
 
 art_bp = Blueprint("art", __name__, url_prefix="/art")
@@ -35,7 +36,9 @@ def view_art_details_route(art_id):
         if artwork and "error" in artwork:
              print(f"Error fetching art details: {artwork['error']}")
         return render_template('404.html'), 404
-    return render_template('art_details.html', artwork=artwork)
+        
+    neighbors = get_neighbor_artworks(art_id)
+    return render_template('art_details.html', artwork=artwork, prev_art=neighbors['prev'], next_art=neighbors['next'])
 
 @art_bp.route('/delete/<int:art_id>', methods=['DELETE'])
 def remove_artwork_route(art_id):
