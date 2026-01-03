@@ -136,3 +136,36 @@ def get_filtered_artworks(filters):
     except Error as e:
         logger.error(f"DB error in get_filtered_artworks: {e}")
         return {"error": str(e)}
+
+def get_neighbor_artworks(art_id):
+    """Fetches the previous and next artwork IDs and images for the carousel."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get next artwork (Ordered by created_at DESC usually, but ID is simpler for neighbors)
+        # Using ID for simplicity in "neighbor" concept, or we could use created_at
+        
+        # Next (newer/higher ID)
+        cursor.execute("SELECT art_id, image_path, title FROM art WHERE art_id > %s ORDER BY art_id ASC LIMIT 1", (art_id,))
+        next_art = cursor.fetchone()
+        
+        # Previous (older/lower ID)
+        cursor.execute("SELECT art_id, image_path, title FROM art WHERE art_id < %s ORDER BY art_id DESC LIMIT 1", (art_id,))
+        prev_art = cursor.fetchone()
+        
+        # Circular Navigation Logic:
+        # If no next, wrap to first (lowest ID)
+        if not next_art:
+            cursor.execute("SELECT art_id, image_path, title FROM art ORDER BY art_id ASC LIMIT 1")
+            next_art = cursor.fetchone()
+            
+        # If no prev, wrap to last (highest ID)
+        if not prev_art:
+            cursor.execute("SELECT art_id, image_path, title FROM art ORDER BY art_id DESC LIMIT 1")
+            prev_art = cursor.fetchone()
+            
+        return {"next": next_art, "prev": prev_art}
+    except Error as e:
+        logger.error(f"DB error in get_neighbor_artworks: {e}")
+        return {"next": None, "prev": None}
