@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/otp_login.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/otp_signup.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/search_overlay.css') }}">
   {% block extra_css %}{% endblock %}
 
   <!-- External JavaScript Libraries -->
@@ -30,6 +31,7 @@
 
   <!-- Application JavaScript -->
   <script src="{{ url_for('static', filename='js/index.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/search_overlay.js') }}" defer></script>
   {% endblock %}
 </head>
 
@@ -50,6 +52,19 @@
   <!-- Additional Scripts -->
   <script type="module" src="{{ url_for('static', filename='js/head.js') }}" defer></script>
   {% block extra_js %}{% endblock %}
+
+  <!-- Cinematic Search Overlay -->
+  <div id="searchOverlay">
+    <button class="close-search">&times;</button>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="Type to search..." autocomplete="off">
+    </div>
+
+    <div id="searchResults" class="search-results">
+      <!-- Dynamic Results -->
+    </div>
+  </div>
 </body>
 
 </html>
