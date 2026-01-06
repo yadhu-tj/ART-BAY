@@ -4,14 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('imageInput');
     const previewImage = document.getElementById('previewImage');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-    const imageActions = document.getElementById('imageActions');
     const changeImageBtn = document.getElementById('changeImageBtn');
     const submitBtn = document.getElementById('submitBtn');
     const redirectUrl = form.getAttribute('data-redirect');
 
-    // --- Image Upload Logic ---
+    // ========== IMAGE UPLOAD LOGIC ==========
 
-    // Trigger file input when clicking upload area (unless clicking change button)
+    // Click to upload
     uploadArea.addEventListener('click', (e) => {
         if (e.target !== changeImageBtn && !changeImageBtn.contains(e.target)) {
             imageInput.click();
@@ -19,19 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     changeImageBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent bubbling to uploadArea
+        e.stopPropagation();
         imageInput.click();
     });
 
-    // Handle File Selection
+    // Handle file selection
     imageInput.addEventListener('change', function () {
         if (this.files && this.files[0]) {
             handleFile(this.files[0]);
         }
     });
 
-    // Drag & Drop Handling
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    // Drag and Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         uploadArea.addEventListener(eventName, preventDefaults, false);
     });
 
@@ -40,21 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
     }
 
-    ;['dragenter', 'dragover'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, highlight, false);
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-active'), false);
     });
 
-    ;['dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, unhighlight, false);
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-active'), false);
     });
-
-    function highlight(e) {
-        uploadArea.classList.add('drag-active');
-    }
-
-    function unhighlight(e) {
-        uploadArea.classList.remove('drag-active');
-    }
 
     uploadArea.addEventListener('drop', handleDrop, false);
 
@@ -63,42 +54,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const files = dt.files;
 
         if (files && files.length > 0) {
-            imageInput.files = files; // Assign dropped files to input
+            imageInput.files = files;
             handleFile(files[0]);
         }
     }
 
     function handleFile(file) {
-        if (['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImage.src = e.target.result;
-                previewImage.style.display = 'block';
-                uploadPlaceholder.style.opacity = '0'; // Fade out placeholder
-                setTimeout(() => { uploadPlaceholder.style.display = 'none'; }, 300);
-                imageActions.style.display = 'flex';
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
-                // Remove error state if present
-                uploadArea.style.borderColor = '';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            showToast('Please select a valid image (PNG, JPG, JPEG)', 'error');
+        if (!validTypes.includes(file.type)) {
+            showToast('Please select a valid image (PNG, JPG)', 'error');
+            return;
         }
+
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            showToast('Image size must be less than 10MB', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+            uploadPlaceholder.style.opacity = '0';
+            setTimeout(() => { uploadPlaceholder.style.display = 'none'; }, 300);
+            changeImageBtn.style.display = 'block';
+            uploadArea.classList.add('has-image');
+            uploadArea.style.borderColor = '';
+        };
+        reader.readAsDataURL(file);
     }
 
-    // --- Form Submission Logic ---
+    // ========== FORM SUBMISSION ==========
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         if (!validateForm()) return;
 
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoader = submitBtn.querySelector('.btn-loader');
+        const originalText = btnText.textContent;
+
+        // Loading state
         submitBtn.disabled = true;
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-block';
 
         const formData = new FormData(form);
+        formData.append('image', imageInput.files[0]);
 
         try {
             const response = await fetch(form.action, {
@@ -106,36 +110,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData
             });
 
-            // Handle response
             if (response.redirected) {
-                showToast('Artwork added successfully! Redirecting...', 'success');
-                window.location.href = response.url;
+                showToast('Artwork published successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = response.url;
+                }, 1000);
             } else {
-                // Try to parse JSON error or fallback to text
                 const text = await response.text();
                 try {
                     const json = JSON.parse(text);
                     if (json.status === 'success') {
-                        showToast('Artwork added successfully!', 'success');
-                        window.location.href = redirectUrl;
+                        showToast('Artwork published successfully!', 'success');
+                        setTimeout(() => {
+                            window.location.href = redirectUrl;
+                        }, 1000);
                     } else {
-                        showToast(json.message || 'Error adding artwork', 'error');
+                        throw new Error(json.message || 'Error adding artwork');
                     }
                 } catch (err) {
-                    // If it's HTML (flask flash message page), maybe just replace content or show generic error
-                    // Usually for this app, we rely on redirects. If it didn't redirect, it's an error.
-                    console.error("Server response:", text);
-                    showToast('Something went wrong. Please check inputs.', 'error');
+                    console.error('Response:', text);
+                    showToast('Something went wrong. Please try again.', 'error');
+                    resetButton();
                 }
             }
         } catch (error) {
             console.error('Submission error:', error);
             showToast('Network error. Please try again.', 'error');
-        } finally {
-            if (!response || !response.ok && !response.redirected) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
+            resetButton();
+        }
+
+        function resetButton() {
+            submitBtn.disabled = false;
+            btnText.style.display = 'inline-block';
+            btnText.textContent = originalText;
+            btnLoader.style.display = 'none';
         }
     });
 
@@ -157,46 +165,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!imageInput.files || imageInput.files.length === 0) {
             showToast('Please upload an image of your artwork', 'error');
-            uploadArea.style.borderColor = 'red';
+            uploadArea.style.borderColor = '#e74c3c';
             return false;
         }
 
         return true;
     }
 
-    // --- Toast Notification Helpers ---
+    // ========== TOAST NOTIFICATION ==========
+
     function showToast(message, type = 'success') {
+        // Remove existing toast
+        const existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+
         const toast = document.createElement('div');
-        toast.style.position = 'fixed';
-        toast.style.bottom = '30px';
-        toast.style.right = '30px';
-        toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
-        toast.style.color = 'white';
-        toast.style.padding = '12px 24px';
-        toast.style.borderRadius = '8px';
-        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        toast.style.zIndex = '10000';
-        toast.style.fontFamily = "'Inter', sans-serif";
-        toast.style.fontSize = '0.95rem';
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'all 0.3s ease';
-
-        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> &nbsp; ${message}`;
-
+        toast.className = `toast-notification ${type}`;
+        toast.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
         document.body.appendChild(toast);
 
-        // Animate in
         requestAnimationFrame(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateY(0)';
+            toast.classList.add('show');
         });
 
-        // Remove after delay
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(20px)';
-            setTimeout(() => document.body.removeChild(toast), 300);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
         }, 3500);
     }
+
 });
