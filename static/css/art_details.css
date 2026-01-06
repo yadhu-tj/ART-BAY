@@ -1,413 +1,472 @@
-/* Virtual Gallery V4 - Concrete & Shadow (Visual Alignment) */
+/* Art Details - Theatre Reveal Design */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-    --bg-wall: #1a1a1a;
-    --accent-orange: #ff6b35;
-    --glass-bg: rgba(10, 10, 10, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    /* Subtle white border */
+    --bg-dark: #000;
+    --accent-orange: #ff6a00;
+    --accent-gradient: linear-gradient(135deg, #ff6a00 0%, #ff9500 100%);
+    --glass-bg: rgba(15, 15, 15, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.1);
     --text-primary: #ffffff;
-    --text-muted: #999999;
-    --spotlight-color: rgba(255, 255, 255, 0.12);
+    --text-muted: #888888;
 }
 
-body {
-    background-color: #000;
-    color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    overflow: hidden;
-}
-
-/* --- Viewport & Scene Environment --- */
-.virtual-gallery-viewport {
+/* ========== THEATRE CONTAINER ========== */
+.art-theatre {
     position: relative;
     width: 100vw;
-    height: 100vh;
-    perspective: 1200px;
-    /* Stronger perspective for depth */
-    overflow: hidden;
-    background: #000;
-}
-
-.gallery-scene {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-}
-
-/* Concrete Wall & Floor */
-.scene-wall-back {
-    position: absolute;
-    top: 0;
-    left: -50%;
-    width: 200%;
-    height: 75%;
-    /* Horizon line at 75% */
-    /* Concrete Texture simulation using nose + gradient */
-    background:
-        radial-gradient(circle at 50% 0%, var(--spotlight-color) 0%, transparent 60%),
-        /* Main Spotlight Cone */
-        url('/static/uploads/custom_texture.png'),
-        /* Fallback or noise URL if available */
-        linear-gradient(to bottom, #222 0%, #111 100%);
-    background-blend-mode: overlay, multiply, normal;
-    transform: translateZ(-500px);
-    /* Push wall back */
-    z-index: 1;
-}
-
-.scene-floor {
-    position: absolute;
-    top: 75%;
-    left: -50%;
-    width: 200%;
-    height: 100%;
-    background:
-        linear-gradient(to bottom, #151515 0%, #050505 100%),
-        url('/static/uploads/custom_texture.png');
-    background-size: 200px;
-    transform: rotateX(90deg) translateZ(0) translateY(0);
-    /* Floor plane */
-    transform-origin: top center;
-    z-index: 1;
-    box-shadow: inset 0 20px 50px #000;
-    /* Shadow at wall meet */
-}
-
-/* --- Interactive Spotlight Logic (JS controlled usually, but base provided) --- */
-.spotlight-main {
-    position: absolute;
-    top: -30%;
-    left: 50%;
-    width: 60vw;
-    height: 100vh;
-    background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-    transform: translateX(-50%) rotateX(15deg);
-    pointer-events: none;
-    z-index: 2;
-    mix-blend-mode: overlay;
-}
-
-/* --- 3D Carousel --- */
-.art-carousel {
-    position: absolute;
-    top: 40%;
-    /* Moved UP from 55% to prevent overlap */
-    /* Centered vertically relative to Wall/Floor intersection */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 50vh;
-    transform-style: preserve-3d;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.art-frame {
-    position: absolute;
-    transform-style: preserve-3d;
-    cursor: pointer;
-    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.art-frame img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-    border: 12px solid #080808;
-    /* Dark framing */
-}
-
-/* Center Piece - "Hung" on wall */
-.center-frame {
-    width: 32vw;
-    max-width: 500px;
-    max-height: 45vh;
-    /* Restricted height to ensure clear separation from panel */
-    transform: translateZ(0);
-    z-index: 20;
-    /* Soft bloom from top spotlight */
-    filter: drop-shadow(0 50px 80px rgba(0, 0, 0, 0.6));
-}
-
-/* Side Pieces - Angled & Receded */
-.side-frame {
-    width: 22vw;
-    max-width: 350px;
-    opacity: 0.5;
-    filter: brightness(0.6) grayscale(20%);
-    z-index: 5;
-}
-
-.side-frame:hover {
-    opacity: 0.8;
-    filter: brightness(0.9) grayscale(0%);
-    transform: translateZ(20px);
-}
-
-.left-frame {
-    /* Angled towards viewer */
-    transform: translateX(-150%) translateZ(-200px) rotateY(35deg);
-}
-
-.right-frame {
-    transform: translateX(150%) translateZ(-200px) rotateY(-35deg);
-}
-
-/* Refined Shadows */
-.frame-shadow {
-    position: absolute;
-    bottom: -100px;
-    left: 10%;
-    width: 80%;
-    height: 40px;
-    background: rgba(0, 0, 0, 0.6);
-    filter: blur(20px);
-    transform: rotateX(90deg);
-    opacity: 0.8;
-}
-
-
-/* --- UI Panel (Reference Match) --- */
-.ui-overlay {
-    position: absolute;
-    bottom: 30px;
-    /* Floating just above bottom */
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    z-index: 100;
-}
-
-.intelligence-panel {
-    width: 65vw;
-    max-width: 1100px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--glass-border);
-    /* The specific orange border radius from reference or just standard rounded? 
-       Reference looks like an orange outline or accent. */
-    border-radius: 24px;
-    /* The Glow Border effect */
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 60px rgba(0, 0, 0, 0.5);
-    padding: 2.5rem 3rem;
-
-    /* Reveal Animation */
-    transform: translateY(20px);
-    opacity: 0;
-    animation: slideUpFade 0.8s ease forwards 0.5s;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.intelligence-panel:hover {
-    border-color: rgba(255, 107, 53, 0.4);
-    /* Subtle Orange Hover */
-    transform: translateY(0);
-}
-
-@keyframes slideUpFade {
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Top Badge */
-.category-pill {
-    display: inline-block;
-    background: linear-gradient(135deg, #ff8c00 0%, #ff5e00 100%);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 50px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.8rem;
-    box-shadow: 0 4px 15px rgba(255, 94, 0, 0.3);
-}
-
-/* Header */
-.panel-head h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 2.5rem;
-    margin: 0;
-    line-height: 1.1;
-    color: #fff;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.artist-name-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 0.5rem;
-    margin-bottom: 2rem;
-    color: #ccc;
-    font-size: 0.95rem;
-}
-
-.artist-mini-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* Grid Layout with Vertical Dividers */
-.panel-body-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1px 1.2fr 1px 1fr;
-    /* Content | Line | Content | Line | Content */
-    gap: 0;
-    align-items: start;
-}
-
-.vertical-divider {
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
-}
-
-.grid-col {
-    padding: 0 2rem;
-}
-
-.grid-col:first-child {
-    padding-left: 0;
-}
-
-.grid-col:last-child {
-    padding-right: 0;
-}
-
-/* Column Styles */
-.col-label {
-    display: block;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-muted);
-    margin-bottom: 1.2rem;
-    border-left: 2px solid var(--accent-orange);
-    padding-left: 8px;
-}
-
-.story-content {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #ddd;
-    max-width: 90%;
-}
-
-.spec-list {
+    min-height: calc(100vh - 80px);
+    background: var(--bg-dark);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 40px 20px 120px;
+
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.art-theatre::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+/* Global scrollbar hide for this page */
+html:has(.art-theatre),
+body:has(.art-theatre) {
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html:has(.art-theatre)::-webkit-scrollbar,
+body:has(.art-theatre)::-webkit-scrollbar {
+    display: none;
+}
+
+/* ========== BACK LINK ========== */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--text-primary);
+}
+
+.back-link i {
+    font-size: 0.8rem;
+}
+
+/* ========== NAVIGATION ARROWS ========== */
+.nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 1.2rem;
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+.nav-prev {
+    left: 25px;
+}
+
+.nav-next {
+    right: 25px;
+}
+
+.nav-arrow:hover {
+    background: var(--accent-orange);
+    border-color: var(--accent-orange);
+    transform: translateY(-50%) scale(1.1);
+    color: #fff;
+}
+
+/* ========== HERO ARTWORK ========== */
+.artwork-hero {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    animation: fadeInUp 1s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.artwork-image {
+    max-width: 100%;
+    max-height: 55vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+    transition: transform 0.5s ease;
+}
+
+.artwork-image:hover {
+    transform: scale(1.02);
+}
+
+/* ========== INFO PANEL ========== */
+.info-panel {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 2rem 2.5rem;
+    margin-top: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    animation: fadeInUp 1s cubic-bezier(0.2, 1, 0.2, 1) 0.2s forwards;
+    opacity: 0;
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ========== PANEL HEADER ========== */
+.panel-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1.5rem;
+}
+
+.category-badge {
+    display: inline-block;
+    background: var(--accent-gradient);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.8rem;
+}
+
+.artwork-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.6rem 0;
+    line-height: 1.2;
+}
+
+.artist-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.artist-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--glass-border);
+}
+
+.artist-avatar-placeholder {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.artist-name {
+    font-weight: 500;
+}
+
+/* ========== PANEL BODY GRID ========== */
+.panel-body {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 2rem;
+}
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-orange);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Description */
+.description-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #ccc;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+/* Specs */
+.specs-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
 }
 
 .spec-item {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    /* Very subtle separator */
-    padding-bottom: 4px;
 }
 
-.spec-item .key {
+.spec-key {
     color: var(--text-muted);
 }
 
-.spec-item .val {
-    font-weight: 600;
-    color: #fff;
+.spec-value {
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
-/* Investment Section */
-.investment-col {
-    display: flex;
-    flex-direction: column;
-    /* align-items: flex-end; reference has it right aligned or justified? */
+/* Investment */
+.investment-section {
+    text-align: center;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.price-tag {
+.price-display {
     font-family: 'Cinzel', serif;
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 1.5rem;
-}
-
-.price-tag .currency {
-    font-size: 1rem;
-    font-family: 'Inter', sans-serif;
-    color: #888;
-    font-weight: 400;
-    margin-left: 5px;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
 }
 
 .acquire-btn {
-    background: #fff;
-    color: #000;
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    background: var(--accent-gradient);
+    color: #fff;
     border: none;
-    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.85rem;
     letter-spacing: 1px;
     cursor: pointer;
-    width: 100%;
-    text-align: center;
-    transition: all 0.3s ease;
-    border-radius: 4px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 5px 20px rgba(255, 106, 0, 0.3);
+    font-family: 'Inter', sans-serif;
 }
 
 .acquire-btn:hover {
-    background: var(--accent-orange);
-    color: #fff;
-    box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 106, 0, 0.5);
 }
 
-/* Mobile Responsiveness */
+.acquire-btn:disabled {
+    background: #444;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.acquire-btn.success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.acquire-btn.error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== TOAST NOTIFICATION ========== */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-notification.success {
+    border-left: 4px solid #2ecc71;
+}
+
+.toast-notification.error {
+    border-left: 4px solid #e74c3c;
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 1024px) {
-    .panel-body-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
+    .panel-body {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .vertical-divider {
-        display: none;
+    .description-section {
+        grid-column: span 2;
     }
 
-    .grid-col {
-        padding: 0;
+    .investment-section {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-left: 0;
+        padding-top: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .art-theatre {
+        padding: 60px 15px 100px;
     }
 
-    .art-carousel {
-        height: 45vh;
-        top: 40%;
+    .back-link {
+        top: 15px;
+        left: 15px;
+        font-size: 0.8rem;
     }
 
-    .side-frame {
-        opacity: 0.3;
+    .nav-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
     }
 
-    .intelligence-panel {
-        width: 90vw;
+    .nav-prev {
+        left: 10px;
+    }
+
+    .nav-next {
+        right: 10px;
+    }
+
+    .artwork-hero {
+        padding: 10px;
+    }
+
+    .artwork-image {
+        max-height: 40vh;
+    }
+
+    .info-panel {
         padding: 1.5rem;
-        bottom: 20px;
-        max-height: 45vh;
-        overflow-y: auto;
+        border-radius: 16px;
+    }
+
+    .artwork-title {
+        font-size: 1.6rem;
+    }
+
+    .panel-body {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .description-section {
+        grid-column: span 1;
+    }
+
+    .investment-section {
+        text-align: left;
+        padding-top: 1rem;
+    }
+
+    .price-display {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .artwork-title {
+        font-size: 1.3rem;
+    }
+
+    .price-display {
+        font-size: 1.4rem;
+    }
+
+    .acquire-btn {
+        font-size: 0.75rem;
+        padding: 0.8rem;
     }
 }
