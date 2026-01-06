@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, session, render_template
 from models.art_queries import (
     add_art, get_all_artworks, get_art_by_id,
     delete_artwork, get_filtered_artworks, get_art_details,
-    get_neighbor_artworks
+    get_neighbor_artworks, search_artworks
 )
 
 art_bp = Blueprint("art", __name__, url_prefix="/art")
@@ -68,3 +68,12 @@ def filter_artworks_route():
     filters = request.get_json()
     result = get_filtered_artworks(filters)
     return jsonify(result)
+
+@art_bp.route('/search', methods=['GET'])
+def search_route():
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify([])
+    
+    results = search_artworks(query)
+    return jsonify(results)
