@@ -169,3 +169,35 @@ def get_neighbor_artworks(art_id):
     except Error as e:
         logger.error(f"DB error in get_neighbor_artworks: {e}")
         return {"next": None, "prev": None}
+
+def search_artworks(query):
+    """
+    Performs a fuzzy search across artworks.
+    Matches against: Title, Description, Category, and Artist Name.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        sql = """
+            SELECT a.art_id, a.title, a.category, a.image_path, a.price, u.name as artist_name 
+            FROM art a
+            JOIN users u ON a.email = u.email
+            WHERE 
+                a.title LIKE %s OR 
+                a.description LIKE %s OR 
+                a.category LIKE %s OR 
+                u.name LIKE %s
+            ORDER BY a.created_at DESC
+            LIMIT 20
+        """
+        
+        search_term = f"%{query}%"
+        params = (search_term, search_term, search_term, search_term)
+        
+        cursor.execute(sql, params)
+        return cursor.fetchall()
+        
+    except Error as e:
+        logger.error(f"DB error in search_artworks: {e}")
+        return []
