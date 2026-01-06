@@ -7,116 +7,95 @@
 {% endblock %}
 
 {% block content %}
-<div class="virtual-gallery-viewport">
+<div class="art-theatre">
 
-    <!-- Environment -->
-    <div class="gallery-scene">
-        <div class="scene-wall-back"></div>
-        <div class="scene-floor"></div>
-        <div class="spotlight-main"></div>
+    <!-- Back Link -->
+    <a href="{{ url_for('gallery') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Gallery
+    </a>
+
+    <!-- Navigation Arrows -->
+    {% if prev_art %}
+    <a href="{{ url_for('art.view_art_details_route', art_id=prev_art.art_id) }}" class="nav-arrow nav-prev"
+        aria-label="Previous artwork">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    {% endif %}
+    {% if next_art %}
+    <a href="{{ url_for('art.view_art_details_route', art_id=next_art.art_id) }}" class="nav-arrow nav-next"
+        aria-label="Next artwork">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+
+    <!-- Hero Artwork -->
+    <div class="artwork-hero">
+        <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="{{ artwork.title }}"
+            class="artwork-image" id="mainArtwork">
     </div>
 
-    <!-- 3D Carousel -->
-    <div class="art-carousel">
-        <!-- Left Neighbor -->
-        {% if prev_art %}
-        <div class="art-frame side-frame left-frame" onclick="window.navigateArt('{{ prev_art.art_id }}')">
-            <img src="/static/uploads/{{ prev_art.image_path.split('/')[-1] }}" alt="{{ prev_art.title }}">
-            <div class="frame-shadow"></div>
-        </div>
-        {% endif %}
+    <!-- Info Panel -->
+    <div class="info-panel">
+        <div class="panel-content">
 
-        <!-- Center (Hero) -->
-        <div class="art-frame center-frame">
-            <img src="/static/uploads/{{ artwork.image_path.split('/')[-1] }}" alt="{{ artwork.title }}"
-                id="mainArtImage">
-            <div class="frame-shadow"></div>
-        </div>
-
-        <!-- Right Neighbor -->
-        {% if next_art %}
-        <div class="art-frame side-frame right-frame" onclick="window.navigateArt('{{ next_art.art_id }}')">
-            <img src="/static/uploads/{{ next_art.image_path.split('/')[-1] }}" alt="{{ next_art.title }}">
-            <div class="frame-shadow"></div>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- UI Overlay (Below Artwork) -->
-    <div class="ui-overlay">
-        <div class="intelligence-panel">
-
-            <!-- Badge & Header -->
-            <div class="panel-head">
-                <span class="category-pill">{{ artwork.category }}</span>
-                <h1>{{ artwork.title }}</h1>
-
-                <div class="artist-name-row">
+            <!-- Header -->
+            <div class="panel-header">
+                <span class="category-badge">{{ artwork.category }}</span>
+                <h1 class="artwork-title">{{ artwork.title }}</h1>
+                <div class="artist-row">
                     {% if artwork.profile_pic %}
-                    <img src="/static/uploads/{{ artwork.profile_pic.split('/')[-1] }}" class="artist-mini-avatar"
+                    <img src="/static/uploads/{{ artwork.profile_pic.split('/')[-1] }}" class="artist-avatar"
                         alt="Artist">
+                    {% else %}
+                    <div class="artist-avatar-placeholder"><i class="fas fa-user"></i></div>
                     {% endif %}
-                    <span>{{ artwork.artist_name }}</span>
+                    <span class="artist-name">{{ artwork.artist_name }}</span>
                 </div>
             </div>
 
-            <!-- Grid Layout (Story | Specs | Investment) -->
-            <div class="panel-body-grid">
-
-                <!-- Col 1: Story -->
-                <div class="grid-col">
-                    <span class="col-label">The Story</span>
-                    <p class="story-content">
-                        {{ artwork.description }}
-                    </p>
+            <!-- Body Grid -->
+            <div class="panel-body">
+                <!-- Description -->
+                <div class="panel-section description-section">
+                    <span class="section-label">The Story</span>
+                    <p class="description-text">{{ artwork.description }}</p>
                 </div>
 
-                <!-- Divider -->
-                <div class="vertical-divider"></div>
-
-                <!-- Col 2: Specifications -->
-                <div class="grid-col">
-                    <span class="col-label">Specifications</span>
-                    <div class="spec-list">
+                <!-- Specs -->
+                <div class="panel-section specs-section">
+                    <span class="section-label">Specifications</span>
+                    <div class="specs-grid">
                         <div class="spec-item">
-                            <span class="key">Dimensions</span>
-                            <span class="val">Variable</span>
+                            <span class="spec-key">Medium</span>
+                            <span class="spec-value">{{ artwork.category }}</span>
                         </div>
                         <div class="spec-item">
-                            <span class="key">Medium</span>
-                            <span class="val">{{ artwork.category }}</span>
+                            <span class="spec-key">Year</span>
+                            <span class="spec-value">{{ artwork.created_at.strftime('%Y') }}</span>
                         </div>
                         <div class="spec-item">
-                            <span class="key">Year</span>
-                            <span class="val">{{ artwork.created_at.strftime('%Y') }}</span>
+                            <span class="spec-key">Dimensions</span>
+                            <span class="spec-value">Variable</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Divider -->
-                <div class="vertical-divider"></div>
-
-                <!-- Col 3: Investment -->
-                <div class="grid-col investment-col">
-                    <span class="col-label">Investment</span>
-                    <div class="price-tag">
-                        ${{ artwork.price }} <span class="currency">USD</span>
-                    </div>
+                <!-- Investment -->
+                <div class="panel-section investment-section">
+                    <span class="section-label">Investment</span>
+                    <div class="price-display">${{ artwork.price }}</div>
                     <button class="acquire-btn" data-art-id="{{ artwork.art_id }}">
-                        Acquire Artwork
+                        <span class="btn-text">Acquire Artwork</span>
+                        <span class="btn-loader" style="display:none;"><i
+                                class="fas fa-circle-notch fa-spin"></i></span>
                     </button>
                 </div>
-
             </div>
+
         </div>
     </div>
 
 </div>
 
-<!-- Helper script for navigation -->
-<script>
-    window.navigateArt = function (id) {
-        window.location.href = '/art/view/' + id;
-    }
-</script>
+{% block footer %}{% endblock %}
 {% endblock %}
