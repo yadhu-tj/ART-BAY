@@ -1,22 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Panel Hover Interaction (Supplemental to CSS) ---
-    // The CSS :hover handles the main expansion, but we can add sound or subtle tilt here if desired.
+    // ========== ADD TO CART ==========
+    const acquireBtn = document.querySelector('.acquire-btn');
 
-    // --- Add to Cart Logic (Re-implemented for new button structure) ---
-    const addToCartBtn = document.querySelector('.acquire-btn');
-
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', async (e) => {
+    if (acquireBtn) {
+        acquireBtn.addEventListener('click', async (e) => {
             const btn = e.currentTarget;
             const artId = btn.dataset.artId;
-            const originalContent = btn.innerHTML;
-            const btnText = btn.querySelector('span');
+            const btnText = btn.querySelector('.btn-text');
+            const btnLoader = btn.querySelector('.btn-loader');
+            const originalText = btnText.textContent;
 
-            // 1. Loading State
+            // Loading state
             btn.disabled = true;
-            if (btnText) btnText.textContent = 'Processing...';
-            btn.style.opacity = '0.7';
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-block';
 
             try {
                 const response = await fetch('/cart/add', {
@@ -28,101 +26,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // 2. Success State
-                    if (btnText) btnText.textContent = 'Acquired';
-                    btn.style.background = '#2ecc71';
-                    btn.style.color = 'white';
-
-                    showToast('Artwork added to collection.', 'success');
+                    // Success
+                    btnLoader.style.display = 'none';
+                    btnText.textContent = 'Added to Collection';
+                    btnText.style.display = 'inline-block';
+                    btn.classList.add('success');
+                    showToast('Artwork added to your collection!', 'success');
                     updateCartCounter();
 
-                    // Reset
+                    // Reset after delay
                     setTimeout(() => {
-                        btn.innerHTML = originalContent;
-                        btn.style.background = '';
-                        btn.style.color = '';
-                        btn.style.opacity = '1';
+                        btnText.textContent = originalText;
+                        btn.classList.remove('success');
                         btn.disabled = false;
                     }, 3000);
-
                 } else {
                     throw new Error(result.message || 'Failed to add to cart');
                 }
             } catch (error) {
-                console.error('Error adding to cart:', error);
-                if (btnText) btnText.textContent = 'Error';
-                btn.style.background = '#e74c3c';
+                console.error('Cart error:', error);
+                btnLoader.style.display = 'none';
+                btnText.textContent = 'Error';
+                btnText.style.display = 'inline-block';
+                btn.classList.add('error');
                 showToast(error.message, 'error');
 
                 setTimeout(() => {
-                    btn.innerHTML = originalContent;
-                    btn.style.background = '';
+                    btnText.textContent = originalText;
+                    btn.classList.remove('error');
                     btn.disabled = false;
                 }, 2000);
             }
         });
     }
 
-    // --- Toast Notification ---
+    // ========== TOAST NOTIFICATION ==========
     function showToast(message, type = 'success') {
+        // Remove existing toast
+        const existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+
         const toast = document.createElement('div');
         toast.className = `toast-notification ${type}`;
-        Object.assign(toast.style, {
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            background: type === 'success' ? '#1a1a1a' : '#e74c3c',
-            border: `1px solid ${type === 'success' ? '#2ecc71' : '#fff'}`,
-            color: 'white',
-            padding: '1rem 2rem',
-            borderRadius: '4px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-            zIndex: '1000',
-            opacity: '0',
-            transform: 'translateY(20px)',
-            transition: 'all 0.5s ease',
-            fontFamily: '"Inter", sans-serif',
-            fontSize: '0.9rem'
-        });
-
-        toast.innerHTML = type === 'success' ? `<span style="color:#2ecc71">●</span> &nbsp; ${message}` : `<span>●</span> &nbsp; ${message}`;
+        toast.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
         document.body.appendChild(toast);
 
+        // Trigger animation
         requestAnimationFrame(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateY(0)';
+            toast.classList.add('show');
         });
 
+        // Remove after delay
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(20px)';
-            setTimeout(() => toast.remove(), 500);
-        }, 3000);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
     }
 
+    // ========== CART COUNTER UPDATE ==========
     function updateCartCounter() {
-        const cartCounter = document.querySelector('.cart-counter');
-        if (cartCounter) {
+        const counter = document.querySelector('.cart-counter');
+        if (counter) {
             fetch('/cart/count')
                 .then(res => res.json())
                 .then(data => {
-                    cartCounter.textContent = data.count;
+                    counter.textContent = data.count;
+                    counter.style.display = data.count > 0 ? 'flex' : 'none';
                 })
-                .catch(err => console.error('Failed to update cart count:', err));
+                .catch(err => console.error('Cart count error:', err));
         }
     }
 
-    // --- Dynamic Spotlight Mouse Follow (Optional Polish) ---
-    // Moves the main spotlight slightly with mouse for 'living' feel
-    document.addEventListener('mousemove', (e) => {
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-
-        const spotlight = document.querySelector('.spotlight-main');
-        if (spotlight) {
-            const moveX = (x - 0.5) * 20; // range -10 to 10%
-            const moveY = (y - 0.5) * 20;
-            spotlight.style.transform = `translate(calc(-50% + ${moveX}px), ${moveY}px)`;
+    // ========== KEYBOARD NAVIGATION ==========
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            const prevLink = document.querySelector('.nav-prev');
+            if (prevLink) prevLink.click();
+        } else if (e.key === 'ArrowRight') {
+            const nextLink = document.querySelector('.nav-next');
+            if (nextLink) nextLink.click();
         }
     });
 
