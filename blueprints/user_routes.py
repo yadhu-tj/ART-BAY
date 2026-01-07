@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from models.user_queries import (
     get_user_by_email, update_user_profile, update_profile_pic, 
     update_user_password, get_user_orders_with_items, get_user_addresses,
-    confirm_order_receipt
+    confirm_order_receipt, get_order_by_id
 )
 from config.config import Config
 
@@ -183,3 +183,17 @@ def confirm_order(order_id):
     email = session['user']['email']
     result = confirm_order_receipt(order_id, email)
     return jsonify(result)
+
+@user_bp.route('/order/<int:order_id>')
+def view_order_tracking(order_id):
+    """Renders the cinematic order tracking page."""
+    if 'user' not in session:
+        return render_template('auth/login.html', error="Please login to view your orders.")
+    
+    email = session['user']['email']
+    order = get_order_by_id(order_id, email)
+    
+    if not order:
+        return render_template('404.html'), 404
+    
+    return render_template('order_tracking.html', order=order)
