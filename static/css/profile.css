@@ -338,3 +338,70 @@
 .text-warning {
     color: #ff9800 !important;
 }
+
+/* Track Order Link */
+.track-order-link {
+    color: var(--accent-orange);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 15px;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 106, 0, 0.3);
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.track-order-link:hover {
+    background: rgba(255, 106, 0, 0.1);
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+
+/* Order Status Badges */
+.order-status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.status-shipped {
+    background: rgba(33, 150, 243, 0.15);
+    color: #2196f3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.status-received {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* Confirm Receipt Button */
+.confirm-receipt-btn {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: #4caf50;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.confirm-receipt-btn:hover {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: #4caf50;
+}
