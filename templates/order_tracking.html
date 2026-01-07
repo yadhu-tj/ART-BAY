@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/order_tracking.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="order-tracking-page">
+
+    <!-- Ambient Background (changes based on status) -->
+    <div class="ambient-bg status-{{ order.order_status }}"></div>
+
+    <!-- Header -->
+    <div class="tracking-header">
+        <a href="/profile" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Profile
+        </a>
+        <div class="order-badge">
+            <span class="order-label">Order</span>
+            <span class="order-number">#{{ order.order_id }}</span>
+        </div>
+    </div>
+
+    <!-- Status Timeline -->
+    <div class="timeline-section">
+        <h2 class="section-title">Journey of Your Masterpiece</h2>
+
+        <div class="timeline">
+            {% set statuses = ['pending', 'shipped', 'received'] %}
+            {% set status_labels = {'pending': 'Curating', 'shipped': 'In Transit', 'received': 'Home Bound'} %}
+            {% set status_icons = {'pending': 'fa-palette', 'shipped': 'fa-shipping-fast', 'received': 'fa-home'} %}
+            {% set status_descriptions = {
+            'pending': 'Your artwork is being carefully prepared and curated for shipment.',
+            'shipped': 'Your masterpiece is on its way to you. Track its journey.',
+            'received': 'Welcome home! Your collection has grown.'
+            } %}
+
+            {% for status in statuses %}
+            {% set is_active = order.order_status == status %}
+            {% set is_completed = statuses.index(order.order_status) > statuses.index(status) %}
+
+            <div class="timeline-item {{ 'active' if is_active else '' }} {{ 'completed' if is_completed else '' }}">
+                <div class="timeline-icon">
+                    <i class="fas {{ status_icons[status] }}"></i>
+                </div>
+                <div class="timeline-content">
+                    <h3>{{ status_labels[status] }}</h3>
+                    <p>{{ status_descriptions[status] }}</p>
+                </div>
+            </div>
+            {% if not loop.last %}
+            <div class="timeline-connector {{ 'completed' if is_completed else '' }}"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="items-section">
+        <h2 class="section-title">Your Collection</h2>
+        <div class="items-grid">
+            {% for item in order.order_items %}
+            <div class="item-card">
+                <div class="item-img-wrapper">
+                    {% if item.image_path %}
+                    <img src="/static/uploads/{{ item.image_path.split('/')[-1] }}" alt="{{ item.title }}">
+                    {% else %}
+                    <div class="placeholder-img"><i class="fas fa-image"></i></div>
+                    {% endif %}
+                </div>
+                <div class="item-info">
+                    <h4 class="item-title">{{ item.title or 'Artwork' }}</h4>
+                    <p class="item-artist">{{ item.artist_name or 'Unknown Artist' }}</p>
+                    <span class="item-price">${{ item.price_at_purchase }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="summary-section glass-card">
+        <div class="summary-row">
+            <span>Order Date</span>
+            <span>{{ order.order_date.strftime('%B %d, %Y') if order.order_date else 'N/A' }}</span>
+        </div>
+        <div class="summary-row total">
+            <span>Total Value</span>
+            <span>${{ order.total_price }}</span>
+        </div>
+        {% if order.order_status == 'shipped' %}
+        <button class="confirm-btn" data-id="{{ order.order_id }}">
+            <i class="fas fa-check-circle"></i> Confirm Receipt
+        </button>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const confirmBtn = document.querySelector('.confirm-btn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', async () => {
+                const orderId = confirmBtn.dataset.id;
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                try {
+                    const res = await fetch(`/profile/orders/confirm/${orderId}`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Failed to confirm receipt.');
+                        confirmBtn.disabled = false;
+                        confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Receipt';
+                    }
+                } catch (e) {
+                    console.error(e);
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Receipt';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
