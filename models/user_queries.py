@@ -188,4 +188,39 @@ def confirm_order_receipt(order_id, email):
         logger.error(f"DB error in confirm_order_receipt: {e}")
         return {"status": "error", "message": str(e)}
 
+def get_order_by_id(order_id, email):
+    """Fetches a single order with its items for the user."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
         
+        # Get order info
+        order_sql = """
+            SELECT order_id, email, total_price, order_status, order_date
+            FROM orders
+            WHERE order_id = %s AND email = %s
+        """
+        cursor.execute(order_sql, (order_id, email))
+        order = cursor.fetchone()
+        
+        if not order:
+            return None
+        
+        # Get order items
+        items_sql = """
+            SELECT oi.art_id, oi.quantity, oi.price_at_purchase,
+                   a.title, a.image_path, u.name as artist_name
+            FROM order_items oi
+            LEFT JOIN art a ON oi.art_id = a.art_id
+            LEFT JOIN users u ON a.email = u.email
+            WHERE oi.order_id = %s
+        """
+        cursor.execute(items_sql, (order_id,))
+        items = cursor.fetchall()
+        
+        order['order_items'] = items
+        return order
+        
+    except Error as e:
+        logger.error(f"DB error in get_order_by_id: {e}")
+        return None
